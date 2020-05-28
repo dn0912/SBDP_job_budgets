@@ -3,6 +3,7 @@ service: lambda-gsd-index-calculator
 custom:
   S3_BUCKET: test-task-update-data-v1
   S3_FILE: test_pretty.json
+  S3_FILE_5TASKS: test_5tasks.json
 
 provider:
   name: aws
@@ -22,3 +23,11 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE}
+  calculate5:
+    description: Calculate GSD index function
+    handler: handler.calculateGSDIndex
+    events:
+      - http: GET calculate5
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      FILE: ${self:custom.S3_FILE_5TASKS}
