@@ -49,7 +49,7 @@ const createTask = (CONTEXT_SET) => {
 const updateTaskStatus = (task, status) => ({
   ...task,
   statusId: status,
-  updateDate: task.updateDate + 50400000,
+  updateDate: task.updateDate + 50400000, // + 14 hours
 })
 
 const main = () => {
@@ -71,7 +71,8 @@ const main = () => {
 
   const taskEvents = []
 
-  for (let i = 0; i < 100000; i++) {
+  // for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < 100; i++) {
     const newTask = createTask(CONTEXT_SET)
     const taskInProgress = updateTaskStatus(newTask, STATUS_ARRAY[1])
     const taskCompleted = updateTaskStatus(newTask, STATUS_ARRAY[2])

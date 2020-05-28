@@ -1,0 +1,24 @@
+service: lambda-gsd-index-calculator
+
+custom:
+  S3_BUCKET: test-task-update-data-v1
+  S3_FILE: test_pretty.json
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+      Resource: "arn:aws:s3:::${self:custom.S3_BUCKET}/*"
+
+functions:
+  calculate:
+    description: Calculate GSD index function
+    handler: handler.calculateGSDIndex
+    events:
+      - http: GET calculate
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      FILE: ${self:custom.S3_FILE}

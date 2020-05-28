@@ -1,0 +1,14 @@
+{
+  "name": "lambda_gsd_index_calculator",
+  "version": "1.0.0",
+  "description": "Single lambda function to calculate productivity index",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anh Duc Nguyen",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.685.0"
+  }
+}
