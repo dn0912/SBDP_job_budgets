@@ -9,6 +9,8 @@ serverless deploy --aws-profile [PROFILE]
 
 # invoke the Lambda directly and see resulting log via
 serverless invoke --function [FUNCTION NAME] --log --aws-profile [PROFILE]
-
 # curl https://XXXXXXX.execute-api.[YOUR_REGION].amazonaws.com/[ENDPOINT]
+
+# logs with tailing flag
+sls logs -f [FUNCTION NAME] -t --aws-profile [PROFILE]
 ```
