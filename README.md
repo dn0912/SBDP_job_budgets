@@ -13,4 +13,7 @@ serverless invoke --function [FUNCTION NAME] --log --aws-profile [PROFILE]
 
 # logs with tailing flag
 sls logs -f [FUNCTION NAME] -t --aws-profile [PROFILE]
+
+# remove services in current working directory
+sls remove --aws-profile [PROFILE]
 ```

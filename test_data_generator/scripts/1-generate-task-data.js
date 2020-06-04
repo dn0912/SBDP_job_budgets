@@ -97,7 +97,7 @@ const taskTemplate = {
   },
   priority: 1577724550781,
   title: "dummy test task title",
-  description: "this is a description of a tast",
+  description: "this is a description of a task",
   labels: [],
   humanTaskId: null,
 }
@@ -121,10 +121,21 @@ const createTask = (CONTEXT_SET) => {
   }
 }
 
+const getRandomAdditionMilliSecTime = (min, max) => {
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
 const updateTaskStatus = (task, status) => ({
   ...task,
   statusId: status,
-  updateDate: task.updateDate + 50400000, // + 14 hours
+  // updateDate: task.updateDate + 1000 * 60 * 60 * 14,
+  updateDate: task.updateDate + getRandomAdditionMilliSecTime(1000 * 60 * 60 * 4, 1000*60*60*12), // between 4 - 12 hours
+})
+
+const updateTaskDetails = (task, updatePayload) => ({
+  ...task,
+  ...updatePayload,
+  updateDate: task.updateDate + getRandomAdditionMilliSecTime(1000 * 60 * 5, 1000 * 60 * 60 * 6), // between 5min - 6h
 })
 
 const createEvent = (newTask, oldTask = {}) => ({
@@ -147,7 +158,8 @@ const main = () => {
   const taskEvents = []
   // const randomContextSet = generateRandomContextSet(1, 1, 1)
   const randomContextSet = [CONTEXT_SET]
-  const taskAmount = 1
+  const taskAmount = 1000
+
 
   randomContextSet.forEach(contextSet => {
     for (let i = 0; i < taskAmount; i++) {
@@ -155,11 +167,26 @@ const main = () => {
       const taskInProgress = updateTaskStatus(newTask, STATUS_ARRAY[1])
       const taskCompleted = updateTaskStatus(newTask, STATUS_ARRAY[2])
 
-      taskEvents.push(
-        createEvent(newTask),
-        createEvent(taskInProgress, newTask),
-        createEvent(taskCompleted, taskInProgress)
-      )
+      // 1. create task event
+      taskEvents.push(createEvent(newTask))
+
+      // 80% of updating task details
+      // if (Math.random() < 0.8) {
+        const updatedDescriptionTask = updateTaskDetails(newTask, { description: 'has changed' })
+        taskEvents.push(createEvent(updatedDescriptionTask, newTask))
+      // }
+
+      // 2. from created/planned status to in progress
+      taskEvents.push(createEvent(taskInProgress, newTask))
+
+      // 80% of updating task details again
+      // if (Math.random() < 0.8) {
+        const updatedTitleTask = updateTaskDetails(newTask, { title: 'title has changed' })
+        taskEvents.push(createEvent(updatedTitleTask, newTask))
+      // }
+
+      // 3. from in progress to completed
+      taskEvents.push(createEvent(taskCompleted, taskInProgress))
     }
   })
 
