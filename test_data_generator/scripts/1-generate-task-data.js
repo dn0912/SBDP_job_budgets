@@ -172,21 +172,21 @@ const main = () => {
 
       // 80% of updating task details
       // if (Math.random() < 0.8) {
-        const updatedDescriptionTask = updateTaskDetails(newTask, { description: 'has changed' })
-        taskEvents.push(createEvent(updatedDescriptionTask, newTask))
+        const updatedDescriptionNewTask = updateTaskDetails(newTask, { description: 'has changed' })
+        taskEvents.push(createEvent(updatedDescriptionNewTask, newTask))
       // }
 
       // 2. from created/planned status to in progress
-      taskEvents.push(createEvent(taskInProgress, newTask))
+      taskEvents.push(createEvent(taskInProgress, updatedDescriptionNewTask))
 
       // 80% of updating task details again
       // if (Math.random() < 0.8) {
-        const updatedTitleTask = updateTaskDetails(newTask, { title: 'title has changed' })
-        taskEvents.push(createEvent(updatedTitleTask, newTask))
+        const updatedTitleInProgressTask = updateTaskDetails(taskInProgress, { title: 'title has changed' })
+        taskEvents.push(createEvent(updatedTitleInProgressTask, taskInProgress))
       // }
 
       // 3. from in progress to completed
-      taskEvents.push(createEvent(taskCompleted, taskInProgress))
+      taskEvents.push(createEvent(taskCompleted, updatedTitleInProgressTask))
     }
   })
 
