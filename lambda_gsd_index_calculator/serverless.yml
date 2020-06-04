@@ -4,6 +4,8 @@ custom:
   S3_BUCKET: test-task-update-data-v1
   S3_FILE: test_pretty.json
   S3_FILE_5TASKS: test_5tasks.json
+  S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
+  S3_TEST_RESULT_SUBFOLDER: test_results
 
 provider:
   name: aws
@@ -13,7 +15,11 @@ provider:
     - Effect: Allow
       Action:
         - s3:GetObject
-      Resource: "arn:aws:s3:::${self:custom.S3_BUCKET}/*"
+        - s3:PutObject
+        - apigateway:POST
+      Resource: 
+        - arn:aws:s3:::${self:custom.S3_BUCKET}/*
+        - arn:aws:apigateway:::/*
 
 functions:
   calculate:
@@ -25,10 +31,21 @@ functions:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE}
   calculate5:
-    description: Calculate GSD index function
+    description: Calculate GSD index function - test data consists of 5 tasks
     handler: handler.calculateGSDIndex
     events:
       - http: GET calculate5
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE_5TASKS}
+  preprocess1k:
+    description: preprocess task update data - test data consists of 1000 tasks
+    handler: src/preprocesser.readandFilterFile
+    events:
+      - http: 
+          path: preprocess1k
+          method: post
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      FILE: ${self:custom.S3_PREPROCESS_1000TASKS}
+      RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}

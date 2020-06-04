@@ -9,6 +9,7 @@
   "author": "Anh Duc Nguyen",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.685.0"
+    "aws-sdk": "^2.685.0",
+    "moment": "^2.26.0"
   }
 }
