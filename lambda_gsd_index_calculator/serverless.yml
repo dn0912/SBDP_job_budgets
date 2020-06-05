@@ -1,25 +1,29 @@
 service: lambda-gsd-index-calculator
 
 custom:
+  REGION: eu-central-1
   S3_BUCKET: test-task-update-data-v1
   S3_FILE: test_pretty.json
   S3_FILE_5TASKS: test_5tasks.json
   S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
   S3_TEST_RESULT_SUBFOLDER: test_results
+  SQS_NAME: PreprocessedDataQueue
 
 provider:
   name: aws
   runtime: nodejs12.x
-  region: eu-central-1
+  region: ${self:custom.REGION}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - s3:GetObject
         - s3:PutObject
         - apigateway:POST
+        - sqs:*
       Resource: 
         - arn:aws:s3:::${self:custom.S3_BUCKET}/*
         - arn:aws:apigateway:::/*
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
 
 functions:
   calculate:
@@ -49,3 +53,21 @@ functions:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_PREPROCESS_1000TASKS}
       RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME}
+  calculate1k:
+    description: calulator lambda after receiving sqs message - fetch cleaned up test data from S3
+    handler: src/calculator.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PreprocessedDataQueue
+              - Arn
+
+resources:
+  Resources:
+    PreprocessedDataQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME}
