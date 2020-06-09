@@ -64,6 +64,9 @@ functions:
             Fn::GetAtt:
               - PreprocessedDataQueue
               - Arn
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
 
 resources:
   Resources:
