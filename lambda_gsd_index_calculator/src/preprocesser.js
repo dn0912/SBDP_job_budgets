@@ -47,7 +47,8 @@ module.exports.readandFilterFile = async (event, context) => {
   console.log('+++event', event)
   console.log('+++context', context)
   try {
-    const s3FileContentAsString = await readFile(BUCKET, FILE)
+    const inputFileName = (event && event.fileName) || FILE
+    const s3FileContentAsString = await readFile(BUCKET, inputFileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = filterUnnecessaryUpdates(s3FileContent)
     const fileName = await putFile(cleanTaskUpdates)

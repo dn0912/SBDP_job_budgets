@@ -30,12 +30,14 @@ module.exports.startJob = async (event, context) => {
   const preprocessorLambdaParams = (payload = {}) => ({
     FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
     InvocationType: 'Event',
-    Payload: JSON.stringify({hello: 'world'}),
+    Payload: JSON.stringify(payload),
   })
 
   // trigger 4 lambdas for gsd calculation
   const result = await Promise.all(inputArray.map(async (fileName) => {
-    const data = await invokeLambda(preprocessorLambdaParams())
+    const data = await invokeLambda(preprocessorLambdaParams({
+      fileName,
+    }))
     console.log('+++data.Payload', data.Payload)
     return data.Payload
   }))
