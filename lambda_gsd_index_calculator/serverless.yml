@@ -21,11 +21,19 @@ provider:
         - apigateway:POST
         - sqs:*
         - lambda:InvokeFunction
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
       Resource: 
         - arn:aws:s3:::${self:custom.S3_BUCKET}/*
         - arn:aws:apigateway:::/*
         - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
         - arn:aws:lambda:${self:custom.REGION}:*:function:*
+        - "*"
+  tracing:
+    apiGateway: true
+    lambda: true
+    s3: true
+
 
 functions:
   # *******************
