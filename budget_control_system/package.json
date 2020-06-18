@@ -1,0 +1,26 @@
+{
+  "name": "budget_control_system",
+  "version": "1.0.0",
+  "description": "## About this project",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/.bin/nodemon --require dotenv/config --exec babel-node --inspect src/index.js",
+    "lint": "eslint \"**/*.js\""
+  },
+  "author": "Anh Duc Nguyen",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/node": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-chai-friendly": "^0.6.0",
+    "eslint-plugin-import": "^2.21.2",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
