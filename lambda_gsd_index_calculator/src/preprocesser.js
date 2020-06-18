@@ -62,6 +62,7 @@ module.exports.readandFilterFile = async (event, context) => {
       QueueUrl: queueUrl,
     }
 
+    // Sends single message to SQS for further process
     const test = await sendSQSMessage(sqsPayload)
 
     console.log('+++sqsPayload', sqsPayload)
