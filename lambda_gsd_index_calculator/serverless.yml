@@ -18,6 +18,8 @@ provider:
       Action:
         - s3:GetObject
         - s3:PutObject
+        - s3:ListBucket
+        - s3:DeleteObject
         - apigateway:POST
         - sqs:*
         - lambda:InvokeFunction
@@ -36,6 +38,15 @@ provider:
 
 
 functions:
+  # *******************
+  # usefull helper functions
+  cleanup:
+    description: cleanup S3 directories
+    handler: src/helper.cleanup
+    events:
+      - http: GET cleanup
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
   # *******************
   # FIRST ITERATION: SINGLE LAMBDA
   calculate:
