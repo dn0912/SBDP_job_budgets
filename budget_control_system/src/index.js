@@ -1,3 +1,15 @@
-console.log('Hello ever running Node.js project.')
+import express from 'express'
 
-console.log(process.env.MY_SECRET)
+const app = express()
+const port = process.env.PORT || 3000
+
+app.get('/', (req, res) => res.status(200).json({
+  hello: 'world!',
+}))
+
+app.listen(
+  port,
+  () => console.log(`App listening at http://localhost:${port}`),
+)
+
+export default app
