@@ -1,4 +1,5 @@
-const AWS = require('aws-sdk')
+const AWSXRay = require('aws-xray-sdk-core')
+const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const lambda = new AWS.Lambda()
 
 const { promisify } = require('util')
@@ -13,6 +14,8 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
   Asynchronous invokation to trigger multiple lambdas with further preprocessing and calculation
 */
 
+// TODO: ONLY HELPER FUNCTION
+const serialize = (object) => JSON.stringify(object, null, 2)
 
 /*
   entry point of SBDP app with definition of
@@ -20,6 +23,11 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
   2. start/stop job entry point
 */
 module.exports.startJob = async (event, context) => {
+
+  console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
+  console.log('## CONTEXT: ' + serialize(context))
+  console.log('## EVENT: ' + serialize(event))
+
   const inputArray = [
     'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
@@ -27,25 +35,17 @@ module.exports.startJob = async (event, context) => {
     'test_with_description_title_change_2000_single.json',
   ]
 
-  const preprocessorLambdaParams = (payload = {}) => ({
-    FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
-    InvocationType: 'Event',
-    Payload: JSON.stringify(payload),
+  const promises = inputArray.map(fileName => {
+    const payload = {
+      fileName
+    }
+    return invokeLambda({
+      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
+      InvocationType: 'Event',
+      Payload: JSON.stringify(payload),
+    })
   })
 
-  // trigger 4 lambdas for gsd calculation
-  const result = await Promise.all(inputArray.map(async (fileName) => {
-    const data = await invokeLambda(preprocessorLambdaParams({
-      fileName,
-    }))
-    console.log('+++data.Payload', data.Payload)
-    return data.Payload
-  }))
-
-  console.log('+++result', result)
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(result),
-  }
+  const test = await Promise.all(promises)
+  console.log('+++test', test)
 }

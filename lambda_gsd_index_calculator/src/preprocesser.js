@@ -43,7 +43,7 @@ const filterUnnecessaryUpdates = (tasksUpdateArray) => {
   return filteredTaskUpdateArray
 }
 
-module.exports.readandFilterFile = async (event, context) => {
+module.exports.readAndFilterFile = async (event, context) => {
   console.log('+++event', event)
   console.log('+++context', context)
   try {
