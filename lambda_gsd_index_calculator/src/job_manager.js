@@ -17,10 +17,19 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
 // TODO: ONLY HELPER FUNCTION
 const serialize = (object) => JSON.stringify(object, null, 2)
 
+// add custom Lambda subsegments
+const addLambdaSubsegments = (xray) => {
+  const segment = xray.getSegment()
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('hello world')
+  console.log('+++subsegment', subsegment)
+  subsegment.close()
+}
+
 /*
   entry point of SBDP app with definition of
-  1. batch size
-  2. start/stop job entry point
+  1. which files should be processed by the preprocessed lambdas
+  2. start job entry point
 */
 module.exports.startJob = async (event, context) => {
 
@@ -28,12 +37,15 @@ module.exports.startJob = async (event, context) => {
   console.log('## CONTEXT: ' + serialize(context))
   console.log('## EVENT: ' + serialize(event))
 
+  // TODO: batch files based on batch size coming from request
   const inputArray = [
     'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
     'test_with_description_title_change_1500_single.json',
     'test_with_description_title_change_2000_single.json',
   ]
+
+  addLambdaSubsegments(AWSXRay)
 
   const promises = inputArray.map(fileName => {
     const payload = {
@@ -46,6 +58,6 @@ module.exports.startJob = async (event, context) => {
     })
   })
 
-  const test = await Promise.all(promises)
-  console.log('+++test', test)
+  const result = await Promise.all(promises)
+  return result
 }
