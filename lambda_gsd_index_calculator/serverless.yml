@@ -104,12 +104,12 @@ functions:
       RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
   # *******************
   # THIRD ITERATION: MANAGER WHICH ORCHESTRATES LAMBDAS IN THE JOB
-  start_single_job:
+  start-job:
     description: >
       Single endpoint to trigger a job
     handler: src/job_manager.startJob
     events:
-      - http: GET result
+      - http: GET start-job
 
 resources:
   Resources:

@@ -18,13 +18,13 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 // add custom Lambda subsegments
-const addLambdaSubsegments = (xray) => {
-  const segment = xray.getSegment()
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('hello world')
-  console.log('+++subsegment', subsegment)
-  subsegment.close()
-}
+// const addLambdaSubsegments = (xray, subsegmentName) => {
+//   const segment = xray.getSegment()
+//   console.log('+++segment', segment)
+//   const subsegment = segment.addNewSubsegment(subsegmentName)
+//   console.log('+++subsegment', subsegment)
+//   subsegment.close()
+// }
 
 /*
   entry point of SBDP app with definition of
@@ -32,6 +32,13 @@ const addLambdaSubsegments = (xray) => {
   2. start job entry point
 */
 module.exports.startJob = async (event, context) => {
+  const segment = AWSXRay.getSegment()
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('start jobmanager')
+  console.log('+++subsegment', subsegment)
+
+  // addLambdaSubsegments(AWSXRay, 'start jobmanager')
+
 
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
   console.log('## CONTEXT: ' + serialize(context))
@@ -42,10 +49,8 @@ module.exports.startJob = async (event, context) => {
     'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
     'test_with_description_title_change_1500_single.json',
-    'test_with_description_title_change_2000_single.json',
+    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
-
-  addLambdaSubsegments(AWSXRay)
 
   const promises = inputArray.map(fileName => {
     const payload = {
@@ -59,5 +64,10 @@ module.exports.startJob = async (event, context) => {
   })
 
   const result = await Promise.all(promises)
+  console.log('+++result', result)
+  // addLambdaSubsegments(AWSXRay, 'end jobmanager')
+  const endSubsegment = segment.addNewSubsegment('end jobmanager')
+  console.log('+++endsubsegment', endSubsegment)
+  subsegment.close()
   return result
 }
