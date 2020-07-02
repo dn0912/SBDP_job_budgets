@@ -3,9 +3,15 @@ import bodyParser from 'body-parser'
 import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
 import DynamoDB from './service/trace-store/dynamo'
+import PriceList from './service/cost-control/price-list'
+
+const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
+
 const traceStore = new DynamoDB()
+const priceList = new PriceList()
+
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.text({
@@ -36,6 +42,8 @@ app.post('/stop', () => {
 
 })
 
+// **************
+// TEST ROUTES!?!
 app.post('/test-put-db', async (req, res) => {
   console.log('+++data', req.body)
   const createdItem = await traceStore.put('test')
@@ -52,6 +60,28 @@ app.get('/test-get-db', async (req, res) => {
     hello: 'world'
   })
 })
+
+app.get('/test-get-prices', async (req, res) => {
+  const response = await priceList.describeServices()
+  console.log('+++response', response)
+  console.log('+++Service', response.Services.find((srvc) => srvc.ServiceCode === 'AWSLambda'))
+  console.log('+++Service', response.Services.find((srvc) => srvc.ServiceCode === 'AmazonDynamoDB'))
+
+  console.log('+++describeLambdaServices', (await priceList.describeLambdaServices()).Services[0])
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-products', async (req, res) => {
+  const response = await priceList.getProducts()
+  console.log('+++response', serialize(response))
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+// TEST ROUTES!?!
+// **************
 
 app.listen(
   port,
