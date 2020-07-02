@@ -25,20 +25,21 @@ class PriceList {
     return response
   }
 
-  /* { ServiceCode: 'AWSLambda',
-  AttributeNames:
-   [ 'productFamily',
-     'termType',
-     'usagetype',
-     'locationType',
-     'Restriction',
-     'servicecode',
-     'groupDescription',
-     'location',
-     'servicename',
-     'group' ] }
-  */
   async describeLambdaServices() {
+  /*
+  { ServiceCode: 'AWSLambda',
+    AttributeNames:
+    [ 'productFamily',
+      'termType',
+      'usagetype',
+      'locationType',
+      'Restriction',
+      'servicecode',
+      'groupDescription',
+      'location',
+      'servicename',
+      'group' ] }
+  */
     const param = {
       FormatVersion: 'aws_v1',
       ServiceCode: 'AWSLambda'
@@ -47,29 +48,43 @@ class PriceList {
     return response
   }
 
+  async describeS3Services() {
+    /*
+      { ServiceCode: 'AmazonS3',
+        AttributeNames:
+        [ 'fromLocationType',
+          'productFamily',
+          'volumeType',
+          'durability',
+          'termType',
+          'usagetype',
+          'locationType',
+          'toLocationType',
+          'availability',
+          'toLocation',
+          'storageClass',
+          'feeDescription',
+          'servicecode',
+          'groupDescription',
+          'feeCode',
+          'transferType',
+          'location',
+          'servicename',
+          'fromLocation',
+          'operation',
+          'group' ] }
+    */
+    const param = {
+      FormatVersion: 'aws_v1',
+      ServiceCode: 'AmazonS3'
+    }
+    const response = await this.priceListService.describeServices(param).promise()
+    return response
+  }
+
   // TODO:
   // example code from https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Pricing.html#getProducts-property is not working
-  async getProducts(region = 'eu-central-1') {
-    // const param = {
-    // Filters: [{
-    //   Field: 'serviceCode',
-    //   Type: 'TERM_MATCH',
-    //   Value: 'AmazonDynamoDB'
-    // }],
-    // }
-
-    // const param = {
-    //   ServiceCode: 'AmazonEC2',
-    //   Filters: [
-    //     {
-    //       Field: 'ServiceCode',
-    //       Type: 'TERM_MATCH',
-    //       Value: 'AmazonEC2'
-    //     },
-    //   ],
-    //   FormatVersion: 'aws_v1',
-    //   MaxResults: 1
-    // }
+  async getLambdaProducts(region = 'eu-central-1') {
     const LOCATION_MAP = {
       'eu-central-1': 'EU (Frankfurt)'
     }
@@ -81,6 +96,33 @@ class PriceList {
           Field: 'servicecode',
           Type: 'TERM_MATCH',
           Value: 'AWSLambda'
+        },
+        {
+          Field: 'location',
+          Type: 'TERM_MATCH',
+          Value: LOCATION_MAP[region]
+        },
+      ],
+      FormatVersion: 'aws_v1',
+      MaxResults: 30,
+    }
+
+    const response = await this.priceListService.getProducts(param).promise()
+    return response
+  }
+
+  async getS3Products(region = 'eu-central-1') {
+    const LOCATION_MAP = {
+      'eu-central-1': 'EU (Frankfurt)'
+    }
+
+    const param = {
+      ServiceCode: 'AmazonS3',
+      Filters: [
+        {
+          Field: 'servicecode',
+          Type: 'TERM_MATCH',
+          Value: 'AmazonS3'
         },
         {
           Field: 'location',

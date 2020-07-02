@@ -44,6 +44,8 @@ app.post('/stop', () => {
 
 // **************
 // TEST ROUTES!?!
+
+// AWS DynamoDB
 app.post('/test-put-db', async (req, res) => {
   console.log('+++data', req.body)
   const createdItem = await traceStore.put('test')
@@ -61,6 +63,7 @@ app.get('/test-get-db', async (req, res) => {
   })
 })
 
+// AWS Price List Service API
 app.get('/test-get-prices', async (req, res) => {
   const response = await priceList.describeServices()
   console.log('+++response', response)
@@ -74,12 +77,15 @@ app.get('/test-get-prices', async (req, res) => {
 })
 
 app.get('/test-get-products', async (req, res) => {
-  const response = await priceList.getProducts()
-  console.log('+++response', serialize(response))
+  // const response = await priceList.getLambdaProducts()
+  const response = await priceList.getS3Products()
+  // console.log('+++response', serialize(response))
+  console.log('+++describeS3Services', (await priceList.describeS3Services()).Services[0])
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })
 })
+
 // TEST ROUTES!?!
 // **************
 
