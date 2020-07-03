@@ -17,15 +17,6 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
 // TODO: ONLY HELPER FUNCTION
 const serialize = (object) => JSON.stringify(object, null, 2)
 
-// add custom Lambda subsegments
-const addLambdaSubsegments = (xray, subsegmentName = 'lambda_tracer') => {
-  const segment = xray.getSegment()
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment(subsegmentName)
-  console.log('+++subsegment', subsegment)
-  subsegment.close()
-}
-
 // TODO: remove later
 // simulate slow function
 const slowDown = async (ms) => {
@@ -39,13 +30,24 @@ const slowDown = async (ms) => {
   2. start job entry point
 */
 module.exports.startJob = async (event, context) => {
-  const segment = AWSXRay.getSegment()
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('start jobmanager')
-  subsegment.addMetadata('hello', 'world', 'my namespace')
-  console.log('+++subsegment', subsegment)
 
-  // addLambdaSubsegments(AWSXRay)
+  // *******
+  // TRACING
+  // const segment = AWSXRay.getSegment()
+  // console.log('+++segment', segment)
+  // const subsegment = segment.addNewSubsegment('start jobmanager')
+  // subsegment.addMetadata('hello', 'world', 'my namespace')
+  // console.log('+++subsegment', subsegment)
+  const segment = AWSXRay.getSegment()
+  const eventBody = JSON.parse(event.body)
+  const jobId = eventBody.jobId || 'dummyId'
+  console.log('+++jobId', jobId)
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('job manager subsegment')
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'AWSLambda')
+  console.log('+++subsegment', subsegment)
+  // *******
 
 
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
@@ -73,12 +75,15 @@ module.exports.startJob = async (event, context) => {
   })
 
   const result = await Promise.all(promises)
+  console.log('+++result', result)
 
   await slowDown(2000)
 
-  console.log('+++result', result)
-  // addLambdaSubsegments(AWSXRay, 'end jobmanager')
+  // *******
+  // TRACING
   subsegment.close()
+  // *******
+
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
