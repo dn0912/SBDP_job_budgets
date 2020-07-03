@@ -69,6 +69,7 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE}
+    timeout: 10
   calculate5:
     description: >
       Same as calculate function:
@@ -80,6 +81,7 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE_5TASKS}
+    timeout: 10
   # *******************
   # SECOND ITERATION: INTERCONNECTED LAMBDAS WITH SQS AND S3
   preprocess1k:
@@ -97,6 +99,7 @@ functions:
       RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
       REGION: ${self:custom.REGION}
       QUEUE_NAME: ${self:custom.SQS_NAME}
+    timeout: 10
   calculate1k:
     description: >
       Single lambda - calulator lambda after receiving sqs message,
@@ -111,6 +114,7 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
+    timeout: 10
   # *******************
   # THIRD ITERATION: MANAGER WHICH ORCHESTRATES LAMBDAS IN THE JOB
   start-job:
