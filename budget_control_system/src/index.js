@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
 import uuid from 'node-uuid'
+import { get } from 'lodash'
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
@@ -140,11 +141,15 @@ app.get('/test-get-xraydata', async (req, res) => {
 
 app.get('/test-get-xraysummary', async (req, res) => {
   // Dateformat in traces are like: 1593786073.729
-  const startTime = 1593787752131 / 1000
+  const startTime = 1593794642856 / 1000
   const endTime = Date.now() / 1000
   const traceData = await tracer.getXRayTraceSummaries(startTime, endTime)
   console.log('+++traceData++++', traceData)
   console.log('+++traceData', serialize(traceData))
+  const lambdaDurations = traceData.TraceSummaries
+    .filter((trace) => get(trace, 'Annotations.serviceType[0].AnnotationValue.StringValue', '') === 'AWSLambda')
+    .map((trace) => trace.Duration)
+  console.log('+++lambdaDurations', lambdaDurations)
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })
