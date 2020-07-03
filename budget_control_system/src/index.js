@@ -4,6 +4,7 @@ import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
+import Tracer from './service/tracer'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -11,6 +12,7 @@ const port = process.env.PORT || 3000
 
 const traceStore = new DynamoDB()
 const priceList = new PriceList()
+const tracer = new Tracer()
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -22,15 +24,21 @@ app.get('/', (req, res) => res.status(200).json({
   hello: 'world!',
 }))
 
+/**
+ * start serverless big data processing tracing endpoint
+ *
+ * @param {string} jobUrl - start endpoint of the serverless big data processing job
+ *
+ * @returns {object}
+*/
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
-  const jobUrl = 'https://www.google.com'
-  // const jobUrl = 'https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start-single-job'
+  const jobUrl = 'https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start-single-job'
 
   const response = await superagent
     .get(jobUrl)
 
-  // console.log('+++', response)
+  console.log('+++', response)
   console.log('+++data', req.body)
 
   res.status(HttpStatus.OK).json({
@@ -38,6 +46,9 @@ app.post('/start-tracing', async (req, res) => {
   })
 })
 
+/**
+ * stop serverless big data processing tracing endpoint
+*/
 app.post('/stop', () => {
 
 })
@@ -78,9 +89,38 @@ app.get('/test-get-prices', async (req, res) => {
 
 app.get('/test-get-products', async (req, res) => {
   // const response = await priceList.getLambdaProducts()
-  const response = await priceList.getS3Products()
+  // const response = await priceList.getS3Products()
   // console.log('+++response', serialize(response))
-  console.log('+++describeS3Services', (await priceList.describeS3Services()).Services[0])
+  console.log('+++describeSQSServices', (await priceList.describeSQSServices()))
+
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-xraydata', async (req, res) => {
+  const traceIds = ['1-5efdc64d-851fcc5c2219f4c03a07f6c8']
+  const traceData = await tracer.getXRayTraces(traceIds)
+
+  console.log('+++traceData', serialize(traceData))
+
+  // const counter = {
+  //   value: 0
+  // }
+
+  // const intervalRefId = setInterval(() => {
+  //   console.log('+++counter.value', counter, intervalRefId)
+  //   counter.value++
+
+  //   //
+  //   if (counter.value === 10) {
+  //     clearInterval(intervalRefId)
+  //     res.status(HttpStatus.OK).json({
+  //       hello: 'world'
+  //     })
+  //   }
+  // }, 500)
+
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })
