@@ -34,6 +34,7 @@ app.get('/', (req, res) => res.status(200).json({
 */
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
+  const dateNowUnix = Date.now()
   const jobUrl = 'https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
@@ -45,12 +46,15 @@ app.post('/start-tracing', async (req, res) => {
     })
 
   console.log('+++data', req.body)
+  console.log('+++dateNowUnix', dateNowUnix)
   console.log('+++jobId', jobId)
   console.log('+++response.statusCode', response.statusCode)
   console.log('+++response.body', response.body)
 
   res.status(HttpStatus.OK).json({
-    hello: 'there',
+    jobUrl,
+    jobId,
+    dateNowUnix,
   })
 })
 
@@ -129,6 +133,18 @@ app.get('/test-get-xraydata', async (req, res) => {
   //   }
   // }, 500)
 
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-xraysummary', async (req, res) => {
+  // Dateformat in traces are like: 1593786073.729
+  const startTime = 1593787752131 / 1000
+  const endTime = Date.now() / 1000
+  const traceData = await tracer.getXRayTraceSummaries(startTime, endTime)
+  console.log('+++traceData++++', traceData)
+  console.log('+++traceData', serialize(traceData))
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })

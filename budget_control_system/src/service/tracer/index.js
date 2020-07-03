@@ -24,4 +24,15 @@ export default class CostTracer {
 
     return traceData
   }
+
+  async getXRayTraceSummaries(startTime, endTime) {
+    console.log('+++getXRayTraceSummaries', { startTime, endTime })
+    const param = {
+      StartTime: startTime,
+      EndTime: endTime,
+    }
+
+    const traceData = await this.xray.getTraceSummaries(param).promise()
+    return traceData
+  }
 }
