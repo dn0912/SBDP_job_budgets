@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
+import uuid from 'node-uuid'
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
@@ -33,13 +34,20 @@ app.get('/', (req, res) => res.status(200).json({
 */
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
-  const jobUrl = 'https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start-single-job'
-
+  const jobUrl = 'https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  const jobId = uuid.v4()
   const response = await superagent
-    .get(jobUrl)
+    .post(jobUrl)
+    .set('Content-Type', 'application/json')
+    .set('Accept', 'application/json')
+    .send({
+      jobId
+    })
 
-  console.log('+++', response)
   console.log('+++data', req.body)
+  console.log('+++jobId', jobId)
+  console.log('+++response.statusCode', response.statusCode)
+  console.log('+++response.body', response.body)
 
   res.status(HttpStatus.OK).json({
     hello: 'there',

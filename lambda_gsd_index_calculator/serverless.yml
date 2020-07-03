@@ -50,6 +50,13 @@ functions:
       - http: GET cleanup
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
+  # upload-test-data:
+  #   description: creates test data and uploads it to S3 for further processing
+  #   handler: src/test-data-generator
+  #   events:
+  #     - http: PUT generate
+  #   environment: 
+  #     BUCKET: ${self:custom.S3_BUCKET}
   # *******************
   # FIRST ITERATION: SINGLE LAMBDA
   calculate:
@@ -109,7 +116,7 @@ functions:
       Single endpoint to trigger a job
     handler: src/job_manager.startJob
     events:
-      - http: GET start-job
+      - http: POST start-job
 
 resources:
   Resources:

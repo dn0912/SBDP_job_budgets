@@ -35,6 +35,10 @@ module.exports.cleanup = async (event, context) => {
     const keysArray = await getFileKeySFromTempFolders()
     const response = await deleteFiles(keysArray)
     console.log('+++response', response)
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response),
+    }
   } catch(err) {
     return {
       statusCode: err.statusCode || 400,

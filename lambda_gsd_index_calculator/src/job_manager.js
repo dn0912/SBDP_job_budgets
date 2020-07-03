@@ -26,6 +26,7 @@ const addLambdaSubsegments = (xray, subsegmentName = 'lambda_tracer') => {
   subsegment.close()
 }
 
+// TODO: remove later
 // simulate slow function
 const slowDown = async (ms) => {
   console.log('+++Take it easy!?!')
@@ -50,11 +51,12 @@ module.exports.startJob = async (event, context) => {
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
   console.log('## CONTEXT: ' + serialize(context))
   console.log('## EVENT: ' + serialize(event))
+  console.log('## eventbody: ' + event.body)
 
   // TODO: batch files based on batch size coming from request
   const inputArray = [
-    'test_with_description_title_change_500_single.json',
-    'test_with_description_title_change_1000_single.json',
+    // 'test_with_description_title_change_500_single.json',
+    // 'test_with_description_title_change_1000_single.json',
     'test_with_description_title_change_1500_single.json',
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
@@ -72,10 +74,14 @@ module.exports.startJob = async (event, context) => {
 
   const result = await Promise.all(promises)
 
-  await slowDown(5000)
+  await slowDown(2000)
 
   console.log('+++result', result)
   // addLambdaSubsegments(AWSXRay, 'end jobmanager')
   subsegment.close()
-  return result
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(result),
+  }
 }

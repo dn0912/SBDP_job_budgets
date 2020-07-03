@@ -13,6 +13,13 @@ const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
 const sendSQSMessage = promisify(sqs.sendMessage).bind(sqs)
 
+// TODO: remove later
+// simulate slow function
+const slowDown = async (ms) => {
+  console.log('+++Take it easy!?!')
+  await new Promise(resolve => setTimeout(resolve, ms))
+}
+
 const readFile = async (bucketName, fileName) => {
   const params = {
     Bucket: bucketName,
@@ -65,6 +72,8 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // Sends single message to SQS for further process
     const test = await sendSQSMessage(sqsPayload)
+
+    await slowDown(5000)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)

@@ -9,6 +9,13 @@ const { promisify } = require('util')
 const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
 
+// TODO: remove later
+// simulate slow function
+const slowDown = async (ms) => {
+  console.log('+++Take it easy!?!')
+  await new Promise(resolve => setTimeout(resolve, ms))
+}
+
 const readFile = async (bucketName, fileName) => {
   const params = {
     Bucket: bucketName,
@@ -92,6 +99,8 @@ module.exports.handler = async (event, context) => {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
   })
+
+  await slowDown(3000)
 
   const response = {
     statusCode: 200,
