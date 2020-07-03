@@ -18,13 +18,19 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 // add custom Lambda subsegments
-// const addLambdaSubsegments = (xray, subsegmentName) => {
-//   const segment = xray.getSegment()
-//   console.log('+++segment', segment)
-//   const subsegment = segment.addNewSubsegment(subsegmentName)
-//   console.log('+++subsegment', subsegment)
-//   subsegment.close()
-// }
+const addLambdaSubsegments = (xray, subsegmentName = 'lambda_tracer') => {
+  const segment = xray.getSegment()
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment(subsegmentName)
+  console.log('+++subsegment', subsegment)
+  subsegment.close()
+}
+
+// simulate slow function
+const slowDown = async (ms) => {
+  console.log('+++Take it easy!?!')
+  await new Promise(resolve => setTimeout(resolve, ms))
+}
 
 /*
   entry point of SBDP app with definition of
@@ -35,9 +41,10 @@ module.exports.startJob = async (event, context) => {
   const segment = AWSXRay.getSegment()
   console.log('+++segment', segment)
   const subsegment = segment.addNewSubsegment('start jobmanager')
+  subsegment.addMetadata('hello', 'world', 'my namespace')
   console.log('+++subsegment', subsegment)
 
-  // addLambdaSubsegments(AWSXRay, 'start jobmanager')
+  // addLambdaSubsegments(AWSXRay)
 
 
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
@@ -64,10 +71,11 @@ module.exports.startJob = async (event, context) => {
   })
 
   const result = await Promise.all(promises)
+
+  await slowDown(5000)
+
   console.log('+++result', result)
   // addLambdaSubsegments(AWSXRay, 'end jobmanager')
-  const endSubsegment = segment.addNewSubsegment('end jobmanager')
-  console.log('+++endsubsegment', endSubsegment)
   subsegment.close()
   return result
 }
