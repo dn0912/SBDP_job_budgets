@@ -91,7 +91,7 @@ app.get('/test-get-products', async (req, res) => {
   // const response = await priceList.getLambdaProducts()
   // const response = await priceList.getS3Products()
   // console.log('+++response', serialize(response))
-  console.log('+++describeSQSServices', (await priceList.describeSQSServices()))
+  console.log('+++describeSQSServices', serialize(await priceList.getSQSProducts()))
 
   res.status(HttpStatus.OK).json({
     hello: 'world'

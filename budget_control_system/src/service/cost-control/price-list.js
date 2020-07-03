@@ -48,6 +48,35 @@ class PriceList {
     return response
   }
 
+  // TODO:
+  // example code from https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Pricing.html#getProducts-property is not working
+  async getLambdaProducts(region = 'eu-central-1') {
+    const LOCATION_MAP = {
+      'eu-central-1': 'EU (Frankfurt)'
+    }
+
+    const param = {
+      ServiceCode: 'AWSLambda',
+      Filters: [
+        {
+          Field: 'servicecode',
+          Type: 'TERM_MATCH',
+          Value: 'AWSLambda'
+        },
+        {
+          Field: 'location',
+          Type: 'TERM_MATCH',
+          Value: LOCATION_MAP[region]
+        },
+      ],
+      FormatVersion: 'aws_v1',
+      MaxResults: 30,
+    }
+
+    const response = await this.priceListService.getProducts(param).promise()
+    return response
+  }
+
   async describeS3Services() {
     /*
       { ServiceCode: 'AmazonS3',
@@ -82,20 +111,18 @@ class PriceList {
     return response
   }
 
-  // TODO:
-  // example code from https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Pricing.html#getProducts-property is not working
-  async getLambdaProducts(region = 'eu-central-1') {
+  async getS3Products(region = 'eu-central-1') {
     const LOCATION_MAP = {
       'eu-central-1': 'EU (Frankfurt)'
     }
 
     const param = {
-      ServiceCode: 'AWSLambda',
+      ServiceCode: 'AmazonS3',
       Filters: [
         {
           Field: 'servicecode',
           Type: 'TERM_MATCH',
-          Value: 'AWSLambda'
+          Value: 'AmazonS3'
         },
         {
           Field: 'location',
@@ -111,18 +138,47 @@ class PriceList {
     return response
   }
 
-  async getS3Products(region = 'eu-central-1') {
+  async describeSQSServices() {
+    /*
+      {
+      "ServiceCode": "AWSQueueService",
+        "AttributeNames": [
+          "productFamily",
+          "messageDeliveryOrder",
+          "termType",
+          "usagetype",
+          "locationType",
+          "Restriction",
+          "servicecode",
+          "groupDescription",
+          "messageDeliveryFrequency",
+          "queueType",
+          "location",
+          "servicename",
+          "group"
+        ]
+      }
+    */
+    const param = {
+      FormatVersion: 'aws_v1',
+      ServiceCode: 'AWSQueueService'
+    }
+    const response = await this.priceListService.describeServices(param).promise()
+    return response
+  }
+
+  async getSQSProducts(region = 'eu-central-1') {
     const LOCATION_MAP = {
       'eu-central-1': 'EU (Frankfurt)'
     }
 
     const param = {
-      ServiceCode: 'AmazonS3',
+      ServiceCode: 'AWSQueueService',
       Filters: [
         {
           Field: 'servicecode',
           Type: 'TERM_MATCH',
-          Value: 'AmazonS3'
+          Value: 'AWSQueueService'
         },
         {
           Field: 'location',
