@@ -23,20 +23,22 @@ provider:
         - apigateway:POST
         - sqs:*
         - lambda:InvokeFunction
-        - xray:PutTraceSegments
-        - xray:PutTelemetryRecords
-        - xray:GetSamplingRules
-        - xray:GetSamplingTargets
-        - xray:GetSamplingStatisticSummaries
+        - xray:*
+        # below for tracing in sls
+        # - xray:PutTraceSegments
+        # - xray:PutTelemetryRecords
+        # - xray:GetSamplingRules
+        # - xray:GetSamplingTargets
+        # - xray:GetSamplingStatisticSummaries
       Resource: 
         - arn:aws:s3:::${self:custom.S3_BUCKET}/*
         - arn:aws:apigateway:::/*
         - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
         - arn:aws:lambda:${self:custom.REGION}:*:function:*
         - "*"
-  tracing:
+  # tracing:
   #   apiGateway: true
-    lambda: true
+  #   lambda: true
   #   s3: true
 
 
