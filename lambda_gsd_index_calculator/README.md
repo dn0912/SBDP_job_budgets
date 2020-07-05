@@ -57,3 +57,11 @@ curl -X POST https://dzsq601tu2.execute-api.eu-central-1.amazonaws.com/dev/start
 ```
 
 After the job you should see the result of the processing in the `gsd` folder in the `test-task-update-data-v1` Bucket.
+
+## Cleanup intermediate storage of big data pipeline and result folder
+
+There is a helper function to clean up the S3 folder which are used for the pipeline
+
+```bash
+sls invoke -f cleanup --aws-profile [YOUR_PROFILE]
+```
