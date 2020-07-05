@@ -2,7 +2,7 @@ service: lambda-gsd-index-calculator
 
 custom:
   REGION: eu-central-1
-  S3_BUCKET: test-task-update-data-v1
+  S3_BUCKET: test-task-update-data-v1 # put data files here
   S3_FILE: test_pretty.json
   S3_FILE_5TASKS: test_5tasks.json
   S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
