@@ -1,4 +1,4 @@
-const { BUCKET, RESULT_FOLDER } = process.env
+const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
 const AWS = require('aws-sdk')
 const moment = require('moment')
@@ -16,10 +16,10 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const readFile = async (bucketName, fileName) => {
+const readFile = async (fileName) => {
   const params = {
-    Bucket: bucketName,
-    Key: `${RESULT_FOLDER}/${fileName}`,
+    Bucket: BUCKET,
+    Key: `${SUBRESULT_FOLDER}/${fileName}`,
   }
 
   const data = await getS3Object(params)
@@ -31,7 +31,7 @@ const putFile = async (fileContent) => {
   const fileName = `${currentmTimeStamp}_gsd_calculated.json`
   await putS3Object({
     Bucket: BUCKET,
-    Key: `gsd/${fileName}`,
+    Key: `${PIPELINE_RESULT_FOLDER}/${fileName}`,
     Body: JSON.stringify(fileContent),
   })
 
@@ -90,7 +90,7 @@ module.exports.handler = async (event, context) => {
 
   const fileName = event.Records[0].body
 
-  const s3FileContentAsString = await readFile(BUCKET, fileName)
+  const s3FileContentAsString = await readFile(fileName)
   const s3FileContent = JSON.parse(s3FileContentAsString)
 
   const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)

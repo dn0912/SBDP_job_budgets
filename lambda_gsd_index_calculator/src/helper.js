@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { BUCKET } = process.env
+const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
 const { promisify } = require('util')
 
@@ -14,8 +14,8 @@ const getFileKeySFromTempFolders = async () => {
   })
   return response.Contents
     .filter(obj =>
-      (obj.Key.startsWith('gsd/') && obj.Key.endsWith('.json'))
-      || (obj.Key.startsWith('test_results/') && obj.Key.endsWith('.json')))
+      (obj.Key.startsWith(`${PIPELINE_RESULT_FOLDER}/`) && obj.Key.endsWith('.json'))
+      || (obj.Key.startsWith(`${SUBRESULT_FOLDER}`) && obj.Key.endsWith('.json')))
     .map(obj => obj.Key)
 }
 

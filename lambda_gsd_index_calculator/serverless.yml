@@ -3,11 +3,12 @@ service: lambda-gsd-index-calculator
 custom:
   REGION: eu-central-1
   S3_BUCKET: test-task-update-data-v1 # put data files here
+  S3_SUBRESULT_FOLDER: test_results # subresults of the preprocessing lambdas are stored here
+  S3_PIPELINE_RESULT_FOLDER: gsd # final results of the calculation lambdas are stored here
+  SQS_NAME: PreprocessedDataQueue
   S3_FILE: test_pretty.json
   S3_FILE_5TASKS: test_5tasks.json
   S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
-  S3_TEST_RESULT_SUBFOLDER: test_results
-  SQS_NAME: PreprocessedDataQueue
 
 provider:
   name: aws
@@ -52,6 +53,8 @@ functions:
       - http: GET cleanup
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
   # upload-test-data:
   #   description: creates test data and uploads it to S3 for further processing
   #   handler: src/test-data-generator
@@ -96,7 +99,7 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_PREPROCESS_1000TASKS}
-      RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       REGION: ${self:custom.REGION}
       QUEUE_NAME: ${self:custom.SQS_NAME}
     timeout: 10
@@ -113,7 +116,8 @@ functions:
               - Arn
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
-      RESULT_FOLDER: ${self:custom.S3_TEST_RESULT_SUBFOLDER}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
     timeout: 10
   # *******************
   # THIRD ITERATION: MANAGER WHICH ORCHESTRATES LAMBDAS IN THE JOB

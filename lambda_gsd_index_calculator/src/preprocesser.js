@@ -1,4 +1,4 @@
-const { BUCKET, FILE, RESULT_FOLDER, REGION, QUEUE_NAME } = process.env
+const { BUCKET, FILE, SUBRESULT_FOLDER, REGION, QUEUE_NAME } = process.env
 
 const AWS = require('aws-sdk')
 const moment = require('moment')
@@ -20,9 +20,9 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const readFile = async (bucketName, fileName) => {
+const readFile = async (fileName) => {
   const params = {
-    Bucket: bucketName,
+    Bucket: BUCKET,
     Key: fileName,
   }
 
@@ -35,7 +35,7 @@ const putFile = async (fileContent) => {
   const fileName = `${currentmTimeStamp}_processedUpdates.json`
   await putS3Object({
     Bucket: BUCKET,
-    Key: `${RESULT_FOLDER}/${fileName}`,
+    Key: `${SUBRESULT_FOLDER}/${fileName}`,
     Body: JSON.stringify(fileContent),
   })
 
@@ -55,7 +55,7 @@ module.exports.readAndFilterFile = async (event, context) => {
   console.log('+++context', context)
   try {
     const inputFileName = (event && event.fileName) || FILE
-    const s3FileContentAsString = await readFile(BUCKET, inputFileName)
+    const s3FileContentAsString = await readFile(inputFileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = filterUnnecessaryUpdates(s3FileContent)
     const fileName = await putFile(cleanTaskUpdates)
