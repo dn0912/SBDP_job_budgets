@@ -21,21 +21,33 @@ provider:
         - s3:PutObject
         - s3:ListBucket
         - s3:DeleteObject
+      Resource:
+        - arn:aws:s3:::${self:custom.S3_BUCKET}/*
+    - Effect: Allow
+      Action:
         - apigateway:POST
+      Resource:
+        - arn:aws:apigateway:::/*
+    - Effect: Allow
+      Action:
         - sqs:*
+      Resource:
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
+    - Effect: Allow
+      Action:
         - lambda:InvokeFunction
-        - xray:*
+      Resource:
+        - arn:aws:lambda:${self:custom.REGION}:*:function:*
+    - Effect: Allow
+      Action:
+        # - xray:*
         # below for tracing in sls
         - xray:PutTraceSegments
         - xray:PutTelemetryRecords
         - xray:GetSamplingRules
         - xray:GetSamplingTargets
         - xray:GetSamplingStatisticSummaries
-      Resource: 
-        - arn:aws:s3:::${self:custom.S3_BUCKET}/*
-        - arn:aws:apigateway:::/*
-        - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
-        - arn:aws:lambda:${self:custom.REGION}:*:function:*
+      Resource:
         - "*"
   tracing:
     apiGateway: true
