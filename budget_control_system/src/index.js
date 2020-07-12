@@ -26,6 +26,9 @@ app.get('/', (req, res) => res.status(200).json({
   hello: 'world!',
 }))
 
+/* Example curl:
+curl -X POST http://localhost:8080/start-tracing
+*/
 /**
  * start serverless big data processing tracing endpoint
  *
@@ -36,7 +39,7 @@ app.get('/', (req, res) => res.status(200).json({
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
   const dateNowUnix = Date.now()
-  const jobUrl = 'https://8horir8nei.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  const jobUrl = 'https://64fdcmq84h.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
     .post(jobUrl)
@@ -164,6 +167,19 @@ app.get('/test-get-xraydata/:traceIds', async (req, res) => {
   })
 })
 
+app.get('/test-batch-get-xraydata/:traceIds', async (req, res) => {
+  const traceIds = req.params.traceIds.split(',')
+  const traceData = await tracer.batchGetXrayTraces(traceIds)
+  console.log('+++traceData', serialize(traceData))
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+// Get xray data based on start time of job
+/* Example curl:
+curl http://localhost:8080/test-get-xraysummary/1594201705424
+*/
 app.get('/test-get-xraysummary/:startTime', async (req, res) => {
   // Dateformat in traces are like: 1593786073.729
   // const startTime = 1594197396137 / 1000
@@ -176,6 +192,19 @@ app.get('/test-get-xraysummary/:startTime', async (req, res) => {
     .filter((trace) => get(trace, 'Annotations.serviceType[0].AnnotationValue.StringValue', '') === 'AWSLambda')
     .map((trace) => trace.Duration)
   console.log('+++lambdaDurations', lambdaDurations)
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-xray-service-graph/:startTime', async (req, res) => {
+  // Dateformat in traces are like: 1593786073.729
+  // const startTime = 1594197396137 / 1000
+  const startTime = parseInt(req.params.startTime, 10) / 1000
+  const endTime = Date.now() / 1000
+  const traceData = await tracer.getXRayServiceGraph(startTime, endTime)
+  console.log('+++getXRayServiceGraph++++', traceData)
+  console.log('+++getXRayServiceGraph', serialize(traceData))
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })
