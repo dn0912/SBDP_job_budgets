@@ -49,10 +49,11 @@ provider:
         - xray:GetSamplingStatisticSummaries
       Resource:
         - "*"
+  timeout: 30
   tracing:
-    apiGateway: true
+    # apiGateway: true
     lambda: true
-  #   s3: true
+    # s3: true
 
 
 functions:
@@ -84,7 +85,6 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE}
-    timeout: 10
   calculate5:
     description: >
       Same as calculate function:
@@ -96,7 +96,6 @@ functions:
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
       FILE: ${self:custom.S3_FILE_5TASKS}
-    timeout: 10
   # *******************
   # SECOND ITERATION: INTERCONNECTED LAMBDAS WITH SQS AND S3
   preprocess1k:
@@ -114,7 +113,6 @@ functions:
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       REGION: ${self:custom.REGION}
       QUEUE_NAME: ${self:custom.SQS_NAME}
-    timeout: 10
   calculate1k:
     description: >
       Single lambda - calulator lambda after receiving sqs message,
@@ -130,7 +128,6 @@ functions:
       BUCKET: ${self:custom.S3_BUCKET}
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
-    timeout: 10
   # *******************
   # THIRD ITERATION: MANAGER WHICH ORCHESTRATES LAMBDAS IN THE JOB
   start-job:
