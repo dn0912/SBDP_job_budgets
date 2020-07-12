@@ -56,7 +56,7 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   const segment = AWSXRay.getSegment()
   console.log('+++jobId', jobId)
   console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('preprocessor subsegment')
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: preprocessor')
   subsegment.addAnnotation('jobId', jobId)
   subsegment.addAnnotation('serviceType', 'AWSLambda')
   console.log('+++subsegment', subsegment)

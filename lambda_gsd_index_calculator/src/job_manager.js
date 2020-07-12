@@ -39,7 +39,7 @@ module.exports.startJob = async (event, context) => {
   const jobId = eventBody.jobId || 'dummyId'
   console.log('+++jobId', jobId)
   console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('job manager subsegment')
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: job manager')
   subsegment.addAnnotation('jobId', jobId)
   subsegment.addAnnotation('serviceType', 'AWSLambda')
   console.log('+++subsegment', subsegment)
