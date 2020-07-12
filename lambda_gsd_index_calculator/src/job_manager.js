@@ -33,11 +33,7 @@ module.exports.startJob = async (event, context) => {
 
   // *******
   // TRACING
-  // const segment = AWSXRay.getSegment()
-  // console.log('+++segment', segment)
-  // const subsegment = segment.addNewSubsegment('start jobmanager')
-  // subsegment.addMetadata('hello', 'world', 'my namespace')
-  // console.log('+++subsegment', subsegment)
+  console.log('+++Start tracing - job manager')
   const segment = AWSXRay.getSegment()
   const eventBody = JSON.parse(event.body)
   const jobId = eventBody.jobId || 'dummyId'
@@ -58,14 +54,15 @@ module.exports.startJob = async (event, context) => {
   // TODO: batch files based on batch size coming from request
   const inputArray = [
     // 'test_with_description_title_change_500_single.json',
-    // 'test_with_description_title_change_1000_single.json',
+    'test_with_description_title_change_1000_single.json',
     'test_with_description_title_change_1500_single.json',
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
   const promises = inputArray.map(fileName => {
     const payload = {
-      fileName
+      fileName,
+      jobId,
     }
     return invokeLambda({
       FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
