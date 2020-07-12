@@ -25,11 +25,13 @@ export default class Tracer {
     return traceData
   }
 
-  async getXRayTraceSummaries(startTime, endTime) {
+  async getXRayTraceSummaries(startTime, endTime, jobId) {
     console.log('+++getXRayTraceSummaries', { startTime, endTime })
+    const FilterExpression = jobId ? `annotation.jobId = "${jobId}"` : ''
     const param = {
       StartTime: startTime,
       EndTime: endTime,
+      FilterExpression,
     }
 
     const traceData = await this.xray.getTraceSummaries(param).promise()

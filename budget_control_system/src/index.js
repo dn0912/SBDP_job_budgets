@@ -197,14 +197,58 @@ app.get('/test-get-xraysummary/:startTime', async (req, res) => {
   })
 })
 
-app.get('/test-get-xray-service-graph/:startTime', async (req, res) => {
-  // Dateformat in traces are like: 1593786073.729
-  // const startTime = 1594197396137 / 1000
+// app.get('/test-get-xray-service-graph/:startTime', async (req, res) => {
+//   // Dateformat in traces are like: 1593786073.729
+//   // const startTime = 1594197396137 / 1000
+//   const startTime = parseInt(req.params.startTime, 10) / 1000
+//   const endTime = Date.now() / 1000
+//   const traceData = await tracer.getXRayServiceGraph(startTime, endTime)
+//   console.log('+++getXRayServiceGraph++++', traceData)
+//   console.log('+++getXRayServiceGraph', serialize(traceData))
+//   res.status(HttpStatus.OK).json({
+//     hello: 'world'
+//   })
+// })
+
+app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
+  const { jobId } = req.params
   const startTime = parseInt(req.params.startTime, 10) / 1000
   const endTime = Date.now() / 1000
-  const traceData = await tracer.getXRayServiceGraph(startTime, endTime)
-  console.log('+++getXRayServiceGraph++++', traceData)
-  console.log('+++getXRayServiceGraph', serialize(traceData))
+  const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
+
+  console.log('+++traceSummary', traceSummary)
+  console.log('+++traceSummary', serialize(traceSummary))
+
+  const jobTraceId = traceSummary.TraceSummaries[0].Id
+  const traceData = await tracer.batchGetXrayTraces([jobTraceId])
+
+  console.log('+++traceData', traceData)
+  console.log('+++traceData', serialize(traceData))
+
+  const traceSegments = traceData.Traces[0].Segments
+
+  // traced lambdas
+  const lambdaTraceSegments = traceSegments
+    .filter((seg) => seg.Document.includes('Cost tracer subsegment'))
+    .map((seg) => ({
+      ...seg,
+      Document: JSON.parse(seg.Document),
+    }))
+  const lambdaProcessingTimes = lambdaTraceSegments.map(
+    (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
+  )
+  console.log('+++lambdaTraceSegments', lambdaTraceSegments, lambdaProcessingTimes)
+
+  // other traced services
+  const TRACED_SERVICES = ['S3', 'SQS']
+  const test = traceSegments
+    .map((seg) => ({
+      ...seg,
+      Document: JSON.parse(seg.Document),
+    }))
+    .filter((seg) => TRACED_SERVICES.includes(seg.Document.name))
+  console.log('+++test', test, test.length)
+
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })
