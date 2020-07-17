@@ -31,7 +31,7 @@ export default class Tracer {
     const param = {
       StartTime: startTime,
       EndTime: endTime,
-      FilterExpression,
+      ...FilterExpression ? { FilterExpression } : {},
     }
 
     const traceData = await this.xray.getTraceSummaries(param).promise()
