@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
 import uuid from 'node-uuid'
-import { get } from 'lodash'
+import { get, set } from 'lodash'
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
@@ -39,7 +39,7 @@ curl -X POST http://localhost:8080/start-tracing
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
   const dateNowUnix = Date.now()
-  const jobUrl = 'https://64fdcmq84h.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  const jobUrl = 'https://srjkd4anc1.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
     .post(jobUrl)
@@ -210,6 +210,10 @@ app.get('/test-get-xraysummary/:startTime', async (req, res) => {
 //   })
 // })
 
+/* Example curl:
+curl http://localhost:8080/test-job-tracing-summary/:startTime/:jobId
+*/
+
 app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   const { jobId } = req.params
   const startTime = parseInt(req.params.startTime, 10) / 1000
@@ -219,16 +223,23 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   console.log('+++traceSummary', traceSummary)
   console.log('+++traceSummary', serialize(traceSummary))
 
-  const jobTraceId = traceSummary.TraceSummaries[0].Id
-  const traceData = await tracer.batchGetXrayTraces([jobTraceId])
+  const jobTraceIds = traceSummary.TraceSummaries.map((trace) => trace.Id)
+  const traceData = await tracer.batchGetXrayTraces(jobTraceIds)
 
   console.log('+++traceData', traceData)
   console.log('+++traceData', serialize(traceData))
 
-  const traceSegments = traceData.Traces[0].Segments
+  const allTraceSegments = traceData.Traces.reduce((acc, trace) => {
+    console.log('++trace.Segments', trace.Segments)
+    const traceSegments = trace.Segments
+    acc.push(...traceSegments)
+    return acc
+  }, [])
+
+  console.log('+++allTraceSegments', allTraceSegments)
 
   // traced lambdas
-  const lambdaTraceSegments = traceSegments
+  const lambdaTraceSegments = allTraceSegments
     .filter((seg) => seg.Document.includes('Cost tracer subsegment'))
     .map((seg) => ({
       ...seg,
@@ -237,17 +248,46 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   const lambdaProcessingTimes = lambdaTraceSegments.map(
     (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
   )
-  console.log('+++lambdaTraceSegments', lambdaTraceSegments, lambdaProcessingTimes)
+  console.log('+++lambdaTraceSegments', lambdaTraceSegments)
+  console.log('+++lambdaProcessingTimes', lambdaProcessingTimes)
+
+  console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
 
   // other traced services
   const TRACED_SERVICES = ['S3', 'SQS']
-  const test = traceSegments
+  const filteredServiceTraceList = allTraceSegments
     .map((seg) => ({
       ...seg,
       Document: JSON.parse(seg.Document),
     }))
     .filter((seg) => TRACED_SERVICES.includes(seg.Document.name))
-  console.log('+++test', test, test.length)
+
+  const tracingMapWithoutLambdas = filteredServiceTraceList
+    .reduce((acc, segment) => {
+      const serviceName = segment.Document.name
+      const serviceOperation = segment.Document.aws.operation
+      const objectPath = `${serviceName}.${serviceOperation}`
+
+      const previousTracedValue = get(acc, objectPath, 0)
+      set(acc, objectPath, previousTracedValue + 1)
+      /* Object structure:
+      {
+        S3: {
+          GetObject: 2,
+          PutObject: 2,
+        },
+        SQS: {
+          SendMessage: 2,
+        }
+      }
+    */
+      return acc
+    }, {})
+
+  console.log('+++OtherServicesTraceSegments', filteredServiceTraceList)
+  console.log('+++OtherServicesTraceSegments', serialize(filteredServiceTraceList))
+  console.log('+++OtherServicesTraceSegments', filteredServiceTraceList.length)
+  console.log('+++tracingMap', tracingMapWithoutLambdas)
 
   res.status(HttpStatus.OK).json({
     hello: 'world'

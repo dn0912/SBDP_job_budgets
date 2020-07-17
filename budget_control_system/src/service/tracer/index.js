@@ -49,7 +49,6 @@ export default class Tracer {
   }
 
   async batchGetXrayTraces(traceIds) {
-    console.log('+++bachGetXrayTraces', { traceIds })
     const param = {
       TraceIds: traceIds
     }
