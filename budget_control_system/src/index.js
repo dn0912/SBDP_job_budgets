@@ -8,6 +8,8 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
+import { calculateLambdaProcessingTimes, createServiceTracingMap } from './utils'
+
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
@@ -114,7 +116,7 @@ app.get('/test-get-product-prices/:service', async (req, res) => {
   let response
   switch (service) {
     case 'lambda':
-      response = await priceList.getLambdaProducts()
+      response = await priceList.getLambdaPricing()
       break
     case 's3':
       response = await priceList.getS3Products()
@@ -239,55 +241,17 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   console.log('+++allTraceSegments', allTraceSegments)
 
   // traced lambdas
-  const lambdaTraceSegments = allTraceSegments
-    .filter((seg) => seg.Document.includes('Cost tracer subsegment'))
-    .map((seg) => ({
-      ...seg,
-      Document: JSON.parse(seg.Document),
-    }))
-  const lambdaProcessingTimes = lambdaTraceSegments.map(
-    (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
-  )
-  console.log('+++lambdaTraceSegments', lambdaTraceSegments)
-  console.log('+++lambdaProcessingTimes', lambdaProcessingTimes)
+  const lambdaProcessingTimes = calculateLambdaProcessingTimes(allTraceSegments)
 
   console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
 
   // other traced services
-  const TRACED_SERVICES = ['S3', 'SQS']
-  const filteredServiceTraceList = allTraceSegments
-    .map((seg) => ({
-      ...seg,
-      Document: JSON.parse(seg.Document),
-    }))
-    .filter((seg) => TRACED_SERVICES.includes(seg.Document.name))
-
-  const tracingMapWithoutLambdas = filteredServiceTraceList
-    .reduce((acc, segment) => {
-      const serviceName = segment.Document.name
-      const serviceOperation = segment.Document.aws.operation
-      const objectPath = `${serviceName}.${serviceOperation}`
-
-      const previousTracedValue = get(acc, objectPath, 0)
-      set(acc, objectPath, previousTracedValue + 1)
-      /* Object structure:
-      {
-        S3: {
-          GetObject: 2,
-          PutObject: 2,
-        },
-        SQS: {
-          SendMessage: 2,
-        }
-      }
-    */
-      return acc
-    }, {})
+  const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
 
   console.log('+++OtherServicesTraceSegments', filteredServiceTraceList)
   console.log('+++OtherServicesTraceSegments', serialize(filteredServiceTraceList))
   console.log('+++OtherServicesTraceSegments', filteredServiceTraceList.length)
-  console.log('+++tracingMap', tracingMapWithoutLambdas)
+  console.log('+++tracingMap', filteredServiceTraceList)
 
   res.status(HttpStatus.OK).json({
     hello: 'world'

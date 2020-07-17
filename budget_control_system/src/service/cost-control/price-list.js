@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk'
+import { get } from 'lodash'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -50,9 +51,12 @@ class PriceList {
 
   // TODO:
   // example code from https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Pricing.html#getProducts-property is not working
-  async getLambdaProducts(region = 'eu-central-1') {
-    const LOCATION_MAP = {
-      'eu-central-1': 'EU (Frankfurt)'
+  async getLambdaPricing(region = 'eu-central-1') {
+    const FILTERS_MAP = {
+      'eu-central-1': {
+        location: 'EU (Frankfurt)',
+        usagetype: 'EUC1-Lambda-GB-Second',
+      }
     }
 
     const param = {
@@ -66,15 +70,27 @@ class PriceList {
         {
           Field: 'location',
           Type: 'TERM_MATCH',
-          Value: LOCATION_MAP[region]
+          Value: FILTERS_MAP[region].location
+        },
+        {
+          Field: 'usagetype',
+          Type: 'TERM_MATCH',
+          Value: FILTERS_MAP[region].usagetype
         },
       ],
       FormatVersion: 'aws_v1',
       MaxResults: 30,
     }
 
-    const response = await this.priceListService.getProducts(param).promise()
-    return response
+    const lambdaProduct = await this.priceListService.getProducts(param).promise()
+    const lambdaOnDemandKey = Object.keys(get(lambdaProduct, 'PriceList[0].terms.OnDemand'))[0]
+    const lambdaPriceDimensionsKey = Object.keys(get(lambdaProduct, `PriceList[0].terms.OnDemand['${lambdaOnDemandKey}'].priceDimensions`))[0]
+    const lambdaPricing = get(lambdaProduct, `PriceList[0].terms.OnDemand['${lambdaOnDemandKey}'].priceDimensions['${lambdaPriceDimensionsKey}'].pricePerUnit.USD`)
+
+    // 1 Nano USD = 1e-9 USD
+    // Nano USD per 100 ms
+    const nanoPrice = Number(`${lambdaPricing}e9`)
+    return nanoPrice / 10 // prices are per 100ms periods
   }
 
   async describeS3Services() {
