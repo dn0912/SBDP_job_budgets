@@ -49,8 +49,10 @@ class PriceList {
     return response
   }
 
-  // TODO:
-  // example code from https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Pricing.html#getProducts-property is not working
+  /**
+   * @param {string} region         AWS Region of lambdas
+   * @returns {number}              Nano USD per 100ms Lambda execution time
+   */
   async getLambdaPricing(region = 'eu-central-1') {
     const FILTERS_MAP = {
       'eu-central-1': {
