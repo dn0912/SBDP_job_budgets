@@ -22,6 +22,7 @@ provider:
         - s3:ListBucket
         - s3:DeleteObject
       Resource:
+        - arn:aws:s3:::${self:custom.S3_BUCKET}
         - arn:aws:s3:::${self:custom.S3_BUCKET}/*
     - Effect: Allow
       Action:
