@@ -1,6 +1,7 @@
 const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
-const AWS = require('aws-sdk')
+const AWSXRay = require('aws-xray-sdk-core')
+const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const moment = require('moment')
 const s3 = new AWS.S3()
 
@@ -84,11 +85,31 @@ const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
   return overAllTimeDiff / allCompletedTasks.length
 }
 
+const startLambdaTracing = (jobId = 'dummyId') => {
+  console.log('+++Start tracing - preprocesser')
+  const segment = AWSXRay.getSegment()
+  console.log('+++jobId', jobId)
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: calculator')
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'AWSLambda')
+  console.log('+++subsegment', subsegment)
+
+  return subsegment
+}
+
 module.exports.handler = async (event, context) => {
-  console.log('+++event', event)
+  console.log('+++event2', JSON.stringify(event, undefined, 2))
   console.log('+++context', context)
 
-  const fileName = event.Records[0].body
+  const eventBody = JSON.parse(event.Records[0].body)
+  const { fileName } = eventBody
+
+  // *******
+  // Tracing
+  const { jobId } = eventBody
+  const lambdaTracingSubsegment = startLambdaTracing(jobId)
+    // *******
 
   const s3FileContentAsString = await readFile(fileName)
   const s3FileContent = JSON.parse(s3FileContentAsString)
@@ -113,5 +134,11 @@ module.exports.handler = async (event, context) => {
   }
 
   console.log('+++response', response)
+
+  // *******
+  // TRACING
+  lambdaTracingSubsegment.close()
+    // *******
+
   return response
 }

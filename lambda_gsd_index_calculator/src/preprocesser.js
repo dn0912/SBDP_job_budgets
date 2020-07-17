@@ -70,7 +70,8 @@ module.exports.readAndFilterFile = async (event, context) => {
   try {
     // *******
     // Tracing
-    const lambdaTracingSubsegment = startLambdaTracing(event.jobId)
+    const jobId = event.jobId
+    const lambdaTracingSubsegment = startLambdaTracing(jobId)
     // *******
 
     const inputFileName = (event && event.fileName) || FILE
@@ -84,8 +85,13 @@ module.exports.readAndFilterFile = async (event, context) => {
     const accountId = context.invokedFunctionArn.split(":")[4]
     const queueUrl = `https://sqs.${REGION}.amazonaws.com/${accountId}/${QUEUE_NAME}`
 
+    const messageBody = {
+      fileName,
+      jobId,
+    }
+
     const sqsPayload = {
-      MessageBody: fileName,
+      MessageBody: JSON.stringify(messageBody),
       QueueUrl: queueUrl,
     }
 
