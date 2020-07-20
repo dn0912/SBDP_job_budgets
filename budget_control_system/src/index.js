@@ -3,7 +3,10 @@ import bodyParser from 'body-parser'
 import superagent from 'superagent'
 import HttpStatus from 'http-status-codes'
 import uuid from 'node-uuid'
-import { get, set } from 'lodash'
+import { get } from 'lodash'
+import moment from 'moment'
+import fs from 'fs'
+
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
@@ -40,7 +43,7 @@ curl -X POST http://localhost:8080/start-tracing
 */
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
-  const dateNowUnix = Date.now()
+  const dateNow = Date.now()
   const jobUrl = 'https://srjkd4anc1.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
@@ -52,15 +55,63 @@ app.post('/start-tracing', async (req, res) => {
     })
 
   console.log('+++data', req.body)
-  console.log('+++dateNowUnix', dateNowUnix)
+  console.log('+++dateNow', dateNow)
   console.log('+++jobId', jobId)
   console.log('+++response.statusCode', response.statusCode)
   console.log('+++response.body', response.body)
 
+  // TODO: to measure trace fetching delay
+  // const counter = {
+  //   value: 0,
+  // }
+
+  // // async function fetchTracePeriodically() {
+  // //   // delay it for 2 sec
+  // //   await new Promise((resolve) => setTimeout(() => {
+  //     console.log('#### wait for 1 sec')
+  //     resolve()
+  //   }, 1000))
+  //   while (counter.value < 10) {
+  //     const pollPeriodinMs = 300
+  //     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
+  //     const startTime = dateNow / 1000
+  //     const endTime = Date.now() / 1000
+  //     const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
+
+  //     const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
+
+  //     console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
+
+  //     const currentTimeStamp = moment.utc().valueOf()
+  //     console.log('+++currentTimeStamp', currentTimeStamp)
+
+  //     const traceResult = {
+  //       jobStartTimeStamp: dateNow,
+  //       arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
+  //       traceCloseTimeStamp: traceCloseTimeStampAnnotation,
+  //       currentTimeStamp,
+  //       elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
+  //     }
+
+  //     // TODO: remove break statement => only for first fetch to record trace delay
+  //     counter.value++
+  //     if (traceSummary.TraceSummaries.length > 0) {
+  //       console.log('+++traceSummaryArray', traceResult)
+  //       fs.appendFileSync(
+  //         'traceFetchingDelays.csv',
+  //         `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
+  //       )
+  //       break
+  //     }
+  //   }
+  // }
+
+  // fetchTracePeriodically()
+
   res.status(HttpStatus.OK).json({
     jobUrl,
     jobId,
-    dateNowUnix,
+    dateNow,
   })
 })
 
