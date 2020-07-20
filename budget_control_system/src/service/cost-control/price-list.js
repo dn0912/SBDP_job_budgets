@@ -211,6 +211,19 @@ class PriceList {
     const response = await this.priceListService.getProducts(param).promise()
     return response
   }
+
+  async calculateLambdaPrice(lambdaProcessingTimes, region = 'eu-central-1') {
+    // TODO: enhance function with lambda memory usage of each function
+    const lambdaPricingPer100Ms = await this.getLambdaPricing(region)
+    const lambdaPrices = lambdaProcessingTimes.map((lambdaProcTime) => {
+      const roundedLambdaProcTime = Math.ceil(lambdaProcTime * 10)
+
+      return roundedLambdaProcTime * lambdaPricingPer100Ms // Nano USD
+    })
+
+    console.log('++++calculateLambdaPrice', lambdaPrices)
+    return lambdaPrices
+  }
 }
 
 export default PriceList

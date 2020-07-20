@@ -61,52 +61,52 @@ app.post('/start-tracing', async (req, res) => {
   console.log('+++response.body', response.body)
 
   // TODO: to measure trace fetching delay
-  // const counter = {
-  //   value: 0,
-  // }
+  const pollPeriodinMs = 300
+  const counter = {
+    value: 0,
+  }
 
-  // // async function fetchTracePeriodically() {
-  // //   // delay it for 2 sec
-  // //   await new Promise((resolve) => setTimeout(() => {
-  //     console.log('#### wait for 1 sec')
-  //     resolve()
-  //   }, 1000))
-  //   while (counter.value < 10) {
-  //     const pollPeriodinMs = 300
-  //     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
-  //     const startTime = dateNow / 1000
-  //     const endTime = Date.now() / 1000
-  //     const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
+  async function fetchTracePeriodically() {
+    // delay it for 2 sec
+    await new Promise((resolve) => setTimeout(() => {
+      console.log('#### wait for 1 sec')
+      resolve()
+    }, 1000))
+    while (counter.value < 20) {
+      await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
+      const startTime = dateNow / 1000
+      const endTime = Date.now() / 1000
+      const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
 
-  //     const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
+      const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
 
-  //     console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
+      console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
 
-  //     const currentTimeStamp = moment.utc().valueOf()
-  //     console.log('+++currentTimeStamp', currentTimeStamp)
+      const currentTimeStamp = moment.utc().valueOf()
+      console.log('+++currentTimeStamp', currentTimeStamp)
 
-  //     const traceResult = {
-  //       jobStartTimeStamp: dateNow,
-  //       arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
-  //       traceCloseTimeStamp: traceCloseTimeStampAnnotation,
-  //       currentTimeStamp,
-  //       elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
-  //     }
+      const traceResult = {
+        jobStartTimeStamp: dateNow,
+        arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
+        traceCloseTimeStamp: traceCloseTimeStampAnnotation,
+        currentTimeStamp,
+        elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
+      }
 
-  //     // TODO: remove break statement => only for first fetch to record trace delay
-  //     counter.value++
-  //     if (traceSummary.TraceSummaries.length > 0) {
-  //       console.log('+++traceSummaryArray', traceResult)
-  //       fs.appendFileSync(
-  //         'traceFetchingDelays.csv',
-  //         `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
-  //       )
-  //       break
-  //     }
-  //   }
-  // }
+      // TODO: remove break statement => only for first fetch to record trace delay
+      counter.value++
+      if (traceSummary.TraceSummaries.length > 0) {
+        console.log('+++traceSummaryArray', traceResult)
+        fs.appendFileSync(
+          'traceFetchingDelays.csv',
+          `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
+        )
+        break
+      }
+    }
+  }
 
-  // fetchTracePeriodically()
+  fetchTracePeriodically()
 
   res.status(HttpStatus.OK).json({
     jobUrl,
@@ -293,6 +293,7 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
 
   // traced lambdas
   const lambdaProcessingTimes = calculateLambdaProcessingTimes(allTraceSegments)
+  const lambdaPrices = await priceList.calculateLambdaPrice(lambdaProcessingTimes)
 
   console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
 
