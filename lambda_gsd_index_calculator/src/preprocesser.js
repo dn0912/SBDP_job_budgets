@@ -114,6 +114,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // *******
     // TRACING
+    lambdaTracingSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
     lambdaTracingSubsegment.close()
     // *******
 

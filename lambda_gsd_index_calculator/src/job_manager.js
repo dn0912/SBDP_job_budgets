@@ -1,5 +1,7 @@
 const AWSXRay = require('aws-xray-sdk-core')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
+const moment = require('moment')
+
 const lambda = new AWS.Lambda()
 
 const { promisify } = require('util')
@@ -11,7 +13,7 @@ const invokeLambda = promisify(lambda.invoke).bind(lambda)
 
   Manager needs to schedule the jobs based on data in S3:
 
-  Asynchronous invokation to trigger multiple lambdas with further preprocessing and calculation
+  Asynchronous invocation to trigger multiple lambdas with further preprocessing and calculation
 */
 
 // TODO: ONLY HELPER FUNCTION
@@ -24,25 +26,30 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const startLambdaTracing = (jobId = 'dummyId') => {
+  console.log('+++Start tracing - job manager')
+  const segment = AWSXRay.getSegment()
+  console.log('+++jobId', jobId)
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: calculator')
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'AWSLambda')
+  console.log('+++subsegment', subsegment)
+
+  return subsegment
+}
+
 /*
   entry point of SBDP app with definition of
   1. which files should be processed by the preprocessed lambdas
   2. start job entry point
 */
 module.exports.startJob = async (event, context) => {
-
   // *******
   // TRACING
-  console.log('+++Start tracing - job manager')
-  const segment = AWSXRay.getSegment()
   const eventBody = JSON.parse(event.body)
-  const jobId = eventBody.jobId || 'dummyId'
-  console.log('+++jobId', jobId)
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: job manager')
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'AWSLambda')
-  console.log('+++subsegment', subsegment)
+  const jobId = eventBody.jobId
+  const lambdaTracingSubsegment = startLambdaTracing(jobId)
   // *******
 
 
@@ -78,7 +85,8 @@ module.exports.startJob = async (event, context) => {
 
   // *******
   // TRACING
-  subsegment.close()
+  lambdaTracingSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+  lambdaTracingSubsegment.close()
   // *******
 
   return {
