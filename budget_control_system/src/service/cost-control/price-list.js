@@ -4,6 +4,8 @@ import { get } from 'lodash'
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
+const serialize = (object) => JSON.stringify(object, null, 2)
+
 // TODO: current price list service api endpoints only for
 // us-east-1
 // ap-south-1
@@ -12,6 +14,14 @@ AWS.config.update({
 })
 
 const priceListService = new AWS.Pricing()
+
+const pricePerUnitHelperFunc = (priceObj) => {
+  const productOnDemandKey = Object.keys(get(priceObj, 'terms.OnDemand'))[0]
+  const productPriceDimensionsKey = Object.keys(get(priceObj, `terms.OnDemand['${productOnDemandKey}'].priceDimensions`))[0]
+  const pricePerUnitUSD = get(priceObj, `terms.OnDemand['${productOnDemandKey}'].priceDimensions['${productPriceDimensionsKey}'].pricePerUnit.USD`)
+
+  return pricePerUnitUSD
+}
 
 class PriceList {
   constructor() {
@@ -85,9 +95,9 @@ class PriceList {
     }
 
     const lambdaProduct = await this.priceListService.getProducts(param).promise()
-    const lambdaOnDemandKey = Object.keys(get(lambdaProduct, 'PriceList[0].terms.OnDemand'))[0]
-    const lambdaPriceDimensionsKey = Object.keys(get(lambdaProduct, `PriceList[0].terms.OnDemand['${lambdaOnDemandKey}'].priceDimensions`))[0]
-    const lambdaPricing = get(lambdaProduct, `PriceList[0].terms.OnDemand['${lambdaOnDemandKey}'].priceDimensions['${lambdaPriceDimensionsKey}'].pricePerUnit.USD`)
+    const lambdaPricing = pricePerUnitHelperFunc(
+      get(lambdaProduct, 'PriceList[0]')
+    )
 
     // 1 Nano USD = 1e-9 USD
     // Nano USD per 100 ms
@@ -185,7 +195,7 @@ class PriceList {
     return response
   }
 
-  async getSQSProducts(region = 'eu-central-1') {
+  async getSQSPricing(region = 'eu-central-1') {
     const LOCATION_MAP = {
       'eu-central-1': 'EU (Frankfurt)'
     }
@@ -209,7 +219,23 @@ class PriceList {
     }
 
     const response = await this.priceListService.getProducts(param).promise()
-    return response
+
+    const fifoQueueProduct = response.PriceList
+      .find((product) =>
+        get(product, 'product.attributes.messageDeliveryFrequency') === 'Exactly Once'
+        && get(product, 'product.attributes.messageDeliveryOrder') === 'Guaranteed')
+
+    const standardQueueProduct = response.PriceList
+      .find((product) =>
+        get(product, 'product.attributes.messageDeliveryFrequency') === 'At Least Once'
+        && get(product, 'product.attributes.messageDeliveryOrder') === 'Not Guaranteed')
+
+    const sqsPricing = {
+      fifo: pricePerUnitHelperFunc(fifoQueueProduct),
+      standard: pricePerUnitHelperFunc(standardQueueProduct),
+    }
+
+    return sqsPricing
   }
 
   async calculateLambdaPrice(lambdaProcessingTimes, region = 'eu-central-1') {
@@ -223,6 +249,23 @@ class PriceList {
 
     console.log('++++calculateLambdaPrice', lambdaPrices)
     return lambdaPrices
+  }
+
+  async calculateSqsPrice(serviceMap, region = 'eu-central-1') {
+    // Pricing per 1 million Requests after Free tier(Monthly)
+    // Standard Queue     $0.40   ($0.0000004 per request)
+    // FIFO Queue         $0.50   ($0.0000005 per request)
+
+    // FIFO Requests
+    // API actions for sending, receiving, deleting, and changing visibility of messages
+    // from FIFO queues are charged at FIFO rates.  All other API requests are charged at standard rates.
+
+    // Size of Payloads
+    // Each 64 KB chunk of a payload is billed as 1 request
+    // (for example, an API action with a 256 KB payload is billed as 4 requests).
+
+    const sqsPrices = await this.getLambdaPricing(region)
+    return sqsPrices
   }
 }
 

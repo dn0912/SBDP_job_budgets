@@ -173,7 +173,7 @@ app.get('/test-get-product-prices/:service', async (req, res) => {
       response = await priceList.getS3Products()
       break
     case 'sqs':
-      response = await priceList.getSQSProducts()
+      response = await priceList.getSQSPricing()
       break
     default:
       break
@@ -299,6 +299,7 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
 
   // other traced services
   const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
+  const sqsPrices = await priceList.calculateSqsPrice(filteredServiceTraceList)
 
   console.log('+++OtherServicesTraceSegments', filteredServiceTraceList)
   console.log('+++OtherServicesTraceSegments', serialize(filteredServiceTraceList))
