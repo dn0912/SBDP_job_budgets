@@ -8,6 +8,8 @@ AWS.config.update({
 
 const XRay = new AWS.XRay()
 
+const serialize = (object) => JSON.stringify(object, null, 2)
+
 export default class Tracer {
   constructor() {
     this.xray = XRay
@@ -54,5 +56,34 @@ export default class Tracer {
     }
     const traceData = await this.xray.batchGetTraces(param).promise()
     return traceData
+  }
+
+  /**
+   * 
+   * @param {*} jobId               JobId which is passed to the big data job
+   * @param {number} startTime      Timestamp - seconds since epoch e.g. 15953207272.81
+   */
+  async getFullTrace(jobId, startTime) {
+    const endTime = Date.now() / 1000
+    const traceSummary = await this.getXRayTraceSummaries(startTime, endTime, jobId)
+
+    console.log('+++traceSummary', traceSummary)
+    console.log('+++traceSummary', serialize(traceSummary))
+    const jobTraceIds = traceSummary.TraceSummaries.map((trace) => trace.Id)
+    const traceData = await this.batchGetXrayTraces(jobTraceIds)
+
+    console.log('+++traceData', traceData)
+    console.log('+++traceData', serialize(traceData))
+
+    const allTraceSegments = traceData.Traces.reduce((acc, trace) => {
+      console.log('++trace.Segments', trace.Segments)
+      const traceSegments = trace.Segments
+      acc.push(...traceSegments)
+      return acc
+    }, [])
+
+    console.log('+++allTraceSegments', allTraceSegments)
+
+    return allTraceSegments
   }
 }
