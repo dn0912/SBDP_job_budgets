@@ -11,7 +11,7 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
-import { calculateLambdaProcessingTimes, createServiceTracingMap } from './utils'
+import { createServiceTracingMap } from './utils'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -270,40 +270,18 @@ curl http://localhost:8080/test-job-tracing-summary/:startTime/:jobId
 app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   const { jobId } = req.params
   const startTime = parseInt(req.params.startTime, 10) / 1000
-  const endTime = Date.now() / 1000
-  const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
 
-  console.log('+++traceSummary', traceSummary)
-  console.log('+++traceSummary', serialize(traceSummary))
+  const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
-  const jobTraceIds = traceSummary.TraceSummaries.map((trace) => trace.Id)
-  const traceData = await tracer.batchGetXrayTraces(jobTraceIds)
-
-  console.log('+++traceData', traceData)
-  console.log('+++traceData', serialize(traceData))
-
-  const allTraceSegments = traceData.Traces.reduce((acc, trace) => {
-    console.log('++trace.Segments', trace.Segments)
-    const traceSegments = trace.Segments
-    acc.push(...traceSegments)
-    return acc
-  }, [])
-
-  console.log('+++allTraceSegments', allTraceSegments)
-
-  // traced lambdas
-  const lambdaProcessingTimes = calculateLambdaProcessingTimes(allTraceSegments)
-  const lambdaPrices = await priceList.calculateLambdaPrice(lambdaProcessingTimes)
+  const lambdaPrices = await priceList.calculateLambdaPrice(allTraceSegments)
 
   console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
 
   // other traced services
   const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
+  console.log('+++filteredServiceTraceList', filteredServiceTraceList)
   const sqsPrices = await priceList.calculateSqsPrice(filteredServiceTraceList)
 
-  console.log('+++OtherServicesTraceSegments', filteredServiceTraceList)
-  console.log('+++OtherServicesTraceSegments', serialize(filteredServiceTraceList))
-  console.log('+++OtherServicesTraceSegments', filteredServiceTraceList.length)
   console.log('+++tracingMap', filteredServiceTraceList)
 
   res.status(HttpStatus.OK).json({

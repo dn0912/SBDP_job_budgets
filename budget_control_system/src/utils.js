@@ -4,7 +4,7 @@ const TRACED_SERVICES = ['S3', 'SQS']
 
 const calculateLambdaProcessingTimes = (traceSegments) => {
   const lambdaTraceSegments = traceSegments
-    .filter((seg) => seg.Document.includes('Cost tracer subsegment'))
+    .filter((seg) => seg.Document.includes('Cost tracer subsegment - Lambda'))
     .map((seg) => ({
       ...seg,
       Document: JSON.parse(seg.Document),

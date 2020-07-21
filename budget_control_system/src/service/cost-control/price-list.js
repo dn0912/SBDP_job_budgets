@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
 
+import { calculateLambdaProcessingTimes } from '../../utils'
+
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
@@ -238,7 +240,9 @@ class PriceList {
     return sqsPricing
   }
 
-  async calculateLambdaPrice(lambdaProcessingTimes, region = 'eu-central-1') {
+  async calculateLambdaPrice(fullTrace, region = 'eu-central-1') {
+    const lambdaProcessingTimes = calculateLambdaProcessingTimes(fullTrace)
+
     // TODO: enhance function with lambda memory usage of each function
     const lambdaPricingPer100Ms = await this.getLambdaPricing(region)
     const lambdaPrices = lambdaProcessingTimes.map((lambdaProcTime) => {
