@@ -264,8 +264,14 @@ class PriceList {
     // Each 64 KB chunk of a payload is billed as 1 request
     // (for example, an API action with a 256 KB payload is billed as 4 requests).
 
-    const sqsPrices = await this.getLambdaPricing(region)
-    return sqsPrices
+    const { fifo, standard } = await this.getSQSPricing(region)
+    const sendMessageAmount = get(serviceMap, 'SQS.SendMessage', 0)
+
+    const sqsPrice = Number(`${fifo * sendMessageAmount}e9`)
+
+    console.log('++++calculateSqsPrice', sqsPrice)
+
+    return sqsPrice // in Nano USD
   }
 }
 
