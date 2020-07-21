@@ -98,6 +98,11 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   return subsegment
 }
 
+const stopLambdaTracing = (lambdaSubsegment) => {
+  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+  lambdaSubsegment.close()
+}
+
 module.exports.handler = async (event, context) => {
   console.log('+++event2', JSON.stringify(event, undefined, 2))
   console.log('+++context', context)
@@ -137,8 +142,7 @@ module.exports.handler = async (event, context) => {
 
   // *******
   // TRACING
-  lambdaTracingSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaTracingSubsegment.close()
+  stopLambdaTracing(lambdaTracingSubsegment)
     // *******
 
   return response

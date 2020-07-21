@@ -64,6 +64,11 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   return subsegment
 }
 
+const stopLambdaTracing = (lambdaSubsegment) => {
+  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+  lambdaSubsegment.close()
+}
+
 const sqsPayloadSizeTracer = (sqsPayload) => {
   const { QueueUrl } = sqsPayload
   console.log('+++sqsPayload', sqsPayload)
@@ -133,8 +138,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // *******
     // TRACING
-    lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-    lambdaSubsegment.close()
+    stopLambdaTracing(lambdaSubsegment)
     // *******
 
     return response

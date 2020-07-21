@@ -39,6 +39,11 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   return subsegment
 }
 
+const stopLambdaTracing = (lambdaSubsegment) => {
+  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+  lambdaSubsegment.close()
+}
+
 /*
   entry point of SBDP app with definition of
   1. which files should be processed by the preprocessed lambdas
@@ -85,8 +90,7 @@ module.exports.startJob = async (event, context) => {
 
   // *******
   // TRACING
-  lambdaTracingSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaTracingSubsegment.close()
+  stopLambdaTracing(lambdaTracingSubsegment)
   // *******
 
   return {
