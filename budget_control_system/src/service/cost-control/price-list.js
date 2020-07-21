@@ -271,7 +271,7 @@ class PriceList {
     const { fifo, standard } = await this.getSQSPricing(region)
     const sendMessageAmount = get(serviceMap, 'SQS.SendMessage', 0)
 
-    const sqsPrice = Number(`${fifo * sendMessageAmount}e9`)
+    const sqsPrice = Number(`${standard * sendMessageAmount}e9`)
 
     console.log('++++calculateSqsPrice', sqsPrice)
 

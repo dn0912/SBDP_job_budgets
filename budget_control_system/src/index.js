@@ -11,7 +11,7 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
-import { createServiceTracingMap } from './utils'
+import { createServiceTracingMap, calculateSqsRequestAmounts } from './utils'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -276,6 +276,9 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   const lambdaPrices = await priceList.calculateLambdaPrice(allTraceSegments)
 
   console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
+
+  // sqs
+  calculateSqsRequestAmounts(allTraceSegments)
 
   // other traced services
   const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)

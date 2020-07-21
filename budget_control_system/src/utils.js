@@ -1,9 +1,9 @@
 import { get, set } from 'lodash'
 
-const TRACED_SERVICES = ['S3', 'SQS']
+const serialize = (object) => JSON.stringify(object, null, 2)
 
-const calculateLambdaProcessingTimes = (traceSegments) => {
-  const lambdaTraceSegments = traceSegments
+const calculateLambdaProcessingTimes = (fullTraceSegments) => {
+  const lambdaTraceSegments = fullTraceSegments
     .filter((seg) => seg.Document.includes('Cost tracer subsegment - Lambda'))
     .map((seg) => ({
       ...seg,
@@ -18,8 +18,35 @@ const calculateLambdaProcessingTimes = (traceSegments) => {
   return lambdaProcessingTimes
 }
 
-const createServiceTracingMap = (traceSegments) => {
-  const filteredServiceTraceList = traceSegments
+const calculateSqsRequestAmounts = (fullTraceSegments) => {
+  const sqsTraceSegments = fullTraceSegments
+    .filter((seg) => seg.Document.includes('Cost tracer subsegment - SQS'))
+    .map((seg) => ({
+      ...seg,
+      Document: JSON.parse(seg.Document),
+    }))
+
+  const sqsSubsegments = sqsTraceSegments.map((document) => {
+    // const lambdaInvocationSubsegmentWithSqsAnnotation =
+    const { subsegments } = get(document, 'Document.subsegments', [])
+      .find((subsegment) => subsegment.name === 'Invocation')
+
+    console.log('+++lambdaInvocationSubsegmentWithSqsAnnotation', subsegments)
+
+    const sqsSubsegment = subsegments
+      .filter((subsegment) => subsegment.name.includes('Cost tracer subsegment - SQS: SQS payload size'))
+
+    console.log('+++sqsSubsegment', sqsSubsegment)
+
+    return sqsSubsegment
+  })
+
+  console.log('+++sqsSubsegments', serialize(sqsSubsegments))
+}
+
+const TRACED_SERVICES = ['S3', 'SQS']
+const createServiceTracingMap = (fullTraceSegments) => {
+  const filteredServiceTraceList = fullTraceSegments
     .map((seg) => ({
       ...seg,
       Document: JSON.parse(seg.Document),
@@ -54,4 +81,5 @@ const createServiceTracingMap = (traceSegments) => {
 export {
   calculateLambdaProcessingTimes,
   createServiceTracingMap,
+  calculateSqsRequestAmounts,
 }
