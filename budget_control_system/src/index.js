@@ -11,7 +11,7 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
-import { createServiceTracingMap, calculateSqsRequestAmounts } from './utils'
+import { createServiceTracingMap, calculateSqsRequestAmountsPerQueue } from './utils'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -112,6 +112,7 @@ app.post('/start-tracing', async (req, res) => {
     jobUrl,
     jobId,
     dateNow,
+    tracingUrl: `http://localhost:8080/test-job-tracing-summary/${dateNow}/${jobId}`
   })
 })
 
@@ -278,17 +279,15 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
 
   // sqs
-  calculateSqsRequestAmounts(allTraceSegments)
+  const sqsRequestMapPerQueue = calculateSqsRequestAmountsPerQueue(allTraceSegments)
+  const sqsPrices = await priceList.calculateSqsPrice(sqsRequestMapPerQueue)
 
   // other traced services
   const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
-  console.log('+++filteredServiceTraceList', filteredServiceTraceList)
-  const sqsPrices = await priceList.calculateSqsPrice(filteredServiceTraceList)
-
   console.log('+++tracingMap', filteredServiceTraceList)
 
   res.status(HttpStatus.OK).json({
-    hello: 'world'
+    totalPrice: lambdaPrices + sqsPrices
   })
 })
 

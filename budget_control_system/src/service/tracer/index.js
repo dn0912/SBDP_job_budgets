@@ -59,7 +59,7 @@ export default class Tracer {
   }
 
   /**
-   * 
+   *
    * @param {*} jobId               JobId which is passed to the big data job
    * @param {number} startTime      Timestamp - seconds since epoch e.g. 15953207272.81
    */

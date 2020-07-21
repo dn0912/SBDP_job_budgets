@@ -1,4 +1,4 @@
-import { get, set } from 'lodash'
+import { get, set, flatten } from 'lodash'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -18,7 +18,7 @@ const calculateLambdaProcessingTimes = (fullTraceSegments) => {
   return lambdaProcessingTimes
 }
 
-const calculateSqsRequestAmounts = (fullTraceSegments) => {
+const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
   const sqsTraceSegments = fullTraceSegments
     .filter((seg) => seg.Document.includes('Cost tracer subsegment - SQS'))
     .map((seg) => ({
@@ -26,22 +26,30 @@ const calculateSqsRequestAmounts = (fullTraceSegments) => {
       Document: JSON.parse(seg.Document),
     }))
 
-  const sqsSubsegments = sqsTraceSegments.map((document) => {
+  const sqsSubsegments = flatten(sqsTraceSegments.map((document) => {
     // const lambdaInvocationSubsegmentWithSqsAnnotation =
     const { subsegments } = get(document, 'Document.subsegments', [])
       .find((subsegment) => subsegment.name === 'Invocation')
 
-    console.log('+++lambdaInvocationSubsegmentWithSqsAnnotation', subsegments)
-
     const sqsSubsegment = subsegments
       .filter((subsegment) => subsegment.name.includes('Cost tracer subsegment - SQS: SQS payload size'))
-
-    console.log('+++sqsSubsegment', sqsSubsegment)
-
     return sqsSubsegment
-  })
+  }))
 
-  console.log('+++sqsSubsegments', serialize(sqsSubsegments))
+  const sqsRequestAmounts = sqsSubsegments.reduce((acc, seg) => {
+    const { queueUrl } = seg.annotations
+    const previousTracedValue = get(acc, `["${queueUrl}"].SendMessage`, 0)
+    const tracedQueueData = {
+      SendMessage: previousTracedValue + 1,
+      QueueType: 'standard'
+    }
+    set(acc, `["${queueUrl}"]`, tracedQueueData)
+    return acc
+  }, {})
+
+  console.log('+++sqsSubsegments', serialize(sqsSubsegments), sqsRequestAmounts)
+
+  return sqsRequestAmounts
 }
 
 const TRACED_SERVICES = ['S3', 'SQS']
@@ -81,5 +89,5 @@ const createServiceTracingMap = (fullTraceSegments) => {
 export {
   calculateLambdaProcessingTimes,
   createServiceTracingMap,
-  calculateSqsRequestAmounts,
+  calculateSqsRequestAmountsPerQueue,
 }

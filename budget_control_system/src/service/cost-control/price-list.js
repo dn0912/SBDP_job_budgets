@@ -252,10 +252,10 @@ class PriceList {
     })
 
     console.log('++++calculateLambdaPrice', lambdaPrices)
-    return lambdaPrices
+    return lambdaPrices.reduce((acc, val) => acc + val)
   }
 
-  async calculateSqsPrice(serviceMap, region = 'eu-central-1') {
+  async calculateSqsPrice(sqsRequestsMapPerQueue, region = 'eu-central-1') {
     // Pricing per 1 million Requests after Free tier(Monthly)
     // Standard Queue     $0.40   ($0.0000004 per request)
     // FIFO Queue         $0.50   ($0.0000005 per request)
@@ -268,14 +268,28 @@ class PriceList {
     // Each 64 KB chunk of a payload is billed as 1 request
     // (for example, an API action with a 256 KB payload is billed as 4 requests).
 
+    // TODO: enhance funtion with queue type through queueUrl: for now all queues are standard type
     const { fifo, standard } = await this.getSQSPricing(region)
-    const sendMessageAmount = get(serviceMap, 'SQS.SendMessage', 0)
+    const queueUrls = Object.keys(sqsRequestsMapPerQueue)
+    const messageAmountsPerType = queueUrls.reduce((acc, url) => {
+      const queueType = sqsRequestsMapPerQueue[url].QueueType
+      const SendMessageRequestAmount = sqsRequestsMapPerQueue[url].SendMessage
 
-    const sqsPrice = Number(`${standard * sendMessageAmount}e9`)
+      return {
+        ...acc,
+        [queueType]: acc[queueType] + SendMessageRequestAmount,
+      }
+    }, {
+      standard: 0,
+      fifo: 0,
+    })
 
-    console.log('++++calculateSqsPrice', sqsPrice)
+    // in Nano USD
+    const sqsStandardPrice = Number(`${standard}e9`) * messageAmountsPerType.standard
+    const sqsFIFOPrice = Number(`${fifo}e9`) * messageAmountsPerType.fifo
 
-    return sqsPrice // in Nano USD
+    console.log('+++sqsPrice', messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, standard)
+    return sqsStandardPrice + sqsFIFOPrice
   }
 }
 
