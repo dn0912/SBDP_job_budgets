@@ -65,8 +65,9 @@ const startLambdaTracing = (jobId = 'dummyId') => {
 }
 
 const sqsPayloadSizeTracer = (sqsPayload) => {
+  const { QueueUrl } = sqsPayload
   console.log('+++sqsPayload', sqsPayload)
-  console.log('+++sqsPayload', JSON.stringify(sqsPayload))
+  console.log('+++sqsPayload111', JSON.stringify(sqsPayload))
   // TODO: Blob is somehow not working
   // const payloadByteSize = new Blob([JSON.stringify(sqsPayload)]).size
   const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8');
@@ -74,8 +75,9 @@ const sqsPayloadSizeTracer = (sqsPayload) => {
 
   const segment = AWSXRay.getSegment()
   const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
-  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024)
+  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
   subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
+  subsegment.addAnnotation('queueUrl', QueueUrl)
   subsegment.close()
 }
 
@@ -103,7 +105,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     const messageBody = {
       fileName,
       jobId,
-      junk: ('x').repeat(1024*240)
+      // junk: ('x').repeat(1024*240)
     }
 
     const sqsPayload = {
