@@ -56,12 +56,27 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   const segment = AWSXRay.getSegment()
   console.log('+++jobId', jobId)
   console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment: preprocessor')
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: preprocessor')
   subsegment.addAnnotation('jobId', jobId)
   subsegment.addAnnotation('serviceType', 'AWSLambda')
   console.log('+++subsegment', subsegment)
 
   return subsegment
+}
+
+const sqsPayloadSizeTracer = (sqsPayload) => {
+  console.log('+++sqsPayload', sqsPayload)
+  console.log('+++sqsPayload', JSON.stringify(sqsPayload))
+  // TODO: Blob is somehow not working
+  // const payloadByteSize = new Blob([JSON.stringify(sqsPayload)]).size
+  const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8');
+  const sqs64KiloByteChunkAmounts = Math.ceil(payloadByteSize / 1024 / 64)
+
+  const segment = AWSXRay.getSegment()
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
+  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024)
+  subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
+  subsegment.close()
 }
 
 module.exports.readAndFilterFile = async (event, context) => {
@@ -71,7 +86,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     // *******
     // Tracing
     const jobId = event.jobId
-    const lambdaTracingSubsegment = startLambdaTracing(jobId)
+    const lambdaSubsegment = startLambdaTracing(jobId)
     // *******
 
     const inputFileName = (event && event.fileName) || FILE
@@ -88,6 +103,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     const messageBody = {
       fileName,
       jobId,
+      junk: ('x').repeat(1024*240)
     }
 
     const sqsPayload = {
@@ -96,6 +112,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     }
 
     // Sends single message to SQS for further process
+    sqsPayloadSizeTracer(sqsPayload)
     const test = await sendSQSMessage(sqsPayload)
 
     await _slowDown(5000)
@@ -114,8 +131,8 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // *******
     // TRACING
-    lambdaTracingSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-    lambdaTracingSubsegment.close()
+    lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+    lambdaSubsegment.close()
     // *******
 
     return response
