@@ -61,7 +61,7 @@ app.post('/start-tracing', async (req, res) => {
   console.log('+++response.body', response.body)
 
   // TODO: to measure trace fetching delay
-  const pollPeriodinMs = 300
+  const pollPeriodinMs = 200
   const counter = {
     value: 0,
   }
@@ -72,10 +72,12 @@ app.post('/start-tracing', async (req, res) => {
       console.log('#### wait for 1 sec')
       resolve()
     }, 1000))
-    while (counter.value < 20) {
+    while (counter.value < 30) {
+      // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
       const startTime = dateNow / 1000
       const endTime = Date.now() / 1000
+      // eslint-disable-next-line no-await-in-loop
       const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
 
       const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
@@ -92,6 +94,8 @@ app.post('/start-tracing', async (req, res) => {
         currentTimeStamp,
         elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
       }
+
+      console.log('+++traceSummary.TraceSummaries', traceSummary.TraceSummaries)
 
       // TODO: remove break statement => only for first fetch to record trace delay
       counter.value++
@@ -281,6 +285,9 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   // sqs
   const sqsRequestMapPerQueue = calculateSqsRequestAmountsPerQueue(allTraceSegments)
   const sqsPrices = await priceList.calculateSqsPrice(sqsRequestMapPerQueue)
+
+  const totalJobPrice = lambdaPrices + sqsPrices
+  console.log('+++totalJobPrice', totalJobPrice)
 
   // other traced services
   const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)

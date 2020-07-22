@@ -47,7 +47,7 @@ const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
     return acc
   }, {})
 
-  console.log('+++sqsSubsegments', serialize(sqsSubsegments), sqsRequestAmounts)
+  // console.log('+++sqsSubsegments', serialize(sqsSubsegments), sqsRequestAmounts)
 
   return sqsRequestAmounts
 }

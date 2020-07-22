@@ -251,8 +251,9 @@ class PriceList {
       return roundedLambdaProcTime * lambdaPricingPer100Ms // Nano USD
     })
 
-    console.log('++++calculateLambdaPrice', lambdaPrices)
-    return lambdaPrices.reduce((acc, val) => acc + val)
+    const lambdaTotalPrice = lambdaPrices.reduce((acc, val) => (acc + val), 0)
+    console.log('++++calculateLambdaPrice', lambdaPrices, lambdaTotalPrice)
+    return lambdaTotalPrice
   }
 
   async calculateSqsPrice(sqsRequestsMapPerQueue, region = 'eu-central-1') {
@@ -288,8 +289,11 @@ class PriceList {
     const sqsStandardPrice = Number(`${standard}e9`) * messageAmountsPerType.standard
     const sqsFIFOPrice = Number(`${fifo}e9`) * messageAmountsPerType.fifo
 
-    console.log('+++sqsPrice', messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, standard)
-    return sqsStandardPrice + sqsFIFOPrice
+    const sqsTotalPrice = sqsStandardPrice + sqsFIFOPrice
+    console.log('+++sqsPrice', {
+      messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, sqsTotalPrice,
+    })
+    return sqsTotalPrice
   }
 }
 
