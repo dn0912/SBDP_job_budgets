@@ -286,11 +286,16 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
   const sqsRequestMapPerQueue = calculateSqsRequestAmountsPerQueue(allTraceSegments)
   const sqsPrices = await priceList.calculateSqsPrice(sqsRequestMapPerQueue)
 
-  const totalJobPrice = lambdaPrices + sqsPrices
-  console.log('+++totalJobPrice', totalJobPrice)
+  // s3
+  const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
+  const s3Prices = await priceList.calculateS3Price(allTraceSegments)
+
+  const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
+  console.log('+++totalJobPrice', {
+    lambdaPrices, sqsPrices, s3Prices, totalJobPrice,
+  })
 
   // other traced services
-  const filteredServiceTraceList = createServiceTracingMap(allTraceSegments)
   console.log('+++tracingMap', filteredServiceTraceList)
 
   res.status(HttpStatus.OK).json({

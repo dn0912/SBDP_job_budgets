@@ -21,6 +21,62 @@ const _slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// *******
+// TRACING
+const startLambdaTracing = (jobId = 'dummyId') => {
+  console.log('+++Start tracing - preprocesser')
+  const segment = AWSXRay.getSegment()
+  console.log('+++jobId', jobId)
+  console.log('+++segment', segment)
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: preprocessor')
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'AWSLambda')
+  console.log('+++subsegment', subsegment)
+
+  return subsegment
+}
+
+const stopLambdaTracing = (lambdaSubsegment) => {
+  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
+  lambdaSubsegment.close()
+}
+
+const sqsPayloadSizeTracer = (jobId, sqsPayload) => {
+  const { QueueUrl } = sqsPayload
+  console.log('+++sqsPayload', sqsPayload)
+  console.log('+++sqsPayload111', JSON.stringify(sqsPayload))
+  // TODO: Blob is somehow not working
+  // const payloadByteSize = new Blob([JSON.stringify(sqsPayload)]).size
+  const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8');
+  const sqs64KiloByteChunkAmounts = Math.ceil(payloadByteSize / 1024 / 64)
+
+  const segment = AWSXRay.getSegment()
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
+  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
+  subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
+  subsegment.addAnnotation('queueUrl', QueueUrl)
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'SQS')
+  subsegment.close()
+}
+
+const s3FileSizeTracer = (jobId, fileContent) => {
+  const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8');
+  const s3ContentKiloByteSize = contentByteSize / 1024
+
+  console.log('+++jobId', jobId)
+  console.log('+++s3ContentKiloByteSize', s3ContentKiloByteSize)
+
+  const segment = AWSXRay.getSegment()
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - S3: S3 file size')
+  subsegment.addAnnotation('s3ContentKiloByteSize', s3ContentKiloByteSize)
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'S3')
+  subsegment.close()
+}
+// TRACING
+// *******
+
 const _readFile = async (fileName) => {
   const params = {
     Bucket: BUCKET,
@@ -51,42 +107,6 @@ const _filterUnnecessaryUpdates = (tasksUpdateArray) => {
   return filteredTaskUpdateArray
 }
 
-const startLambdaTracing = (jobId = 'dummyId') => {
-  console.log('+++Start tracing - preprocesser')
-  const segment = AWSXRay.getSegment()
-  console.log('+++jobId', jobId)
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: preprocessor')
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'AWSLambda')
-  console.log('+++subsegment', subsegment)
-
-  return subsegment
-}
-
-const stopLambdaTracing = (lambdaSubsegment) => {
-  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaSubsegment.close()
-}
-
-const sqsPayloadSizeTracer = (sqsPayload) => {
-  const { QueueUrl } = sqsPayload
-  console.log('+++sqsPayload', sqsPayload)
-  console.log('+++sqsPayload111', JSON.stringify(sqsPayload))
-  // TODO: Blob is somehow not working
-  // const payloadByteSize = new Blob([JSON.stringify(sqsPayload)]).size
-  const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8');
-  const sqs64KiloByteChunkAmounts = Math.ceil(payloadByteSize / 1024 / 64)
-
-  const segment = AWSXRay.getSegment()
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
-  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
-  subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
-  subsegment.addAnnotation('queueUrl', QueueUrl)
-  subsegment.addAnnotation('serviceType', 'SQS')
-  subsegment.close()
-}
-
 module.exports.readAndFilterFile = async (event, context) => {
   console.log('+++event', JSON.stringify(event, undefined, 2))
   console.log('+++context', context)
@@ -101,6 +121,10 @@ module.exports.readAndFilterFile = async (event, context) => {
     const s3FileContentAsString = await _readFile(inputFileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = _filterUnnecessaryUpdates(s3FileContent)
+    // *******
+    // Tracing
+    s3FileSizeTracer(jobId, cleanTaskUpdates)
+    // *******
     const fileName = await _putFile(cleanTaskUpdates)
 
     console.log('+++fileName', fileName)
@@ -120,7 +144,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     }
 
     // Sends single message to SQS for further process
-    sqsPayloadSizeTracer(sqsPayload)
+    sqsPayloadSizeTracer(jobId, sqsPayload)
     const test = await sendSQSMessage(sqsPayload)
 
     await _slowDown(5000)

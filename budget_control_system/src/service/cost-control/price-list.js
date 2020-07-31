@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
 
-import { calculateLambdaProcessingTimes } from '../../utils'
+import { calculateLambdaProcessingTimes, createServiceTracingMap } from '../../utils'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -194,13 +194,22 @@ class PriceList {
     const putCopyPostListRequestProduct = response.PriceList
       .find((product) => get(product, 'product.attributes.usagetype') === 'EUC1-Requests-Tier1')
 
+    const putCopyPostListRequests = pricePerUnitHelperFunc(putCopyPostListRequestProduct)
+
     // GET, SELECT, and all other requests
     const getSelectOthersRequestsProcuct = response.PriceList
       .find((product) => get(product, 'product.attributes.usagetype') === 'EUC1-Requests-Tier2')
 
+    const getSelectOthersRequests = pricePerUnitHelperFunc(getSelectOthersRequestsProcuct)
+
     const requestAndDataRetrievalsPrices = {
-      putCopyPostListRequests: pricePerUnitHelperFunc(putCopyPostListRequestProduct),
-      getSelectOthersRequests: pricePerUnitHelperFunc(getSelectOthersRequestsProcuct),
+      PutObject: putCopyPostListRequests,
+      CopyObject: putCopyPostListRequests,
+      PostObject: putCopyPostListRequests,
+      ListObjects: putCopyPostListRequests,
+      GetObject: getSelectOthersRequests,
+      SelectObject: getSelectOthersRequests,
+      Others: getSelectOthersRequests,
     }
 
     // 3. Data transfer
@@ -350,13 +359,46 @@ class PriceList {
   }
 
   // TODO: currently only S3 Standard
-  async calculateS3Price(region = 'eu-central-1') {
-    const _calculateStorageFactor = () => {}
-    const _calculateRequestAndRetrievalsFactor = () => {}
-    const _calculateDataTransferFactor = () => {}
-    const _calculateManagementAndReplicationFactor = () => {}
+  async calculateS3Price(fullTrace, region = 'eu-central-1') {
+    const s3Pricings = await this.getS3Pricing()
 
+    const _calculateStorageFactor = (completeTrace) => {
+      
+    }
 
+    const _calculateRequestAndRetrievalsFactor = (completeTrace) => {
+      const fullRequestTracingMap = createServiceTracingMap(completeTrace)
+      const s3RequestsMap = get(fullRequestTracingMap, 'S3', {})
+      const price = Object.keys(s3RequestsMap)
+        .reduce((acc, requestType) => {
+          const requestAmount = s3RequestsMap[requestType] || 0
+
+          const priceForRequest = s3Pricings.requestAndDataRetrievalsPrices[requestType] || s3Pricings.requestAndDataRetrievalsPrices.Others
+
+          // every 1000 request
+          return acc + priceForRequest * Math.ceil(requestAmount / 1000)
+        }, 0)
+
+      return price
+    }
+
+    const _calculateDataTransferFactor = () => { }
+    const _calculateManagementAndReplicationFactor = () => { }
+
+    // TODO:
+    const storagePrice = 0
+
+    // 2. Request and Data Retrieval price
+    // e.g. { SQS: { SendMessage: 2 }, S3: { GetObject: 4, PutObject: 4 } }
+    const requestAndDataRetrievalsPrice = _calculateRequestAndRetrievalsFactor(fullTrace)
+
+    const s3Totalprice = storagePrice + requestAndDataRetrievalsPrice
+
+    console.log('+++s3Totalprice', {
+      requestAndDataRetrievalsPrice,
+    })
+
+    return Number(`${s3Totalprice}e9`)
   }
 }
 
