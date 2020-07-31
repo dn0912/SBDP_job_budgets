@@ -100,7 +100,7 @@ app.post('/start-tracing', async (req, res) => {
       // TODO: remove break statement => only for first fetch to record trace delay
       counter.value++
       if (traceSummary.TraceSummaries.length > 0) {
-        console.log('+++traceSummaryArray', traceResult)
+        console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
         fs.appendFileSync(
           'traceFetchingDelays.csv',
           `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,

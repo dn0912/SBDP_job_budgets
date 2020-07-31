@@ -83,6 +83,7 @@ const sqsPayloadSizeTracer = (sqsPayload) => {
   subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
   subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
   subsegment.addAnnotation('queueUrl', QueueUrl)
+  subsegment.addAnnotation('serviceType', 'SQS')
   subsegment.close()
 }
 
