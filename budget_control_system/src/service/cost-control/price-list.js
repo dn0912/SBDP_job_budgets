@@ -25,6 +25,23 @@ const pricePerUnitHelperFunc = (priceObj) => {
   return pricePerUnitUSD
 }
 
+const multiplePricesPerUnitHelperFunc = (priceObj) => {
+  const productOnDemandKey = Object.keys(get(priceObj, 'terms.OnDemand'))[0]
+  const productPriceDimensionsKeys = Object.keys(get(priceObj, `terms.OnDemand['${productOnDemandKey}'].priceDimensions`))
+
+  const pricesObjectsInUSD = productPriceDimensionsKeys.reduce((acc, priceDimensionKey) => {
+    const priceDimensionProduct = get(priceObj, `terms.OnDemand['${productOnDemandKey}'].priceDimensions['${priceDimensionKey}']`)
+    acc.push({
+      ...priceDimensionProduct,
+      pricePerUnitUSD: get(priceDimensionProduct, 'pricePerUnit.USD'),
+    })
+
+    return acc
+  }, [])
+
+  return pricesObjectsInUSD
+}
+
 class PriceList {
   constructor() {
     this.priceListService = priceListService
@@ -141,7 +158,7 @@ class PriceList {
     return response
   }
 
-  async getS3Products(region = 'eu-central-1') {
+  async getS3Pricing(tierType, region = 'eu-central-1') {
     const LOCATION_MAP = {
       'eu-central-1': 'EU (Frankfurt)'
     }
@@ -161,11 +178,47 @@ class PriceList {
         },
       ],
       FormatVersion: 'aws_v1',
-      MaxResults: 30,
+      MaxResults: 100,
     }
 
     const response = await this.priceListService.getProducts(param).promise()
-    return response
+
+    // 1. Storage
+    const storageProducts = response.PriceList
+      .find((product) => get(product, 'product.attributes.usagetype') === 'EUC1-TimedStorage-ByteHrs')
+
+    const storagePrices = multiplePricesPerUnitHelperFunc(storageProducts)
+
+    // 2. Request and Data Retrievals
+    // PUT/COPY/POST or LIST requests
+    const putCopyPostListRequestProduct = response.PriceList
+      .find((product) => get(product, 'product.attributes.usagetype') === 'EUC1-Requests-Tier1')
+
+    // GET, SELECT, and all other requests
+    const getSelectOthersRequestsProcuct = response.PriceList
+      .find((product) => get(product, 'product.attributes.usagetype') === 'EUC1-Requests-Tier2')
+
+    const requestAndDataRetrievalsPrices = {
+      putCopyPostListRequests: pricePerUnitHelperFunc(putCopyPostListRequestProduct),
+      getSelectOthersRequests: pricePerUnitHelperFunc(getSelectOthersRequestsProcuct),
+    }
+
+    // 3. Data transfer
+    // Note: Transfers between S3 buckets or from Amazon S3 to
+    // any service(s) within the same AWS Region are free.
+    // Source: https://aws.amazon.com/s3/pricing/?nc1=h_ls (accessed: 2020/07/31)
+    const dataTransferPrices = 0
+
+    // 4. Management and Replication
+    // Note: By default all the management and replication features are disabled
+    const managementAndReplicationPrices = 0
+
+    return {
+      storagePrices,
+      requestAndDataRetrievalsPrices,
+      dataTransferPrices,
+      managementAndReplicationPrices,
+    }
   }
 
   async describeSQSServices() {
@@ -294,6 +347,16 @@ class PriceList {
       messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, sqsTotalPrice,
     })
     return sqsTotalPrice
+  }
+
+  // TODO: currently only S3 Standard
+  async calculateS3Price(region = 'eu-central-1') {
+    const _calculateStorageFactor = () => {}
+    const _calculateRequestAndRetrievalsFactor = () => {}
+    const _calculateDataTransferFactor = () => {}
+    const _calculateManagementAndReplicationFactor = () => {}
+
+
   }
 }
 

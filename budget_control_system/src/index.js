@@ -175,7 +175,7 @@ app.get('/test-get-product-prices/:service', async (req, res) => {
       response = await priceList.getLambdaPricing()
       break
     case 's3':
-      response = await priceList.getS3Products()
+      response = await priceList.getS3Pricing()
       break
     case 'sqs':
       response = await priceList.getSQSPricing()

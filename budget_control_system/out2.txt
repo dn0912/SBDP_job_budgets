@@ -1,0 +1,3305 @@
+
+> budget_control_system@1.0.0 start /Users/dnguyen/Documents/masters_thesis/sbdp_job_budgets/budget_control_system
+> nodemon --require dotenv/config --exec babel-node --inspect src/index.js
+
+[33m[nodemon] 2.0.4[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,json[39m
+[32m[nodemon] starting `babel-node --require dotenv/config --inspect src/index.js`[39m
++++process.env eu-central-1
+App listening at http://localhost:8080
++++response s3 {
+  "FormatVersion": "aws_v1",
+  "PriceList": [
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Scanned by S3 Select in Standard",
+          "usagetype": "EUC1-Select-Scanned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Select-Scanned"
+        },
+        "sku": "22H2YQQ6TQ3VBW7N"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "22H2YQQ6TQ3VBW7N.JRTCKXETXF": {
+            "priceDimensions": {
+              "22H2YQQ6TQ3VBW7N.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.00225 per GB - for bytes scanned by S3 Select in Standard",
+                "appliesTo": [],
+                "rateCode": "22H2YQQ6TQ3VBW7N.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0022500000"
+                }
+              }
+            },
+            "sku": "22H2YQQ6TQ3VBW7N",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests to Intelligent-Tiering",
+          "usagetype": "EUC1-Requests-INT-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-INT-Tier2"
+        },
+        "sku": "2RS5NPZC8MXMAJA9"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "2RS5NPZC8MXMAJA9.JRTCKXETXF": {
+            "priceDimensions": {
+              "2RS5NPZC8MXMAJA9.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0043 per 10,000 GET and all other requests to Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "2RS5NPZC8MXMAJA9.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000004300"
+                }
+              }
+            },
+            "sku": "2RS5NPZC8MXMAJA9",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT/COPY/POST or LIST requests to Standard-Infrequent Access",
+          "usagetype": "EUC1-Requests-SIA-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-SIA-Tier1"
+        },
+        "sku": "2YEQ3FP5YQ38N8A3"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "2YEQ3FP5YQ38N8A3.JRTCKXETXF": {
+            "priceDimensions": {
+              "2YEQ3FP5YQ38N8A3.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.01 per 1,000 PUT, COPY, POST or LIST requests to Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "2YEQ3FP5YQ38N8A3.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000100000"
+                }
+              }
+            },
+            "sku": "2YEQ3FP5YQ38N8A3",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Restore Object",
+          "usagetype": "EUC1-Requests-Tier3",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "RestoreObject",
+          "group": "S3-API-Tier3"
+        },
+        "sku": "36U4EY9RF7F6EUCR"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "36U4EY9RF7F6EUCR.JRTCKXETXF": {
+            "priceDimensions": {
+              "36U4EY9RF7F6EUCR.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 Glacier Requests",
+                "appliesTo": [],
+                "rateCode": "36U4EY9RF7F6EUCR.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "36U4EY9RF7F6EUCR",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT for Replication to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "PutObjectForRepl",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "3GU9FU26M8K8VF4N"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "3GU9FU26M8K8VF4N.JRTCKXETXF": {
+            "priceDimensions": {
+              "3GU9FU26M8K8VF4N.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 PUT for Replication to Glacier",
+                "appliesTo": [],
+                "rateCode": "3GU9FU26M8K8VF4N.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "3GU9FU26M8K8VF4N",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "UploadPart to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "UploadPart",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "482HGKZSE2XBZGXW"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "482HGKZSE2XBZGXW.JRTCKXETXF": {
+            "priceDimensions": {
+              "482HGKZSE2XBZGXW.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 UploadPart requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "482HGKZSE2XBZGXW.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "482HGKZSE2XBZGXW",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "InitiateMultipartUpload for Replication to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "InitiateMultipartUploadForRepl",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "4GSJQ9EF2CGXWEKN"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "4GSJQ9EF2CGXWEKN.JRTCKXETXF": {
+            "priceDimensions": {
+              "4GSJQ9EF2CGXWEKN.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 InitiateMultipartUpload for Replication to Glacier",
+                "appliesTo": [],
+                "rateCode": "4GSJQ9EF2CGXWEKN.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "4GSJQ9EF2CGXWEKN",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT requests to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "PutObject",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "4UJEK5ACW9GQRAAY"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "4UJEK5ACW9GQRAAY.JRTCKXETXF": {
+            "priceDimensions": {
+              "4UJEK5ACW9GQRAAY.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 PutObject requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "4UJEK5ACW9GQRAAY.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "4UJEK5ACW9GQRAAY",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Scanned using Bulk tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Bulk-Select-Scanned",
+          "usagetype": "EUC1-Bulk-Select-Scanned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "56YCVY6D8D3S2AXE"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "56YCVY6D8D3S2AXE.JRTCKXETXF": {
+            "priceDimensions": {
+              "56YCVY6D8D3S2AXE.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.0012 per GB - Bulk Select Data Scanned Bytes",
+                "appliesTo": [],
+                "rateCode": "56YCVY6D8D3S2AXE.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0012000000"
+                }
+              }
+            },
+            "sku": "56YCVY6D8D3S2AXE",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "Amazon Glacier",
+          "storageClass": "Archive",
+          "servicecode": "AmazonS3",
+          "durability": "99.999999999%",
+          "usagetype": "EUC1-TimedStorage-GlacierByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "N/A",
+          "operation": ""
+        },
+        "sku": "5PRA62XBEEGFSXAQ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "5PRA62XBEEGFSXAQ.JRTCKXETXF": {
+            "priceDimensions": {
+              "5PRA62XBEEGFSXAQ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0045 per GB / month of storage used - Amazon Glacier",
+                "appliesTo": [],
+                "rateCode": "5PRA62XBEEGFSXAQ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0045000000"
+                }
+              }
+            },
+            "sku": "5PRA62XBEEGFSXAQ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for storing small objects (<128KB) in ZIA Storage",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Storage-ZIA-SmObject",
+          "usagetype": "EUC1-TimedStorage-ZIA-SmObjects",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "6C674P97YFD8WK56"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "6C674P97YFD8WK56.JRTCKXETXF": {
+            "priceDimensions": {
+              "6C674P97YFD8WK56.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0108 per GB-Month of storage used for small objects",
+                "appliesTo": [],
+                "rateCode": "6C674P97YFD8WK56.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0108000000"
+                }
+              }
+            },
+            "sku": "6C674P97YFD8WK56",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Scanned using Expedited tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Expedited-Select-Scanned",
+          "usagetype": "EUC1-Exp-Select-Scanned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "6KM6W2WDJVMZ384Y"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "6KM6W2WDJVMZ384Y.JRTCKXETXF": {
+            "priceDimensions": {
+              "6KM6W2WDJVMZ384Y.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.024 per GB - Expedited Select Data Scanned Bytes",
+                "appliesTo": [],
+                "rateCode": "6KM6W2WDJVMZ384Y.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0240000000"
+                }
+              }
+            },
+            "sku": "6KM6W2WDJVMZ384Y",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Per object per month monitoring and automation fee for objects in Intelligent-Tiering",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Monitoring and Automation-ObjectCount",
+          "usagetype": "EUC1-Monitoring-Automation-INT",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "6NDME2THFFCUG2QV"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "6NDME2THFFCUG2QV.JRTCKXETXF": {
+            "priceDimensions": {
+              "6NDME2THFFCUG2QV.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Objects",
+                "endRange": "Inf",
+                "description": "$0.0025 per 1,000 Objects per month in Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "6NDME2THFFCUG2QV.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000025000"
+                }
+              }
+            },
+            "sku": "6NDME2THFFCUG2QV",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "InitiateMultipartUpload to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "InitiateMultipartUpload",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "6SSWG62VNYS33C9Y"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "6SSWG62VNYS33C9Y.JRTCKXETXF": {
+            "priceDimensions": {
+              "6SSWG62VNYS33C9Y.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 InitiateMultipartUpload requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "6SSWG62VNYS33C9Y.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "6SSWG62VNYS33C9Y",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Expedited Glacier Restore Requests",
+          "usagetype": "EUC1-Requests-Tier6",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Tier6"
+        },
+        "sku": "7E9NYMJZW34HCQZW"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "7E9NYMJZW34HCQZW.JRTCKXETXF": {
+            "priceDimensions": {
+              "7E9NYMJZW34HCQZW.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.012 per Expedited Glacier request",
+                "appliesTo": [],
+                "rateCode": "7E9NYMJZW34HCQZW.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0120000000"
+                }
+              }
+            },
+            "sku": "7E9NYMJZW34HCQZW",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for retrieving greater than 5% of data stored",
+          "servicecode": "AmazonS3",
+          "feeCode": "Glacier:PeakRestore",
+          "usagetype": "EUC1-Peak-Restore-Bytes-Delta",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "7K73AYXKS76XHKNF"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "7K73AYXKS76XHKNF.JRTCKXETXF": {
+            "priceDimensions": {
+              "7K73AYXKS76XHKNF.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.008 per GB - Glacier Restore Fee (EUC1)",
+                "appliesTo": [],
+                "rateCode": "7K73AYXKS76XHKNF.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0080000000"
+                }
+              }
+            },
+            "sku": "7K73AYXKS76XHKNF",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "POST requests to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "PostObject",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "7UMEAQPFZ6X3Z3UM"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "7UMEAQPFZ6X3Z3UM.JRTCKXETXF": {
+            "priceDimensions": {
+              "7UMEAQPFZ6X3Z3UM.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 PostObject requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "7UMEAQPFZ6X3Z3UM.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "7UMEAQPFZ6X3Z3UM",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Lifecycle Transition Requests into Glacier Deep Archive",
+          "usagetype": "EUC1-Requests-Tier3",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "S3-GDATransition",
+          "group": "S3-API-Tier3"
+        },
+        "sku": "84X6U84UPJJH6Y7Y"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "84X6U84UPJJH6Y7Y.JRTCKXETXF": {
+            "priceDimensions": {
+              "84X6U84UPJJH6Y7Y.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 Lifecycle requests to Glacier Deep Archive in EU (Frankfurt)",
+                "appliesTo": [],
+                "rateCode": "84X6U84UPJJH6Y7Y.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "84X6U84UPJJH6Y7Y",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Pro-rated fee for objects deleted before 30 days in Intelligent-Tiering volume",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3:EarlyDelete-INT",
+          "usagetype": "EUC1-EarlyDelete-INT",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "87A787U5J6DU4TY7"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "87A787U5J6DU4TY7.JRTCKXETXF": {
+            "priceDimensions": {
+              "87A787U5J6DU4TY7.JRTCKXETXF.D42MF2PVJS": {
+                "unit": "GB-Mo",
+                "endRange": "512000",
+                "description": "$0.0235 per GB - next 450 TB / month prorated for objects deleted or overwritten before 30 days in Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "87A787U5J6DU4TY7.JRTCKXETXF.D42MF2PVJS",
+                "beginRange": "51200",
+                "pricePerUnit": {
+                  "USD": "0.0235000000"
+                }
+              },
+              "87A787U5J6DU4TY7.JRTCKXETXF.PGHJ3S3EYE": {
+                "unit": "GB-Mo",
+                "endRange": "51200",
+                "description": "$0.0245 per GB - first 50 TB / month prorated for objects deleted or overwritten before 30 days in Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "87A787U5J6DU4TY7.JRTCKXETXF.PGHJ3S3EYE",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0245000000"
+                }
+              },
+              "87A787U5J6DU4TY7.JRTCKXETXF.PXJDJ3YRG3": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0225 per GB - over 500 TB / month prorated for objects deleted or overwritten before 30 days in Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "87A787U5J6DU4TY7.JRTCKXETXF.PXJDJ3YRG3",
+                "beginRange": "512000",
+                "pricePerUnit": {
+                  "USD": "0.0225000000"
+                }
+              }
+            },
+            "sku": "87A787U5J6DU4TY7",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "Standard - Infrequent Access",
+          "storageClass": "Infrequent Access",
+          "servicecode": "AmazonS3",
+          "durability": "99.999999999%",
+          "usagetype": "EUC1-TimedStorage-SIA-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "99.9%",
+          "operation": ""
+        },
+        "sku": "8J8N4Q7B7RUWRJRX"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "8J8N4Q7B7RUWRJRX.JRTCKXETXF": {
+            "priceDimensions": {
+              "8J8N4Q7B7RUWRJRX.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB-Month of storage used in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "8J8N4Q7B7RUWRJRX.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0135000000"
+                }
+              }
+            },
+            "sku": "8J8N4Q7B7RUWRJRX",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "volumeType": "Amazon Glacier",
+          "storageClass": "Staging",
+          "servicecode": "AmazonS3",
+          "usagetype": "EUC1-TimedStorage-GlacierStaging",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "8JMSFQDSMS8M56MA"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "8JMSFQDSMS8M56MA.JRTCKXETXF": {
+            "priceDimensions": {
+              "8JMSFQDSMS8M56MA.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0225 per GB-Month of storage used in GlacierStagingStorage",
+                "appliesTo": [],
+                "rateCode": "8JMSFQDSMS8M56MA.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0225000000"
+                }
+              }
+            },
+            "sku": "8JMSFQDSMS8M56MA",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT/COPY/POST or LIST requests to Intelligent-Tiering",
+          "usagetype": "EUC1-Requests-INT-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-INT-Tier1"
+        },
+        "sku": "8PMJSF2XR7BE2SXD"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "8PMJSF2XR7BE2SXD.JRTCKXETXF": {
+            "priceDimensions": {
+              "8PMJSF2XR7BE2SXD.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 PUT, COPY, POST, or LIST requests to Intelligent-Tiering",
+                "appliesTo": [],
+                "rateCode": "8PMJSF2XR7BE2SXD.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "8PMJSF2XR7BE2SXD",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for storing small objects (<128KB) in SIA Storage",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Storage-SIA-SmObject",
+          "usagetype": "EUC1-TimedStorage-SIA-SmObjects",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "9BW47CFX964UHKKD"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "9BW47CFX964UHKKD.JRTCKXETXF": {
+            "priceDimensions": {
+              "9BW47CFX964UHKKD.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB-Month of storage used for small objects",
+                "appliesTo": [],
+                "rateCode": "9BW47CFX964UHKKD.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0135000000"
+                }
+              }
+            },
+            "sku": "9BW47CFX964UHKKD",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for deleting items prior to 90 days",
+          "servicecode": "AmazonS3",
+          "feeCode": "Glacier:EarlyDelete",
+          "usagetype": "EUC1-EarlyDelete-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "9FFMFTCN7C48MZPT"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "9FFMFTCN7C48MZPT.JRTCKXETXF": {
+            "priceDimensions": {
+              "9FFMFTCN7C48MZPT.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB - Glacier Early Delete",
+                "appliesTo": [],
+                "rateCode": "9FFMFTCN7C48MZPT.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0045000000"
+                }
+              }
+            },
+            "sku": "9FFMFTCN7C48MZPT",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Returned using Expedited tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Expedited-Select-Returned",
+          "usagetype": "EUC1-Exp-Select-Returned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "AH9ST94EEKHBDQWZ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "AH9ST94EEKHBDQWZ.JRTCKXETXF": {
+            "priceDimensions": {
+              "AH9ST94EEKHBDQWZ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.036 per GB - Expedited Select Data Returned Bytes",
+                "appliesTo": [],
+                "rateCode": "AH9ST94EEKHBDQWZ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0360000000"
+                }
+              }
+            },
+            "sku": "AH9ST94EEKHBDQWZ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "Tags",
+          "storageClass": "Tags",
+          "servicecode": "AmazonS3",
+          "durability": "N/A",
+          "usagetype": "EUC1-TagStorage-TagHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "N/A",
+          "operation": ""
+        },
+        "sku": "AQTZDW86AMP3YWQ8"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "AQTZDW86AMP3YWQ8.JRTCKXETXF": {
+            "priceDimensions": {
+              "AQTZDW86AMP3YWQ8.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Tag-Mo",
+                "endRange": "Inf",
+                "description": "$0.01 per 10,000 tags",
+                "appliesTo": [],
+                "rateCode": "AQTZDW86AMP3YWQ8.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000010000"
+                }
+              }
+            },
+            "sku": "AQTZDW86AMP3YWQ8",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT/COPY/POST or LIST requests to One Zone-Infrequent Access",
+          "usagetype": "EUC1-Requests-ZIA-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-ZIA-Tier1"
+        },
+        "sku": "AYQPYQNBUQ4RRXQ8"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "AYQPYQNBUQ4RRXQ8.JRTCKXETXF": {
+            "priceDimensions": {
+              "AYQPYQNBUQ4RRXQ8.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.01 per 1,000 PUT, COPY, POST or LIST requests to One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "AYQPYQNBUQ4RRXQ8.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000100000"
+                }
+              }
+            },
+            "sku": "AYQPYQNBUQ4RRXQ8",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Per object fee for objects listed in an Inventory",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Inventory-ObjectsListed",
+          "usagetype": "EUC1-Inventory-ObjectsListed",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "C9WT6CC9A7NFH7JQ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "C9WT6CC9A7NFH7JQ.JRTCKXETXF": {
+            "priceDimensions": {
+              "C9WT6CC9A7NFH7JQ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Objects",
+                "endRange": "Inf",
+                "description": "$0.0027 per 1 million objects listed in S3 Inventory",
+                "appliesTo": [],
+                "rateCode": "C9WT6CC9A7NFH7JQ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000000027"
+                }
+              }
+            },
+            "sku": "C9WT6CC9A7NFH7JQ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Fee for Bulk Retrieval of data stored from Glacier Deep Archive",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Bulk-Retrieval",
+          "usagetype": "EUC1-Bulk-Retrieval-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "DeepArchiveRestoreObject"
+        },
+        "sku": "CJZQJPQTQUUPKZXV"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "CJZQJPQTQUUPKZXV.JRTCKXETXF": {
+            "priceDimensions": {
+              "CJZQJPQTQUUPKZXV.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.005 per GB Bulk retrieval fee from Glacier Deep Archive in EU (Frankfurt)",
+                "appliesTo": [],
+                "rateCode": "CJZQJPQTQUUPKZXV.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0050000000"
+                }
+              }
+            },
+            "sku": "CJZQJPQTQUUPKZXV",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Scanned using Standard tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Standard-Select-Scanned",
+          "usagetype": "EUC1-Std-Select-Scanned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "DGPJQSH3C8393F4E"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "DGPJQSH3C8393F4E.JRTCKXETXF": {
+            "priceDimensions": {
+              "DGPJQSH3C8393F4E.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.0096 per GB - Standard Select Data Scanned Bytes",
+                "appliesTo": [],
+                "rateCode": "DGPJQSH3C8393F4E.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0096000000"
+                }
+              }
+            },
+            "sku": "DGPJQSH3C8393F4E",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "CopyPart to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "CopyPart",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "DNW44HCWPYX56HC6"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "DNW44HCWPYX56HC6.JRTCKXETXF": {
+            "priceDimensions": {
+              "DNW44HCWPYX56HC6.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 CopyPart to Glacier",
+                "appliesTo": [],
+                "rateCode": "DNW44HCWPYX56HC6.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "DNW44HCWPYX56HC6",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests  to Standard-Infrequent Access",
+          "usagetype": "EUC1-Requests-SIA-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-SIA-Tier2"
+        },
+        "sku": "DUVEDNCXM5DGYHWK"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "DUVEDNCXM5DGYHWK.JRTCKXETXF": {
+            "priceDimensions": {
+              "DUVEDNCXM5DGYHWK.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.01 per 10,000 GET and all other requests  to Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "DUVEDNCXM5DGYHWK.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000010000"
+                }
+              }
+            },
+            "sku": "DUVEDNCXM5DGYHWK",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Fee for Standard Retrieval of data stored from Glacier Deep Archive",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Standard-Retrieval",
+          "usagetype": "EUC1-Standard-Retrieval-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "DeepArchiveRestoreObject"
+        },
+        "sku": "E295CEZ26NBH2TRD"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "E295CEZ26NBH2TRD.JRTCKXETXF": {
+            "priceDimensions": {
+              "E295CEZ26NBH2TRD.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.024 per GB Standard retrieval fee from Glacier Deep Archive in EU (Frankfurt)",
+                "appliesTo": [],
+                "rateCode": "E295CEZ26NBH2TRD.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0240000000"
+                }
+              }
+            },
+            "sku": "E295CEZ26NBH2TRD",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Expedited Retrieval of data stored",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Expedited-Retrieval",
+          "usagetype": "EUC1-Expedited-Retrieval-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "EK3YXA3KP5WX4E2G"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "EK3YXA3KP5WX4E2G.JRTCKXETXF": {
+            "priceDimensions": {
+              "EK3YXA3KP5WX4E2G.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.036 per GB - Expedited retrieval fee",
+                "appliesTo": [],
+                "rateCode": "EK3YXA3KP5WX4E2G.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0360000000"
+                }
+              }
+            },
+            "sku": "EK3YXA3KP5WX4E2G",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "CompleteMultipartUpload to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "CompleteMultipartUpload",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "ENHS2YXAC5DVBPTP"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "ENHS2YXAC5DVBPTP.JRTCKXETXF": {
+            "priceDimensions": {
+              "ENHS2YXAC5DVBPTP.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 CompleteMultipartUpload requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "ENHS2YXAC5DVBPTP.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "ENHS2YXAC5DVBPTP",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT/COPY/POST or LIST requests",
+          "usagetype": "EUC1-Requests-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Tier1"
+        },
+        "sku": "F5832W93RMW27RD7"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "F5832W93RMW27RD7.JRTCKXETXF": {
+            "priceDimensions": {
+              "F5832W93RMW27RD7.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 PUT, COPY, POST, or LIST requests",
+                "appliesTo": [],
+                "rateCode": "F5832W93RMW27RD7.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "F5832W93RMW27RD7",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "One Zone - Infrequent Access",
+          "storageClass": "Infrequent Access",
+          "servicecode": "AmazonS3",
+          "durability": "99.999999999%",
+          "usagetype": "EUC1-TimedStorage-ZIA-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "99.5%",
+          "operation": ""
+        },
+        "sku": "F6DQ725G4AE9TA53"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "F6DQ725G4AE9TA53.JRTCKXETXF": {
+            "priceDimensions": {
+              "F6DQ725G4AE9TA53.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0108 per GB-Month of storage used in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "F6DQ725G4AE9TA53.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0108000000"
+                }
+              }
+            },
+            "sku": "F6DQ725G4AE9TA53",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "CompleteMultipartUpload for Replication Time Control to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "CompleteMultipartUploadReplTime",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "FGMHUUR3EMZFUCGX"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "FGMHUUR3EMZFUCGX.JRTCKXETXF": {
+            "priceDimensions": {
+              "FGMHUUR3EMZFUCGX.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 CompleteMultipartUpload for Replication Time Control to Glacier",
+                "appliesTo": [],
+                "rateCode": "FGMHUUR3EMZFUCGX.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "FGMHUUR3EMZFUCGX",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Scanned by S3 Select in Standard-Infrequent Access",
+          "usagetype": "EUC1-Select-Scanned-SIA-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-SIA-Select-Scanned"
+        },
+        "sku": "H52EGC5XY3CBHD5W"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "H52EGC5XY3CBHD5W.JRTCKXETXF": {
+            "priceDimensions": {
+              "H52EGC5XY3CBHD5W.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.00225 per GB - for bytes scanned by S3 Select in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "H52EGC5XY3CBHD5W.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0022500000"
+                }
+              }
+            },
+            "sku": "H52EGC5XY3CBHD5W",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests to GDA",
+          "usagetype": "EUC1-Requests-GDA-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-GDA-Tier2"
+        },
+        "sku": "J5YAM7JDZMWDBEKD"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "J5YAM7JDZMWDBEKD.JRTCKXETXF": {
+            "priceDimensions": {
+              "J5YAM7JDZMWDBEKD.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0043 per 10,000 GET and all other requests from Glacier",
+                "appliesTo": [],
+                "rateCode": "J5YAM7JDZMWDBEKD.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000004300"
+                }
+              }
+            },
+            "sku": "J5YAM7JDZMWDBEKD",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for objects deleted before 30 days in Standard-Infrequent Access volume",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3:EarlyDelete-SIA",
+          "usagetype": "EUC1-EarlyDelete-SIA",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "JSFP3ER8TK5FPAQ5"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "JSFP3ER8TK5FPAQ5.JRTCKXETXF": {
+            "priceDimensions": {
+              "JSFP3ER8TK5FPAQ5.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB-Month prorated for objects deleted or overwritten before 30 days in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "JSFP3ER8TK5FPAQ5.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0135000000"
+                }
+              }
+            },
+            "sku": "JSFP3ER8TK5FPAQ5",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Object Retrieval in One Zone-Infrequent Access",
+          "usagetype": "EUC1-Retrieval-ZIA",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-ZIA-Retrieval"
+        },
+        "sku": "JYFG8JSUQM4F7TEZ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "JYFG8JSUQM4F7TEZ.JRTCKXETXF": {
+            "priceDimensions": {
+              "JYFG8JSUQM4F7TEZ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.01 per GB - flat fee for all bytes retrieved in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "JYFG8JSUQM4F7TEZ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0100000000"
+                }
+              }
+            },
+            "sku": "JYFG8JSUQM4F7TEZ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "InitiateMultipartUpload for Replication Time Control to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "InitiateMultipartUploadReplTime",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "KCTRWV7AJBXAXD5J"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "KCTRWV7AJBXAXD5J.JRTCKXETXF": {
+            "priceDimensions": {
+              "KCTRWV7AJBXAXD5J.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 InitiateMultipartUpload for Replication Time Control to Glacier",
+                "appliesTo": [],
+                "rateCode": "KCTRWV7AJBXAXD5J.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "KCTRWV7AJBXAXD5J",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests to GLACIER",
+          "usagetype": "EUC1-Requests-GLACIER-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-GLACIER-Tier2"
+        },
+        "sku": "KTE8UEH8XGZ3GMV9"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "KTE8UEH8XGZ3GMV9.JRTCKXETXF": {
+            "priceDimensions": {
+              "KTE8UEH8XGZ3GMV9.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0043 per 10,000 GET and all other requests from Glacier",
+                "appliesTo": [],
+                "rateCode": "KTE8UEH8XGZ3GMV9.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000004300"
+                }
+              }
+            },
+            "sku": "KTE8UEH8XGZ3GMV9",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Returned by S3 Select in Intelligent-Tiering",
+          "usagetype": "EUC1-Select-Returned-INT-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-INT-Select-Returned"
+        },
+        "sku": "MW4DZNNHEDPK8KZD"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "MW4DZNNHEDPK8KZD.JRTCKXETXF": {
+            "priceDimensions": {
+              "MW4DZNNHEDPK8KZD.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.0008 per GB - for bytes returned by S3 Select in Intelligent - Tiering",
+                "appliesTo": [],
+                "rateCode": "MW4DZNNHEDPK8KZD.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0008000000"
+                }
+              }
+            },
+            "sku": "MW4DZNNHEDPK8KZD",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "CompleteMultipartUpload for Replication to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "CompleteMultipartUploadForRepl",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "MWRNTHGBQEM329GS"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "MWRNTHGBQEM329GS.JRTCKXETXF": {
+            "priceDimensions": {
+              "MWRNTHGBQEM329GS.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 CompleteMultipartUpload for Replication to Glacier",
+                "appliesTo": [],
+                "rateCode": "MWRNTHGBQEM329GS.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "MWRNTHGBQEM329GS",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Returned by S3 Select in Standard",
+          "usagetype": "EUC1-Select-Returned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Select-Returned"
+        },
+        "sku": "ND646Q6FX92HX8SJ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "ND646Q6FX92HX8SJ.JRTCKXETXF": {
+            "priceDimensions": {
+              "ND646Q6FX92HX8SJ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.0008 per GB - for bytes returned by S3 Select in Standard",
+                "appliesTo": [],
+                "rateCode": "ND646Q6FX92HX8SJ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0008000000"
+                }
+              }
+            },
+            "sku": "ND646Q6FX92HX8SJ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Scanned by S3 Select in One Zone-Infrequent Access",
+          "usagetype": "EUC1-Select-Scanned-ZIA-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-ZIA-Select-Scanned"
+        },
+        "sku": "NE4X9N82JHF9PDFM"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "NE4X9N82JHF9PDFM.JRTCKXETXF": {
+            "priceDimensions": {
+              "NE4X9N82JHF9PDFM.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.00225 per GB - for bytes scanned by S3 Select in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "NE4X9N82JHF9PDFM.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0022500000"
+                }
+              }
+            },
+            "sku": "NE4X9N82JHF9PDFM",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Object Retrieval in Standard-Infrequent Access",
+          "usagetype": "EUC1-Retrieval-SIA",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-SIA-Retrieval"
+        },
+        "sku": "NGU8K6Q4AHV7NJ7E"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "NGU8K6Q4AHV7NJ7E.JRTCKXETXF": {
+            "priceDimensions": {
+              "NGU8K6Q4AHV7NJ7E.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.01 per GB - flat fee for all bytes retrieved in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "NGU8K6Q4AHV7NJ7E.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0100000000"
+                }
+              }
+            },
+            "sku": "NGU8K6Q4AHV7NJ7E",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "Standard",
+          "storageClass": "General Purpose",
+          "servicecode": "AmazonS3",
+          "durability": "99.999999999%",
+          "usagetype": "EUC1-TimedStorage-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "99.99%",
+          "operation": ""
+        },
+        "sku": "NRYRNCXF5TWHB476"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "NRYRNCXF5TWHB476.JRTCKXETXF": {
+            "priceDimensions": {
+              "NRYRNCXF5TWHB476.JRTCKXETXF.PXJDJ3YRG3": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0225 per GB - storage used / month over 500 TB",
+                "appliesTo": [],
+                "rateCode": "NRYRNCXF5TWHB476.JRTCKXETXF.PXJDJ3YRG3",
+                "beginRange": "512000",
+                "pricePerUnit": {
+                  "USD": "0.0225000000"
+                }
+              },
+              "NRYRNCXF5TWHB476.JRTCKXETXF.D42MF2PVJS": {
+                "unit": "GB-Mo",
+                "endRange": "512000",
+                "description": "$0.0235 per GB - next 450 TB / month of storage used",
+                "appliesTo": [],
+                "rateCode": "NRYRNCXF5TWHB476.JRTCKXETXF.D42MF2PVJS",
+                "beginRange": "51200",
+                "pricePerUnit": {
+                  "USD": "0.0235000000"
+                }
+              },
+              "NRYRNCXF5TWHB476.JRTCKXETXF.PGHJ3S3EYE": {
+                "unit": "GB-Mo",
+                "endRange": "51200",
+                "description": "$0.0245 per GB - first 50 TB / month of storage used",
+                "appliesTo": [],
+                "rateCode": "NRYRNCXF5TWHB476.JRTCKXETXF.PGHJ3S3EYE",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0245000000"
+                }
+              }
+            },
+            "sku": "NRYRNCXF5TWHB476",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "volumeType": "Glacier Deep Archive",
+          "storageClass": "Staging",
+          "servicecode": "AmazonS3",
+          "usagetype": "EUC1-TimedStorage-GDA-Staging",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "NWG22AVVQE2NQ8GB"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "NWG22AVVQE2NQ8GB.JRTCKXETXF": {
+            "priceDimensions": {
+              "NWG22AVVQE2NQ8GB.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0225 per GB-Month of storage used in GlacierStagingStorage",
+                "appliesTo": [],
+                "rateCode": "NWG22AVVQE2NQ8GB.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0225000000"
+                }
+              }
+            },
+            "sku": "NWG22AVVQE2NQ8GB",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for small objects deleted before 30 days in One Zone-Infrequent Access volume",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3:EarlyDelete-ZIA-SmallObjects",
+          "usagetype": "EUC1-EarlyDelete-ZIA-SmObjects",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "P88CPBUZ2TM8TA6S"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "P88CPBUZ2TM8TA6S.JRTCKXETXF": {
+            "priceDimensions": {
+              "P88CPBUZ2TM8TA6S.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0108 per GB-Month prorated for small objects deleted or overwritten before 30 days in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "P88CPBUZ2TM8TA6S.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0108000000"
+                }
+              }
+            },
+            "sku": "P88CPBUZ2TM8TA6S",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Scanned by S3 Select in Intelligent-Tiering",
+          "usagetype": "EUC1-Select-Scanned-INT-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-INT-Select-Scanned"
+        },
+        "sku": "PNSBYHZWWQBWNACF"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "PNSBYHZWWQBWNACF.JRTCKXETXF": {
+            "priceDimensions": {
+              "PNSBYHZWWQBWNACF.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.00225 per GB - for bytes scanned by S3 Select in Intelligent - Tiering",
+                "appliesTo": [],
+                "rateCode": "PNSBYHZWWQBWNACF.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0022500000"
+                }
+              }
+            },
+            "sku": "PNSBYHZWWQBWNACF",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "volumeType": "Intelligent-Tiering Infrequent Access",
+          "storageClass": "Intelligent-Tiering",
+          "servicecode": "AmazonS3",
+          "usagetype": "EUC1-TimedStorage-INT-IA-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "QZFPVD8C6A8MTCX5"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "QZFPVD8C6A8MTCX5.JRTCKXETXF": {
+            "priceDimensions": {
+              "QZFPVD8C6A8MTCX5.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB-Month of storage used in Intelligent-Tiering, Infrequent Access Tier",
+                "appliesTo": [],
+                "rateCode": "QZFPVD8C6A8MTCX5.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0135000000"
+                }
+              }
+            },
+            "sku": "QZFPVD8C6A8MTCX5",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "PUT for Replication Time Control to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "PutObjectReplTime",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "RFD7R64XUQUNV7Y4"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "RFD7R64XUQUNV7Y4.JRTCKXETXF": {
+            "priceDimensions": {
+              "RFD7R64XUQUNV7Y4.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 PUT for Replication Time Control to Glacier",
+                "appliesTo": [],
+                "rateCode": "RFD7R64XUQUNV7Y4.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "RFD7R64XUQUNV7Y4",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Returned by S3 Select in Standard-Infrequent Access",
+          "usagetype": "EUC1-Select-Returned-SIA-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-SIA-Select-Returned"
+        },
+        "sku": "S3TTUZS5ZTTNWZC8"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "S3TTUZS5ZTTNWZC8.JRTCKXETXF": {
+            "priceDimensions": {
+              "S3TTUZS5ZTTNWZC8.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.01 per GB - for bytes returned by S3 Select in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "S3TTUZS5ZTTNWZC8.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0100000000"
+                }
+              }
+            },
+            "sku": "S3TTUZS5ZTTNWZC8",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Fee for Bulk Retrieval of data stored",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Bulk-Retrieval",
+          "usagetype": "EUC1-Bulk-Retrieval-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "RestoreObject"
+        },
+        "sku": "S4S848FGKC87MEDA"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "S4S848FGKC87MEDA.JRTCKXETXF": {
+            "priceDimensions": {
+              "S4S848FGKC87MEDA.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.003 per GB - Bulk retrieval fee",
+                "appliesTo": [],
+                "rateCode": "S4S848FGKC87MEDA.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0030000000"
+                }
+              }
+            },
+            "sku": "S4S848FGKC87MEDA",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Returned using Standard tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Standard-Select-Returned",
+          "usagetype": "EUC1-Std-Select-Returned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "SDEUSPMKFV5Y4TGQ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "SDEUSPMKFV5Y4TGQ.JRTCKXETXF": {
+            "priceDimensions": {
+              "SDEUSPMKFV5Y4TGQ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.012 per GB - Standard Select Data Returned Bytes",
+                "appliesTo": [],
+                "rateCode": "SDEUSPMKFV5Y4TGQ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0120000000"
+                }
+              }
+            },
+            "sku": "SDEUSPMKFV5Y4TGQ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Per job fee for Batch Operations jobs",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-BatchOperations-Jobs",
+          "usagetype": "EUC1-BatchOperations-Jobs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "SDZEB3SSJRTJES63"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "SDZEB3SSJRTJES63.JRTCKXETXF": {
+            "priceDimensions": {
+              "SDZEB3SSJRTJES63.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Jobs",
+                "endRange": "Inf",
+                "description": "$0.25 per job fee for Batch Operations",
+                "appliesTo": [],
+                "rateCode": "SDZEB3SSJRTJES63.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.2500000000"
+                }
+              }
+            },
+            "sku": "SDZEB3SSJRTJES63",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Bulk Glacier Restore Requests",
+          "usagetype": "EUC1-Requests-Tier5",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Tier5"
+        },
+        "sku": "SKE33TK9WY2SJ6V5"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "SKE33TK9WY2SJ6V5.JRTCKXETXF": {
+            "priceDimensions": {
+              "SKE33TK9WY2SJ6V5.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.03 per 1,000 - Bulk Glacier requests",
+                "appliesTo": [],
+                "rateCode": "SKE33TK9WY2SJ6V5.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000300000"
+                }
+              }
+            },
+            "sku": "SKE33TK9WY2SJ6V5",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Fee for Select Data Returned using Bulk tier",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Bulk-Select-Returned",
+          "usagetype": "EUC1-Bulk-Select-Returned-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "TB36FKENMMUAD98J"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "TB36FKENMMUAD98J.JRTCKXETXF": {
+            "priceDimensions": {
+              "TB36FKENMMUAD98J.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.003 per GB - Bulk Select Data Returned Bytes",
+                "appliesTo": [],
+                "rateCode": "TB36FKENMMUAD98J.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0030000000"
+                }
+              }
+            },
+            "sku": "TB36FKENMMUAD98J",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Data Returned by S3 Select in One Zone-Infrequent Access",
+          "usagetype": "EUC1-Select-Returned-ZIA-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-ZIA-Select-Returned"
+        },
+        "sku": "TN2ZT92GTNPS76FE"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "TN2ZT92GTNPS76FE.JRTCKXETXF": {
+            "priceDimensions": {
+              "TN2ZT92GTNPS76FE.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.01 per GB - for bytes returned by S3 Select in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "TN2ZT92GTNPS76FE.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0100000000"
+                }
+              }
+            },
+            "sku": "TN2ZT92GTNPS76FE",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests",
+          "usagetype": "EUC1-Requests-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Tier2"
+        },
+        "sku": "TUSXZSTYY6YJH244"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "TUSXZSTYY6YJH244.JRTCKXETXF": {
+            "priceDimensions": {
+              "TUSXZSTYY6YJH244.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0043 per 10,000 GET and all other requests",
+                "appliesTo": [],
+                "rateCode": "TUSXZSTYY6YJH244.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000004300"
+                }
+              }
+            },
+            "sku": "TUSXZSTYY6YJH244",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "GET and all other requests to One Zone-Infrequent Access",
+          "usagetype": "EUC1-Requests-ZIA-Tier2",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-ZIA-Tier2"
+        },
+        "sku": "TZWQR4H8MDYDUBCZ"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "TZWQR4H8MDYDUBCZ.JRTCKXETXF": {
+            "priceDimensions": {
+              "TZWQR4H8MDYDUBCZ.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.01 per 10,000 GET and all other requests  to One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "TZWQR4H8MDYDUBCZ.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000010000"
+                }
+              }
+            },
+            "sku": "TZWQR4H8MDYDUBCZ",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Fee for Standard Retrieval of data stored",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Standard-Retrieval",
+          "usagetype": "EUC1-Standard-Retrieval-Bytes",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "RestoreObject"
+        },
+        "sku": "UKUKPFY37QQSCQ7M"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "UKUKPFY37QQSCQ7M.JRTCKXETXF": {
+            "priceDimensions": {
+              "UKUKPFY37QQSCQ7M.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB",
+                "endRange": "Inf",
+                "description": "$0.012 per GB - Standard retrieval fee",
+                "appliesTo": [],
+                "rateCode": "UKUKPFY37QQSCQ7M.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0120000000"
+                }
+              }
+            },
+            "sku": "UKUKPFY37QQSCQ7M",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "API Request",
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Lifecycle Transition Requests into Standard - Infrequent Access or One Zone - Infrequent Access or Intelligent-Tiering",
+          "usagetype": "EUC1-Requests-Tier4",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "",
+          "group": "S3-API-Tier4"
+        },
+        "sku": "UKWV93XW52YH5JCY"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "UKWV93XW52YH5JCY.JRTCKXETXF": {
+            "priceDimensions": {
+              "UKWV93XW52YH5JCY.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.01 per 1,000 transitions to Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "UKWV93XW52YH5JCY.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000100000"
+                }
+              }
+            },
+            "sku": "UKWV93XW52YH5JCY",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "UploadPart for Replication Time Control to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "UploadPartReplTime",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "UMQCAPGWKXNADWGX"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "UMQCAPGWKXNADWGX.JRTCKXETXF": {
+            "priceDimensions": {
+              "UMQCAPGWKXNADWGX.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 UploadPart for Replication Time Control to Glacier",
+                "appliesTo": [],
+                "rateCode": "UMQCAPGWKXNADWGX.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "UMQCAPGWKXNADWGX",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for small objects deleted before 30 days in Standard-Infrequent Access volume",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3:EarlyDelete-SIA-SmallObjects",
+          "usagetype": "EUC1-EarlyDelete-SIA-SmObjects",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "VXN94P7848YKD9HE"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "VXN94P7848YKD9HE.JRTCKXETXF": {
+            "priceDimensions": {
+              "VXN94P7848YKD9HE.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0135 per GB-Month prorated for small objects deleted or overwritten before 30 days in Standard-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "VXN94P7848YKD9HE.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0135000000"
+                }
+              }
+            },
+            "sku": "VXN94P7848YKD9HE",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "Lifecycle Transition Requests into Glacier",
+          "usagetype": "EUC1-Requests-Tier3",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "S3-GlacierTransition",
+          "group": "S3-API-Tier3"
+        },
+        "sku": "WGPDMZ3U2339MSH3"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "WGPDMZ3U2339MSH3.JRTCKXETXF": {
+            "priceDimensions": {
+              "WGPDMZ3U2339MSH3.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 Glacier Requests",
+                "appliesTo": [],
+                "rateCode": "WGPDMZ3U2339MSH3.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "WGPDMZ3U2339MSH3",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Pro-rated fee for objects deleted before 30 days in One Zone-Infrequent Access volume",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3:EarlyDelete-ZIA",
+          "usagetype": "EUC1-EarlyDelete-ZIA",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "XQQ699C2QE3PE2HU"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "XQQ699C2QE3PE2HU.JRTCKXETXF": {
+            "priceDimensions": {
+              "XQQ699C2QE3PE2HU.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0108 per GB-Month prorated for objects deleted or overwritten before 30 days in One Zone-Infrequent Access",
+                "appliesTo": [],
+                "rateCode": "XQQ699C2QE3PE2HU.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0108000000"
+                }
+              }
+            },
+            "sku": "XQQ699C2QE3PE2HU",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "feeDescription": "Per object fee for object operations performed by Batch Operations",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-BatchOperations-Objects",
+          "usagetype": "EUC1-BatchOperations-Objects",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "XZWTGPTRVBN52R9D"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "XZWTGPTRVBN52R9D.JRTCKXETXF": {
+            "priceDimensions": {
+              "XZWTGPTRVBN52R9D.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Objects",
+                "endRange": "Inf",
+                "description": "$1.00 per 1 million object operations performed by Batch Operations",
+                "appliesTo": [],
+                "rateCode": "XZWTGPTRVBN52R9D.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000010000"
+                }
+              }
+            },
+            "sku": "XZWTGPTRVBN52R9D",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Fee",
+        "attributes": {
+          "feeDescription": "Per object fee for objects included in Analytics",
+          "servicecode": "AmazonS3",
+          "feeCode": "S3-Analytics-ObjectCount",
+          "usagetype": "EUC1-StorageAnalytics-ObjCount",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "Y9Q7EU8PT9S897DM"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "Y9Q7EU8PT9S897DM.JRTCKXETXF": {
+            "priceDimensions": {
+              "Y9Q7EU8PT9S897DM.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Objects",
+                "endRange": "Inf",
+                "description": "$0.10 per 1 million objects monitored in S3 Analytics",
+                "appliesTo": [],
+                "rateCode": "Y9Q7EU8PT9S897DM.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000001000"
+                }
+              }
+            },
+            "sku": "Y9Q7EU8PT9S897DM",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "volumeType": "Intelligent-Tiering Frequent Access",
+          "storageClass": "Intelligent-Tiering",
+          "servicecode": "AmazonS3",
+          "usagetype": "EUC1-TimedStorage-INT-FA-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": ""
+        },
+        "sku": "YGSYYBP4NVAB45MW"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "YGSYYBP4NVAB45MW.JRTCKXETXF": {
+            "priceDimensions": {
+              "YGSYYBP4NVAB45MW.JRTCKXETXF.D42MF2PVJS": {
+                "unit": "GB-Mo",
+                "endRange": "512000",
+                "description": "$0.0235 per GB - next 450 TB / month of storage used in Intelligent-Tiering, Frequent Access Tier",
+                "appliesTo": [],
+                "rateCode": "YGSYYBP4NVAB45MW.JRTCKXETXF.D42MF2PVJS",
+                "beginRange": "51200",
+                "pricePerUnit": {
+                  "USD": "0.0235000000"
+                }
+              },
+              "YGSYYBP4NVAB45MW.JRTCKXETXF.PXJDJ3YRG3": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0225 per GB - over 500 TB / month of storage used in Intelligent-Tiering, Frequent Access Tier",
+                "appliesTo": [],
+                "rateCode": "YGSYYBP4NVAB45MW.JRTCKXETXF.PXJDJ3YRG3",
+                "beginRange": "512000",
+                "pricePerUnit": {
+                  "USD": "0.0225000000"
+                }
+              },
+              "YGSYYBP4NVAB45MW.JRTCKXETXF.PGHJ3S3EYE": {
+                "unit": "GB-Mo",
+                "endRange": "51200",
+                "description": "$0.0245 per GB - first 50 TB / month of storage used in Intelligent-Tiering, Frequent Access Tier",
+                "appliesTo": [],
+                "rateCode": "YGSYYBP4NVAB45MW.JRTCKXETXF.PGHJ3S3EYE",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0245000000"
+                }
+              }
+            },
+            "sku": "YGSYYBP4NVAB45MW",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "COPY requests to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "CopyObject",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "YQNZEC6BA595KK64"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "YQNZEC6BA595KK64.JRTCKXETXF": {
+            "priceDimensions": {
+              "YQNZEC6BA595KK64.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.06 per 1,000 CopyObject requests to Glacier",
+                "appliesTo": [],
+                "rateCode": "YQNZEC6BA595KK64.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000600000"
+                }
+              }
+            },
+            "sku": "YQNZEC6BA595KK64",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "productFamily": "Storage",
+        "attributes": {
+          "volumeType": "Reduced Redundancy",
+          "storageClass": "Non-Critical Data",
+          "servicecode": "AmazonS3",
+          "durability": "99.99%",
+          "usagetype": "EUC1-TimedStorage-RRS-ByteHrs",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "availability": "99.99%",
+          "operation": ""
+        },
+        "sku": "ZH6ZST5BYN9NVNHX"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "ZH6ZST5BYN9NVNHX.JRTCKXETXF": {
+            "priceDimensions": {
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.JR3K5QW8G3": {
+                "unit": "GB-Mo",
+                "endRange": "Inf",
+                "description": "$0.0238 per GB - storage used /  month over 5000 TB - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.JR3K5QW8G3",
+                "beginRange": "5120000",
+                "pricePerUnit": {
+                  "USD": "0.0238000000"
+                }
+              },
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.YJ98HAVVPP": {
+                "unit": "GB-Mo",
+                "endRange": "1024000",
+                "description": "$0.0247 per GB - next 500 TB / month of storage used - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.YJ98HAVVPP",
+                "beginRange": "512000",
+                "pricePerUnit": {
+                  "USD": "0.0247000000"
+                }
+              },
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.D42MF2PVJS": {
+                "unit": "GB-Mo",
+                "endRange": "512000",
+                "description": "$0.0251 per GB - next 450 TB / month of storage used - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.D42MF2PVJS",
+                "beginRange": "51200",
+                "pricePerUnit": {
+                  "USD": "0.0251000000"
+                }
+              },
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.6YNURZBX9Y": {
+                "unit": "GB-Mo",
+                "endRange": "1024",
+                "description": "$0.0260 per GB - first 1 TB / month of storage used - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.6YNURZBX9Y",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0260000000"
+                }
+              },
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.J25EHUHHDK": {
+                "unit": "GB-Mo",
+                "endRange": "5120000",
+                "description": "$0.0242 per GB - next 4000 TB / month of storage used - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.J25EHUHHDK",
+                "beginRange": "1024000",
+                "pricePerUnit": {
+                  "USD": "0.0242000000"
+                }
+              },
+              "ZH6ZST5BYN9NVNHX.JRTCKXETXF.QUZRP4P8Y4": {
+                "unit": "GB-Mo",
+                "endRange": "51200",
+                "description": "$0.0255 per GB - next 49 TB / month of storage used - Reduced Redundancy Storage",
+                "appliesTo": [],
+                "rateCode": "ZH6ZST5BYN9NVNHX.JRTCKXETXF.QUZRP4P8Y4",
+                "beginRange": "1024",
+                "pricePerUnit": {
+                  "USD": "0.0255000000"
+                }
+              }
+            },
+            "sku": "ZH6ZST5BYN9NVNHX",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    },
+    {
+      "product": {
+        "attributes": {
+          "servicecode": "AmazonS3",
+          "groupDescription": "UploadPart for Replication to Glacier",
+          "usagetype": "EUC1-Requests-GLACIER-Tier1",
+          "locationType": "AWS Region",
+          "location": "EU (Frankfurt)",
+          "servicename": "Amazon Simple Storage Service",
+          "operation": "UploadPartForRepl",
+          "group": "S3-API-GLACIER-Tier1"
+        },
+        "sku": "ZZV9FY4EPXHYDGH4"
+      },
+      "serviceCode": "AmazonS3",
+      "terms": {
+        "OnDemand": {
+          "ZZV9FY4EPXHYDGH4.JRTCKXETXF": {
+            "priceDimensions": {
+              "ZZV9FY4EPXHYDGH4.JRTCKXETXF.6YS6EN2CT7": {
+                "unit": "Requests",
+                "endRange": "Inf",
+                "description": "$0.0054 per 1,000 UploadPart for Replication to Glacier",
+                "appliesTo": [],
+                "rateCode": "ZZV9FY4EPXHYDGH4.JRTCKXETXF.6YS6EN2CT7",
+                "beginRange": "0",
+                "pricePerUnit": {
+                  "USD": "0.0000054000"
+                }
+              }
+            },
+            "sku": "ZZV9FY4EPXHYDGH4",
+            "effectiveDate": "2020-04-01T00:00:00Z",
+            "offerTermCode": "JRTCKXETXF",
+            "termAttributes": {}
+          }
+        }
+      },
+      "version": "20200427224505",
+      "publicationDate": "2020-04-27T22:45:05Z"
+    }
+  ]
+}
