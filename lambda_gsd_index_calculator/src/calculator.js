@@ -17,6 +17,25 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// *******
+// TRACING
+const s3FileSizeTracer = (jobId, fileContent) => {
+  const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8');
+  const s3ContentKiloByteSize = contentByteSize / 1024
+
+  console.log('+++jobId', jobId)
+  console.log('+++s3ContentKiloByteSize', s3ContentKiloByteSize)
+
+  const segment = AWSXRay.getSegment()
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - S3: S3 file size')
+  subsegment.addAnnotation('s3ContentKiloByteSize', s3ContentKiloByteSize)
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'S3')
+  subsegment.close()
+}
+// TRACING
+// *******
+
 const readFile = async (fileName) => {
   const params = {
     Bucket: BUCKET,
@@ -121,10 +140,12 @@ module.exports.handler = async (event, context) => {
 
   const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)
 
-  const resultFileName = await putFile({
+  const fileContent = {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
-  })
+  }
+  s3FileSizeTracer(jobId, fileContent)
+  const resultFileName = await putFile(fileContent)
 
   await slowDown(3000)
 
