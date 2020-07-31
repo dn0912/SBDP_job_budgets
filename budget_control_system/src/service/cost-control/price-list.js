@@ -1,7 +1,11 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
 
-import { calculateLambdaProcessingTimes, createServiceTracingMap } from '../../utils'
+import {
+  calculateLambdaProcessingTimes,
+  createServiceTracingMap,
+  calculateS3ContentSizeInGB,
+} from '../../utils'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -361,9 +365,27 @@ class PriceList {
   // TODO: currently only S3 Standard
   async calculateS3Price(fullTrace, region = 'eu-central-1') {
     const s3Pricings = await this.getS3Pricing()
+    console.log('+++s3Pricings', s3Pricings)
 
     const _calculateStorageFactor = (completeTrace) => {
-      
+      // TODO: UserInput of how much data (in GB) is already stored in S3 for pricing calculation
+      const s3CurrentUsageInGB = 0
+      const pricePerGBFactor = s3Pricings.storagePrices.find((priceObj) => {
+        const beginRange = Number(priceObj.beginRange)
+        const endRange = Number(priceObj.endRange) || -1 // -1 in case 'Inf'
+
+        if (endRange !== -1) {
+          return (beginRange <= s3CurrentUsageInGB && s3CurrentUsageInGB <= endRange)
+        }
+        return s3CurrentUsageInGB >= beginRange
+      })
+
+      console.log('+++pricePerGBFactor', pricePerGBFactor)
+
+      const s3ContentSizeInGB = calculateS3ContentSizeInGB(completeTrace)
+      console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
+
+      return Math.ceil(s3ContentSizeInGB) * pricePerGBFactor.pricePerUnitUSD
     }
 
     const _calculateRequestAndRetrievalsFactor = (completeTrace) => {
@@ -386,7 +408,7 @@ class PriceList {
     const _calculateManagementAndReplicationFactor = () => { }
 
     // TODO:
-    const storagePrice = 0
+    const storagePrice = _calculateStorageFactor(fullTrace)
 
     // 2. Request and Data Retrieval price
     // e.g. { SQS: { SendMessage: 2 }, S3: { GetObject: 4, PutObject: 4 } }
@@ -395,9 +417,11 @@ class PriceList {
     const s3Totalprice = storagePrice + requestAndDataRetrievalsPrice
 
     console.log('+++s3Totalprice', {
+      storagePrice,
       requestAndDataRetrievalsPrice,
     })
 
+    // nano USD
     return Number(`${s3Totalprice}e9`)
   }
 }

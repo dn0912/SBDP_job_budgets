@@ -2,13 +2,31 @@ import { get, set, flatten } from 'lodash'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
-const calculateLambdaProcessingTimes = (fullTraceSegments) => {
-  const lambdaTraceSegments = fullTraceSegments
-    .filter((seg) => seg.Document.includes('Cost tracer subsegment - Lambda'))
+const _parceFullTraceIntoServiceTraceSegments = (subsegmentName, fullTrace) =>
+  fullTrace
+    .filter((seg) => seg.Document.includes(subsegmentName))
     .map((seg) => ({
       ...seg,
       Document: JSON.parse(seg.Document),
     }))
+
+const _parceServiceTraceSegmentsIntoSubsegments = (subsegmentName, serviceTraceSegments) =>
+  flatten(serviceTraceSegments.map((document) => {
+    // const lambdaInvocationSubsegmentWithSqsAnnotation =
+    const { subsegments } = get(document, 'Document.subsegments', [])
+      .find((subsegment) => subsegment.name === 'Invocation')
+
+    const sqsSubsegment = subsegments
+      .filter((subsegment) => subsegment.name.includes(subsegmentName))
+    return sqsSubsegment
+  }))
+
+const calculateLambdaProcessingTimes = (fullTraceSegments) => {
+  const lambdaTraceSegments = _parceFullTraceIntoServiceTraceSegments(
+    'Cost tracer subsegment - Lambda',
+    fullTraceSegments,
+  )
+
   const lambdaProcessingTimes = lambdaTraceSegments.map(
     (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
   )
@@ -19,22 +37,15 @@ const calculateLambdaProcessingTimes = (fullTraceSegments) => {
 }
 
 const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
-  const sqsTraceSegments = fullTraceSegments
-    .filter((seg) => seg.Document.includes('Cost tracer subsegment - SQS'))
-    .map((seg) => ({
-      ...seg,
-      Document: JSON.parse(seg.Document),
-    }))
+  const sqsTraceSegments = _parceFullTraceIntoServiceTraceSegments(
+    'Cost tracer subsegment - SQS',
+    fullTraceSegments,
+  )
 
-  const sqsSubsegments = flatten(sqsTraceSegments.map((document) => {
-    // const lambdaInvocationSubsegmentWithSqsAnnotation =
-    const { subsegments } = get(document, 'Document.subsegments', [])
-      .find((subsegment) => subsegment.name === 'Invocation')
-
-    const sqsSubsegment = subsegments
-      .filter((subsegment) => subsegment.name.includes('Cost tracer subsegment - SQS: SQS payload size'))
-    return sqsSubsegment
-  }))
+  const sqsSubsegments = _parceServiceTraceSegmentsIntoSubsegments(
+    'Cost tracer subsegment - SQS: SQS payload size',
+    sqsTraceSegments,
+  )
 
   const sqsRequestAmounts = sqsSubsegments.reduce((acc, seg) => {
     const { queueUrl } = seg.annotations
@@ -50,6 +61,25 @@ const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
   // console.log('+++sqsSubsegments', serialize(sqsSubsegments), sqsRequestAmounts)
 
   return sqsRequestAmounts
+}
+
+const calculateS3ContentSizeInGB = (fullTraceSegments) => {
+  const s3TraceSegments = _parceFullTraceIntoServiceTraceSegments('Cost tracer subsegment - S3', fullTraceSegments)
+
+  console.log('+++s3TraceSegments', s3TraceSegments)
+  const s3Subsegments = _parceServiceTraceSegmentsIntoSubsegments(
+    'Cost tracer subsegment - S3: S3 file size',
+    s3TraceSegments,
+  )
+
+  console.log('+++s3Subsegments', s3Subsegments)
+
+  const totalS3ContentSizeInKiloByte = s3Subsegments.reduce((acc, subSeq) =>
+    acc + subSeq.annotations.s3ContentKiloByteSize, 0)
+
+  console.log('+++totalS3ContentSize', totalS3ContentSizeInKiloByte)
+
+  return totalS3ContentSizeInKiloByte / 1024 ** 2 // convert from KB into GB
 }
 
 const TRACED_SERVICES = ['S3', 'SQS']
@@ -90,4 +120,5 @@ export {
   calculateLambdaProcessingTimes,
   createServiceTracingMap,
   calculateSqsRequestAmountsPerQueue,
+  calculateS3ContentSizeInGB,
 }
