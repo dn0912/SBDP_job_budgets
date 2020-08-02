@@ -13,9 +13,7 @@ import Tracer from './service/tracer'
 
 import {
   createServiceTracingMap,
-  calculateSqsRequestAmountsPerQueue,
-  calculateS3ContentSizeInGB,
-} from './utils'
+} from './service/cost-control/utils'
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
@@ -282,20 +280,22 @@ app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
 
   const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
+  // lambda
   const lambdaPrices = await priceList.calculateLambdaPrice(allTraceSegments)
 
-  console.log('++++++++++++++++++++++++++++++++++++++++++++++++')
-
   // sqs
-  const sqsRequestMapPerQueue = calculateSqsRequestAmountsPerQueue(allTraceSegments)
-  const sqsPrices = await priceList.calculateSqsPrice(sqsRequestMapPerQueue)
+  const sqsPrices = await priceList.calculateSqsPrice(allTraceSegments)
 
   // s3
   const s3Prices = await priceList.calculateS3Price(allTraceSegments)
 
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
-  console.log('+++totalJobPrice', {
-    lambdaPrices, sqsPrices, s3Prices, totalJobPrice,
+  console.log('+++totalJobPrice in Nano USD', {
+    'Lambda total price': lambdaPrices,
+    'SQS total price': sqsPrices,
+    'S3 total price': s3Prices,
+    'Job price in Nano USD': totalJobPrice,
+    'Job price in USD': Number(`${totalJobPrice}e-9`),
   })
 
   // other traced services

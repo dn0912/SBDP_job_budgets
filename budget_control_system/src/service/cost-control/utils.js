@@ -27,13 +27,32 @@ const calculateLambdaProcessingTimes = (fullTraceSegments) => {
     fullTraceSegments,
   )
 
-  const lambdaProcessingTimes = lambdaTraceSegments.map(
-    (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
+  const lambdaSubsegments = _parceServiceTraceSegmentsIntoSubsegments(
+    'Cost tracer subsegment - Lambda',
+    lambdaTraceSegments,
   )
-  console.log('+++lambdaTraceSegments', lambdaTraceSegments)
-  console.log('+++lambdaProcessingTimes', lambdaProcessingTimes)
 
-  return lambdaProcessingTimes
+  const lambdaProcessingDurationWithMemoryAllocInMB = lambdaSubsegments
+    .reduce((acc, subSeg, index) => {
+      const lambdaTraceSegmentDoc = lambdaTraceSegments[index].Document
+      acc.push({
+        // processingTime: subSeg.end_time - subSeg.start_time, // using subsegment start/endtime
+        processingTime: lambdaTraceSegmentDoc.end_time - lambdaTraceSegmentDoc.start_time,
+        memoryAllocationInMB: subSeg.annotations.memoryAllocationInMB,
+      })
+      return acc
+    }, [])
+
+  // const lambdaProcessingTimes = lambdaTraceSegments.map(
+  //   (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
+  // )
+  console.log('+++lambdaSubsegments', lambdaSubsegments)
+  console.log('+++lambdaTraceSegments', lambdaTraceSegments)
+  console.log('+++lambdaProcessingDurationWithMemoryAllocInMB', lambdaProcessingDurationWithMemoryAllocInMB)
+  // console.log('+++lambdaProcessingTimes', lambdaProcessingTimes)
+  // console.log('+++diff', lambdaProcessingDurationWithMemoryAllocInMB.map((val, index) => val.processingTime - lambdaProcessingTimes[index]))
+
+  return lambdaProcessingDurationWithMemoryAllocInMB
 }
 
 const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
@@ -58,21 +77,16 @@ const calculateSqsRequestAmountsPerQueue = (fullTraceSegments) => {
     return acc
   }, {})
 
-  // console.log('+++sqsSubsegments', serialize(sqsSubsegments), sqsRequestAmounts)
-
   return sqsRequestAmounts
 }
 
 const calculateS3ContentSizeInGB = (fullTraceSegments) => {
   const s3TraceSegments = _parceFullTraceIntoServiceTraceSegments('Cost tracer subsegment - S3', fullTraceSegments)
 
-  console.log('+++s3TraceSegments', s3TraceSegments)
   const s3Subsegments = _parceServiceTraceSegmentsIntoSubsegments(
     'Cost tracer subsegment - S3: S3 file size',
     s3TraceSegments,
   )
-
-  console.log('+++s3Subsegments', s3Subsegments)
 
   const totalS3ContentSizeInKiloByte = s3Subsegments.reduce((acc, subSeq) =>
     acc + subSeq.annotations.s3ContentKiloByteSize, 0)

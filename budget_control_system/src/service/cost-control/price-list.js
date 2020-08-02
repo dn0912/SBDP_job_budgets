@@ -5,7 +5,8 @@ import {
   calculateLambdaProcessingTimes,
   createServiceTracingMap,
   calculateS3ContentSizeInGB,
-} from '../../utils'
+  calculateSqsRequestAmountsPerQueue,
+} from './utils'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -310,11 +311,15 @@ class PriceList {
     const lambdaProcessingTimes = calculateLambdaProcessingTimes(fullTrace)
 
     // TODO: enhance function with lambda memory usage of each function
-    const lambdaPricingPer100Ms = await this.getLambdaPricing(region)
-    const lambdaPrices = lambdaProcessingTimes.map((lambdaProcTime) => {
-      const roundedLambdaProcTime = Math.ceil(lambdaProcTime * 10)
+    const lambdaPricingPer100MsWith1GBMemory = await this.getLambdaPricing(region)
+    console.log('+++lambdaPricingPer100Ms', lambdaPricingPer100MsWith1GBMemory)
+    const lambdaPrices = lambdaProcessingTimes.map((tracedLambdaVal) => {
+      const roundedLambdaProcTime = Math.ceil(tracedLambdaVal.processingTime * 10)
+      const memoryAllocation = tracedLambdaVal.memoryAllocationInMB
 
-      return roundedLambdaProcTime * lambdaPricingPer100Ms // Nano USD
+      const lambdaPricePer100MS = (1024 / memoryAllocation) * lambdaPricingPer100MsWith1GBMemory
+
+      return lambdaPricePer100MS * roundedLambdaProcTime // Nano USD
     })
 
     const lambdaTotalPrice = lambdaPrices.reduce((acc, val) => (acc + val), 0)
@@ -322,20 +327,22 @@ class PriceList {
     return lambdaTotalPrice
   }
 
-  async calculateSqsPrice(sqsRequestsMapPerQueue, region = 'eu-central-1') {
+  async calculateSqsPrice(fullTrace, region = 'eu-central-1') {
     // Pricing per 1 million Requests after Free tier(Monthly)
     // Standard Queue     $0.40   ($0.0000004 per request)
     // FIFO Queue         $0.50   ($0.0000005 per request)
 
     // FIFO Requests
-    // API actions for sending, receiving, deleting, and changing visibility of messages
-    // from FIFO queues are charged at FIFO rates.  All other API requests are charged at standard rates.
+    // API actions for sending, receiving, deleting, and changing visibility of messages from FIFO
+    // queues are charged at FIFO rates.  All other API requests are charged at standard rates.
 
     // Size of Payloads
     // Each 64 KB chunk of a payload is billed as 1 request
     // (for example, an API action with a 256 KB payload is billed as 4 requests).
 
     // TODO: enhance funtion with queue type through queueUrl: for now all queues are standard type
+
+    const sqsRequestsMapPerQueue = calculateSqsRequestAmountsPerQueue(fullTrace)
     const { fifo, standard } = await this.getSQSPricing(region)
     const queueUrls = Object.keys(sqsRequestsMapPerQueue)
     const messageAmountsPerType = queueUrls.reduce((acc, url) => {
@@ -380,8 +387,6 @@ class PriceList {
         return s3CurrentUsageInGB >= beginRange
       })
 
-      console.log('+++pricePerGBFactor', pricePerGBFactor)
-
       const s3ContentSizeInGB = calculateS3ContentSizeInGB(completeTrace)
       console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
 
@@ -395,7 +400,8 @@ class PriceList {
         .reduce((acc, requestType) => {
           const requestAmount = s3RequestsMap[requestType] || 0
 
-          const priceForRequest = s3Pricings.requestAndDataRetrievalsPrices[requestType] || s3Pricings.requestAndDataRetrievalsPrices.Others
+          const priceForRequest = s3Pricings.requestAndDataRetrievalsPrices[requestType]
+          || s3Pricings.requestAndDataRetrievalsPrices.Others
 
           // every 1000 request
           return acc + priceForRequest * Math.ceil(requestAmount / 1000)

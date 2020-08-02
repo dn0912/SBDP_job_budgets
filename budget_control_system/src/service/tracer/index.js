@@ -68,15 +68,15 @@ export default class Tracer {
     const traceSummary = await this.getXRayTraceSummaries(startTime, endTime, jobId)
 
     console.log('+++traceSummary', traceSummary)
-    console.log('+++traceSummary', serialize(traceSummary))
+    // console.log('+++traceSummary', serialize(traceSummary))
     const jobTraceIds = traceSummary.TraceSummaries.map((trace) => trace.Id)
     const traceData = await this.batchGetXrayTraces(jobTraceIds)
 
     console.log('+++traceData', traceData)
-    console.log('+++traceData', serialize(traceData))
+    // console.log('+++traceData', serialize(traceData))
 
     const allTraceSegments = traceData.Traces.reduce((acc, trace) => {
-      console.log('++trace.Segments', trace.Segments)
+      // console.log('++trace.Segments', trace.Segments)
       const traceSegments = trace.Segments
       acc.push(...traceSegments)
       return acc
