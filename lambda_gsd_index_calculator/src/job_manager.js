@@ -26,7 +26,7 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const startLambdaTracing = (jobId = 'dummyId') => {
+const startLambdaTracing = (jobId = 'dummyId', context) => {
   console.log('+++Start tracing - job manager')
   const segment = AWSXRay.getSegment()
   console.log('+++jobId', jobId)
@@ -34,6 +34,7 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: calculator')
   subsegment.addAnnotation('jobId', jobId)
   subsegment.addAnnotation('serviceType', 'AWSLambda')
+  subsegment.addAnnotation('memoryAllocationInMB', context.memoryLimitInMB)
   console.log('+++subsegment', subsegment)
 
   return subsegment
@@ -54,7 +55,7 @@ module.exports.startJob = async (event, context) => {
   // TRACING
   const eventBody = JSON.parse(event.body)
   const jobId = eventBody.jobId
-  const lambdaTracingSubsegment = startLambdaTracing(jobId)
+  const lambdaTracingSubsegment = startLambdaTracing(jobId, context)
   // *******
 
 

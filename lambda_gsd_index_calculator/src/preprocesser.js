@@ -23,7 +23,7 @@ const _slowDown = async (ms) => {
 
 // *******
 // TRACING
-const startLambdaTracing = (jobId = 'dummyId') => {
+const startLambdaTracing = (jobId = 'dummyId', context) => {
   console.log('+++Start tracing - preprocesser')
   const segment = AWSXRay.getSegment()
   console.log('+++jobId', jobId)
@@ -31,6 +31,7 @@ const startLambdaTracing = (jobId = 'dummyId') => {
   const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: preprocessor')
   subsegment.addAnnotation('jobId', jobId)
   subsegment.addAnnotation('serviceType', 'AWSLambda')
+  subsegment.addAnnotation('memoryAllocationInMB', context.memoryLimitInMB)
   console.log('+++subsegment', subsegment)
 
   return subsegment
@@ -114,7 +115,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     // *******
     // Tracing
     const jobId = event.jobId
-    const lambdaSubsegment = startLambdaTracing(jobId)
+    const lambdaSubsegment = startLambdaTracing(jobId, context)
     // *******
 
     const inputFileName = (event && event.fileName) || FILE
