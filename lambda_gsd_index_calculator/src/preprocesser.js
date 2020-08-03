@@ -2,17 +2,25 @@ const { BUCKET, FILE, SUBRESULT_FOLDER, REGION, QUEUE_NAME } = process.env
 
 const AWSXRay = require('aws-xray-sdk-core')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
+const TracedAWS = require('service-cost-tracer')
+
 const moment = require('moment')
-const s3 = new AWS.S3()
-const sqs = new AWS.SQS({
+const s3 = new TracedAWS.S3()
+
+const tracedSQS = new TracedAWS.SQS({
   region: REGION,
 })
+
+// console.log('+++TracedAWS', TracedAWS)
+console.log('+++tracedAWS', tracedSQS)
+tracedSQS.helloWorldDuc()
+// console.log('+++ducsqs.sendDucTracedMessage', ducsqs.sendDucTracedMessage)
 
 const { promisify } = require('util')
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
-const sendSQSMessage = promisify(sqs.sendMessage).bind(sqs)
+const sendTracedSQSMessage = promisify(tracedSQS.sendMessage).bind(tracedSQS)
 
 // TODO: remove later
 // simulate slow function
@@ -146,7 +154,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // Sends single message to SQS for further process
     sqsPayloadSizeTracer(jobId, sqsPayload)
-    const test = await sendSQSMessage(sqsPayload)
+    const test = await sendTracedSQSMessage(sqsPayload, jobId)
 
     await _slowDown(5000)
 

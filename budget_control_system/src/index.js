@@ -46,7 +46,7 @@ curl -X POST http://localhost:8080/start-tracing
 app.post('/start-tracing', async (req, res) => {
   // const { jobUrl } = req.body
   const dateNow = Date.now()
-  const jobUrl = 'https://srjkd4anc1.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  const jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
     .post(jobUrl)
