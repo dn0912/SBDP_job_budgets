@@ -11,16 +11,13 @@ const tracedSQS = new TracedAWS.SQS({
   region: REGION,
 })
 
-// console.log('+++TracedAWS', TracedAWS)
 console.log('+++tracedAWS', tracedSQS)
-tracedSQS.helloWorldDuc()
-// console.log('+++ducsqs.sendDucTracedMessage', ducsqs.sendDucTracedMessage)
 
 const { promisify } = require('util')
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
-const sendTracedSQSMessage = promisify(tracedSQS.sendMessage).bind(tracedSQS)
+const sendTracedSQSMessage = promisify(tracedSQS.sendTracedMessage).bind(tracedSQS)
 
 // TODO: remove later
 // simulate slow function

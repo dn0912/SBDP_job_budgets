@@ -24,15 +24,21 @@ const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 //   }
 // })
 
+// AWS.SQS.prototype.sendTracedMessage = async function(payload, jobId) {
 AWS.SQS.prototype.sendTracedMessage = function(payload, jobId, callback) {
   console.log('+++sendTracedMessage', jobId)
 
-  const request = this.sendMessage(payload)
+  // const result = await this.sendMessage(payload).promise()
+  // const result = this.sendMessage(payload, callback)
 
-  return callback(request)
+  // console.log('+++resulst', result)
+  // return result
+  return this.sendMessage(payload, callback)
 }
 
-AWS.SQS.prototype.helloWorldDuc = () => console.log('+++hello world')
+AWS.SQS.prototype.helloWorldDuc = function () {
+  console.log('+++hello world Duc')
+}
 
 // class DucSQS extends AWS.SQS {
 //   sendDucTracedMessage(payload, jobId, callback) {
