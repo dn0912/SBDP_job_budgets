@@ -1,8 +1,6 @@
-const AWSXRay = require('aws-xray-sdk-core')
-const AWS = AWSXRay.captureAWS(require('aws-sdk'))
-const moment = require('moment')
+const TracedAWS = require('service-cost-tracer')
 
-const lambda = new AWS.Lambda()
+const lambda = new TracedAWS.Lambda()
 
 const { promisify } = require('util')
 
@@ -26,25 +24,6 @@ const slowDown = async (ms) => {
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const startLambdaTracing = (jobId = 'dummyId', context) => {
-  console.log('+++Start tracing - job manager')
-  const segment = AWSXRay.getSegment()
-  console.log('+++jobId', jobId)
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: calculator')
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'AWSLambda')
-  subsegment.addAnnotation('memoryAllocationInMB', context.memoryLimitInMB)
-  console.log('+++subsegment', subsegment)
-
-  return subsegment
-}
-
-const stopLambdaTracing = (lambdaSubsegment) => {
-  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaSubsegment.close()
-}
-
 /*
   entry point of SBDP app with definition of
   1. which files should be processed by the preprocessed lambdas
@@ -55,7 +34,7 @@ module.exports.startJob = async (event, context) => {
   // TRACING
   const eventBody = JSON.parse(event.body)
   const jobId = eventBody.jobId
-  const lambdaTracingSubsegment = startLambdaTracing(jobId, context)
+  const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
   // *******
 
 
@@ -89,10 +68,8 @@ module.exports.startJob = async (event, context) => {
 
   await slowDown(2000)
 
-  // *******
   // TRACING
-  stopLambdaTracing(lambdaTracingSubsegment)
-  // *******
+  TracedAWS.stopLambdaTracer(lambdaSubsegment)
 
   return {
     statusCode: 200,

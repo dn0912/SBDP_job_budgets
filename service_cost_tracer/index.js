@@ -31,10 +31,6 @@ AWS.SQS.prototype.tracedSendMessage = function (sqsPayload, jobId, callback) {
   return this.sendMessage(sqsPayload, callback)
 }
 
-AWS.SQS.prototype.helloWorldDuc = function () {
-  console.log('+++hello world Duc')
-}
-
 // Lambda
 AWS.startLambdaTracer = function (context, jobId) {
   console.log('+++Start tracing - preprocesser')
