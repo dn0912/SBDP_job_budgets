@@ -11,13 +11,11 @@ const tracedSQS = new TracedAWS.SQS({
   region: REGION,
 })
 
-console.log('+++tracedAWS', tracedSQS)
-
 const { promisify } = require('util')
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
-const sendTracedSQSMessage = promisify(tracedSQS.sendTracedMessage).bind(tracedSQS)
+const tracedSendSQSMessage = promisify(tracedSQS.tracedSendMessage).bind(tracedSQS)
 
 // TODO: remove later
 // simulate slow function
@@ -28,43 +26,6 @@ const _slowDown = async (ms) => {
 
 // *******
 // TRACING
-const startLambdaTracing = (jobId = 'dummyId', context) => {
-  console.log('+++Start tracing - preprocesser')
-  const segment = AWSXRay.getSegment()
-  console.log('+++jobId', jobId)
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: preprocessor')
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'AWSLambda')
-  subsegment.addAnnotation('memoryAllocationInMB', context.memoryLimitInMB)
-  console.log('+++subsegment', subsegment)
-
-  return subsegment
-}
-
-const stopLambdaTracing = (lambdaSubsegment) => {
-  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaSubsegment.close()
-}
-
-const sqsPayloadSizeTracer = (jobId, sqsPayload) => {
-  const { QueueUrl } = sqsPayload
-  console.log('+++sqsPayload', sqsPayload)
-  console.log('+++sqsPayload111', JSON.stringify(sqsPayload))
-  // TODO: Blob is somehow not working
-  // const payloadByteSize = new Blob([JSON.stringify(sqsPayload)]).size
-  const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8');
-  const sqs64KiloByteChunkAmounts = Math.ceil(payloadByteSize / 1024 / 64)
-
-  const segment = AWSXRay.getSegment()
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
-  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
-  subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
-  subsegment.addAnnotation('queueUrl', QueueUrl)
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'SQS')
-  subsegment.close()
-}
 
 const s3FileSizeTracer = (jobId, fileContent) => {
   const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8');
@@ -120,7 +81,8 @@ module.exports.readAndFilterFile = async (event, context) => {
     // *******
     // Tracing
     const jobId = event.jobId
-    const lambdaSubsegment = startLambdaTracing(jobId, context)
+    // const lambdaSubsegment = startLambdaTracing(jobId, context)
+    const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
     // *******
 
     const inputFileName = (event && event.fileName) || FILE
@@ -150,8 +112,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     }
 
     // Sends single message to SQS for further process
-    sqsPayloadSizeTracer(jobId, sqsPayload)
-    const test = await sendTracedSQSMessage(sqsPayload, jobId)
+    const test = await tracedSendSQSMessage(sqsPayload, jobId)
 
     await _slowDown(5000)
 
@@ -169,7 +130,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // *******
     // TRACING
-    stopLambdaTracing(lambdaSubsegment)
+    TracedAWS.stopLambdaTracer(lambdaSubsegment)
     // *******
 
     return response
