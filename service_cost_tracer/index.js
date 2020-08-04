@@ -5,18 +5,7 @@ const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 
 const moment = require('moment')
 
-// AWS.SQS.prototype.sendTracedMessage = async function(payload, jobId) {
-AWS.SQS.prototype.sendTracedMessage = function(payload, jobId, callback) {
-  console.log('+++sendTracedMessage', jobId)
-
-  // const result = await this.sendMessage(payload).promise()
-  // const result = this.sendMessage(payload, callback)
-
-  // console.log('+++resulst', result)
-  // return result
-  return this.sendMessage(payload, callback)
-}
-
+// SQS
 const sqsPayloadSizeTracer = function (sqsPayload, jobId) {
   const { QueueUrl } = sqsPayload
   console.log('+++sqsPayload', sqsPayload)
@@ -37,7 +26,7 @@ const sqsPayloadSizeTracer = function (sqsPayload, jobId) {
 }
 
 AWS.SQS.prototype.tracedSendMessage = function (sqsPayload, jobId, callback) {
-  console.log('+++sendTracedMessage', jobId)
+  console.log('+++tracedSendMessage', jobId)
   sqsPayloadSizeTracer(sqsPayload, jobId)
   return this.sendMessage(sqsPayload, callback)
 }
@@ -46,6 +35,7 @@ AWS.SQS.prototype.helloWorldDuc = function () {
   console.log('+++hello world Duc')
 }
 
+// Lambda
 AWS.startLambdaTracer = function (context, jobId) {
   console.log('+++Start tracing - preprocesser')
   const segment = AWSXRay.getSegment()
@@ -66,18 +56,27 @@ AWS.stopLambdaTracer = function (lambdaSubsegment) {
   lambdaSubsegment.close()
 }
 
-// class DucSQS extends AWS.SQS {
-//   sendDucTracedMessage(payload, jobId, callback) {
-//     console.log('extended one HELLO WORLD', jobId)
+// S3
+const s3FileSizeTracer = function (fileContent, jobId) {
+  const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8');
+  const s3ContentKiloByteSize = contentByteSize / 1024
 
-//     this.sendMessage(payload, callback)
-//   }
+  console.log('+++jobId', jobId)
+  console.log('+++s3ContentKiloByteSize', s3ContentKiloByteSize)
 
-//   sendMessage(payload, callback) {
-//     console.log('original sendMessage')
-//     super.sendMessage(payload, callback)
-//   }
-// }
+  const segment = AWSXRay.getSegment()
+  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - S3: S3 file size')
+  subsegment.addAnnotation('s3ContentKiloByteSize', s3ContentKiloByteSize)
+  subsegment.addAnnotation('jobId', jobId)
+  subsegment.addAnnotation('serviceType', 'S3')
+  subsegment.close()
+}
+
+AWS.S3.prototype.tracedPutObject = function (params, jobId, callback) {
+  const fileContent = params.Body
+  s3FileSizeTracer(fileContent, jobId)
+  return this.putObject(params, callback)
+}
 
 // AWS.DucSQS = DucSQS
 module.exports = AWS
