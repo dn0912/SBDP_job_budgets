@@ -1,14 +1,14 @@
 const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
-const AWSXRay = require('aws-xray-sdk-core')
-const AWS = AWSXRay.captureAWS(require('aws-sdk'))
+const TracedAWS = require('service-cost-tracer')
+
 const moment = require('moment')
-const s3 = new AWS.S3()
+const s3 = new TracedAWS.S3()
 
 const { promisify } = require('util')
 
 const getS3Object = promisify(s3.getObject).bind(s3)
-const putS3Object = promisify(s3.putObject).bind(s3)
+const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
 
 // TODO: remove later
 // simulate slow function
@@ -16,25 +16,6 @@ const slowDown = async (ms) => {
   console.log('+++Take it easy!?!')
   await new Promise(resolve => setTimeout(resolve, ms))
 }
-
-// *******
-// TRACING
-const s3FileSizeTracer = (jobId, fileContent) => {
-  const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8');
-  const s3ContentKiloByteSize = contentByteSize / 1024
-
-  console.log('+++jobId', jobId)
-  console.log('+++s3ContentKiloByteSize', s3ContentKiloByteSize)
-
-  const segment = AWSXRay.getSegment()
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - S3: S3 file size')
-  subsegment.addAnnotation('s3ContentKiloByteSize', s3ContentKiloByteSize)
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'S3')
-  subsegment.close()
-}
-// TRACING
-// *******
 
 const readFile = async (fileName) => {
   const params = {
@@ -46,14 +27,15 @@ const readFile = async (fileName) => {
   return data.Body.toString('utf-8')
 }
 
-const putFile = async (fileContent) => {
+const putFile = async (fileContent, jobId) => {
   const currentmTimeStamp = moment().valueOf()
   const fileName = `${currentmTimeStamp}_gsd_calculated.json`
-  await putS3Object({
+  const params = {
     Bucket: BUCKET,
     Key: `${PIPELINE_RESULT_FOLDER}/${fileName}`,
     Body: JSON.stringify(fileContent),
-  })
+  }
+  await tracedPutObject(params, jobId)
 
   return fileName
 }
@@ -104,25 +86,6 @@ const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
   return overAllTimeDiff / allCompletedTasks.length
 }
 
-const startLambdaTracing = (jobId = 'dummyId', context) => {
-  console.log('+++Start tracing - preprocesser')
-  const segment = AWSXRay.getSegment()
-  console.log('+++jobId', jobId)
-  console.log('+++segment', segment)
-  const subsegment = segment.addNewSubsegment('Cost tracer subsegment - Lambda: calculator')
-  subsegment.addAnnotation('jobId', jobId)
-  subsegment.addAnnotation('serviceType', 'AWSLambda')
-  subsegment.addAnnotation('memoryAllocationInMB', context.memoryLimitInMB)
-  console.log('+++subsegment', subsegment)
-
-  return subsegment
-}
-
-const stopLambdaTracing = (lambdaSubsegment) => {
-  lambdaSubsegment.addAnnotation('currentTimeStamp', moment.utc().valueOf())
-  lambdaSubsegment.close()
-}
-
 module.exports.handler = async (event, context) => {
   console.log('+++event2', JSON.stringify(event, undefined, 2))
   console.log('+++context', context)
@@ -133,7 +96,7 @@ module.exports.handler = async (event, context) => {
   // *******
   // Tracing
   const { jobId } = eventBody
-  const lambdaTracingSubsegment = startLambdaTracing(jobId, context)
+  const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
     // *******
 
   const s3FileContentAsString = await readFile(fileName)
@@ -145,8 +108,8 @@ module.exports.handler = async (event, context) => {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
   }
-  s3FileSizeTracer(jobId, fileContent)
-  const resultFileName = await putFile(fileContent)
+  // s3FileSizeTracer(jobId, fileContent)
+  const resultFileName = await putFile(fileContent, jobId)
 
   await slowDown(3000)
 
@@ -162,10 +125,8 @@ module.exports.handler = async (event, context) => {
 
   console.log('+++response', response)
 
-  // *******
   // TRACING
-  stopLambdaTracing(lambdaTracingSubsegment)
-    // *******
+  TracedAWS.stopLambdaTracer(lambdaSubsegment)
 
   return response
 }
