@@ -20,7 +20,7 @@ const tracedSendMessage = promisify(tracedSQS.tracedSendMessage).bind(tracedSQS)
 // TODO: remove later
 // simulate slow function
 const _slowDown = async (ms) => {
-  console.log('+++Take it easy!?!')
+  console.log(`+++Take it easy!?! ${ms} ms`)
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -89,7 +89,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     // Sends single message to SQS for further process
     const test = await tracedSendMessage(sqsPayload, jobId)
 
-    await _slowDown(5000)
+    await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)

@@ -20,7 +20,7 @@ const serialize = (object) => JSON.stringify(object, null, 2)
 // TODO: remove later
 // simulate slow function
 const slowDown = async (ms) => {
-  console.log('+++Take it easy!?!')
+  console.log(`+++Take it easy!?! ${ms} ms`)
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -47,7 +47,7 @@ module.exports.startJob = async (event, context) => {
   const inputArray = [
     // 'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
-    // 'test_with_description_title_change_1500_single.json',
+    'test_with_description_title_change_1500_single.json',
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
@@ -66,7 +66,7 @@ module.exports.startJob = async (event, context) => {
   const result = await Promise.all(promises)
   console.log('+++result', result)
 
-  await slowDown(2000)
+  await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
   // TRACING
   TracedAWS.stopLambdaTracer(lambdaSubsegment)

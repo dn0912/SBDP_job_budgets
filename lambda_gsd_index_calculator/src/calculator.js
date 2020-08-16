@@ -13,7 +13,7 @@ const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
 // TODO: remove later
 // simulate slow function
 const slowDown = async (ms) => {
-  console.log('+++Take it easy!?!')
+  console.log(`+++Take it easy!?! ${ms} ms`)
   await new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -111,7 +111,7 @@ module.exports.handler = async (event, context) => {
   // s3FileSizeTracer(jobId, fileContent)
   const resultFileName = await putFile(fileContent, jobId)
 
-  await slowDown(3000)
+  await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
 
   const response = {
     statusCode: 200,
