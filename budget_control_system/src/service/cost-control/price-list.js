@@ -312,7 +312,7 @@ class PriceList {
 
     // TODO: enhance function with lambda memory usage of each function
     const lambdaPricingPer100MsWith1GBMemory = await this.getLambdaPricing(region)
-    console.log('+++lambdaPricingPer100Ms', lambdaPricingPer100MsWith1GBMemory)
+    // console.log('+++lambdaPricingPer100Ms', lambdaPricingPer100MsWith1GBMemory)
     const lambdaPrices = lambdaProcessingTimes.map((tracedLambdaVal) => {
       const roundedLambdaProcTime = Math.ceil(tracedLambdaVal.processingTime * 10)
       const memoryAllocation = tracedLambdaVal.memoryAllocationInMB
@@ -323,7 +323,7 @@ class PriceList {
     })
 
     const lambdaTotalPrice = lambdaPrices.reduce((acc, val) => (acc + val), 0)
-    console.log('++++calculateLambdaPrice', lambdaPrices, lambdaTotalPrice)
+    // console.log('++++calculateLambdaPrice', lambdaPrices, lambdaTotalPrice)
     return lambdaTotalPrice
   }
 
@@ -363,16 +363,16 @@ class PriceList {
     const sqsFIFOPrice = Number(`${fifo}e9`) * messageAmountsPerType.fifo
 
     const sqsTotalPrice = sqsStandardPrice + sqsFIFOPrice
-    console.log('+++sqsPrice', {
-      messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, sqsTotalPrice,
-    })
+    // console.log('+++sqsPrice', {
+    //   messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, sqsTotalPrice,
+    // })
     return sqsTotalPrice
   }
 
   // TODO: currently only S3 Standard
   async calculateS3Price(fullTrace, region = 'eu-central-1') {
     const s3Pricings = await this.getS3Pricing()
-    console.log('+++s3Pricings', s3Pricings)
+    // console.log('+++s3Pricings', s3Pricings)
 
     const _calculateStorageFactor = (completeTrace) => {
       // TODO: UserInput of how much data (in GB) is already stored in S3 for pricing calculation
@@ -388,7 +388,7 @@ class PriceList {
       })
 
       const s3ContentSizeInGB = calculateS3ContentSizeInGB(completeTrace)
-      console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
+      // console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
 
       return Math.ceil(s3ContentSizeInGB) * pricePerGBFactor.pricePerUnitUSD
     }
@@ -396,6 +396,7 @@ class PriceList {
     const _calculateRequestAndRetrievalsFactor = (completeTrace) => {
       const fullRequestTracingMap = createServiceTracingMap(completeTrace)
       const s3RequestsMap = get(fullRequestTracingMap, 'S3', {})
+      // TODO: add PUT, COPY, POST, LIST request as one type together
       const price = Object.keys(s3RequestsMap)
         .reduce((acc, requestType) => {
           const requestAmount = s3RequestsMap[requestType] || 0
@@ -413,7 +414,7 @@ class PriceList {
     const _calculateDataTransferFactor = () => { }
     const _calculateManagementAndReplicationFactor = () => { }
 
-    // TODO:
+    // TODO: get userinput of how much data he already used on S3 for pricing factor
     const storagePrice = _calculateStorageFactor(fullTrace)
 
     // 2. Request and Data Retrieval price
@@ -422,10 +423,10 @@ class PriceList {
 
     const s3Totalprice = storagePrice + requestAndDataRetrievalsPrice
 
-    console.log('+++s3Totalprice', {
-      storagePrice,
-      requestAndDataRetrievalsPrice,
-    })
+    // console.log('+++s3Totalprice', {
+    //   storagePrice,
+    //   requestAndDataRetrievalsPrice,
+    // })
 
     // nano USD
     return Number(`${s3Totalprice}e9`)

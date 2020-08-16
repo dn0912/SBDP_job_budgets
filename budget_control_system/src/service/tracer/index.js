@@ -28,7 +28,7 @@ export default class Tracer {
   }
 
   async getXRayTraceSummaries(startTime, endTime, jobId) {
-    console.log('+++getXRayTraceSummaries', { startTime, endTime })
+    console.log('+++getXRayTraceSummaries', { startTime, endTime, passedSec: endTime - startTime })
     const FilterExpression = jobId ? `annotation.jobId = "${jobId}"` : ''
     const param = {
       StartTime: startTime,
@@ -67,12 +67,12 @@ export default class Tracer {
     const endTime = Date.now() / 1000
     const traceSummary = await this.getXRayTraceSummaries(startTime, endTime, jobId)
 
-    console.log('+++traceSummary', traceSummary)
+    // console.log('+++traceSummary', traceSummary)
     // console.log('+++traceSummary', serialize(traceSummary))
     const jobTraceIds = traceSummary.TraceSummaries.map((trace) => trace.Id)
     const traceData = await this.batchGetXrayTraces(jobTraceIds)
 
-    console.log('+++traceData', traceData)
+    // console.log('+++traceData', traceData)
     // console.log('+++traceData', serialize(traceData))
 
     const allTraceSegments = traceData.Traces.reduce((acc, trace) => {
@@ -82,7 +82,7 @@ export default class Tracer {
       return acc
     }, [])
 
-    console.log('+++allTraceSegments', allTraceSegments)
+    // console.log('+++allTraceSegments', allTraceSegments)
 
     return allTraceSegments
   }

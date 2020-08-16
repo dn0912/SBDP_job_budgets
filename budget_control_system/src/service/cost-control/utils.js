@@ -46,9 +46,9 @@ const calculateLambdaProcessingTimes = (fullTraceSegments) => {
   // const lambdaProcessingTimes = lambdaTraceSegments.map(
   //   (lambdaTrace) => lambdaTrace.Document.end_time - lambdaTrace.Document.start_time
   // )
-  console.log('+++lambdaSubsegments', lambdaSubsegments)
-  console.log('+++lambdaTraceSegments', lambdaTraceSegments)
-  console.log('+++lambdaProcessingDurationWithMemoryAllocInMB', lambdaProcessingDurationWithMemoryAllocInMB)
+  // console.log('+++lambdaSubsegments', lambdaSubsegments)
+  // console.log('+++lambdaTraceSegments', lambdaTraceSegments)
+  // console.log('+++lambdaProcessingDurationWithMemoryAllocInMB', lambdaProcessingDurationWithMemoryAllocInMB)
   // console.log('+++lambdaProcessingTimes', lambdaProcessingTimes)
   // console.log('+++diff', lambdaProcessingDurationWithMemoryAllocInMB.map((val, index) => val.processingTime - lambdaProcessingTimes[index]))
 
@@ -91,7 +91,7 @@ const calculateS3ContentSizeInGB = (fullTraceSegments) => {
   const totalS3ContentSizeInKiloByte = s3Subsegments.reduce((acc, subSeq) =>
     acc + subSeq.annotations.s3ContentKiloByteSize, 0)
 
-  console.log('+++totalS3ContentSize', totalS3ContentSizeInKiloByte)
+  // console.log('+++totalS3ContentSize', totalS3ContentSizeInKiloByte)
 
   return totalS3ContentSizeInKiloByte / 1024 ** 2 // convert from KB into GB
 }
