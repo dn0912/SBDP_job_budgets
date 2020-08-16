@@ -100,3 +100,6 @@
 1596574489396, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596574492372, 1596574497199, 4827
 1596574638713, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596574641891, 1596574646360, 4469
 1596575209252, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596575212168, 1596575216235, 4067
+1596618736943, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596618740180, 1596618746222, 6042
+1596619419193, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596619422238, 1596619428257, 6019
+1596620418299, arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job, 1596620421406, 1596620426345, 4939

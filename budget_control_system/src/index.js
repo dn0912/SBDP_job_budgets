@@ -23,6 +23,106 @@ const traceStore = new DynamoDB()
 const priceList = new PriceList()
 const tracer = new Tracer()
 
+const calculateJobCosts = async (jobStartTime, jobId, iterationNumber) => {
+  const startTime = parseInt(jobStartTime, 10) / 1000
+  const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
+
+  // lambda
+  const lambdaPrices = await priceList.calculateLambdaPrice(allTraceSegments)
+
+  // sqs
+  const sqsPrices = await priceList.calculateSqsPrice(allTraceSegments)
+
+  // s3
+  const s3Prices = await priceList.calculateS3Price(allTraceSegments)
+
+  const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
+
+  console.log('+++totalJobPrice in Nano USD', {
+    iteration: iterationNumber,
+    'passed time since job start': (Date.now() / 1000) - startTime,
+    'Lambda total price': lambdaPrices,
+    'SQS total price': sqsPrices,
+    'S3 total price': s3Prices,
+    'Job price in Nano USD': totalJobPrice,
+    'Job price in USD': Number(`${totalJobPrice}e-9`),
+  })
+}
+
+async function calculateJobCostsPeriodically(jobStartTime, jobId) {
+  const pollPeriodinMs = 500
+  const counter = {
+    value: 0,
+  }
+
+  // delay it for 1 sec
+  await new Promise((resolve) => setTimeout(() => {
+    console.log('#### wait for 1 sec')
+    resolve()
+  }, 1000))
+
+  while (counter.value < 30) {
+    console.log('++++++++++++++++++++++++++++++++++++')
+    console.log('+++counter.value', counter.value)
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
+
+    // eslint-disable-next-line no-await-in-loop
+    calculateJobCosts(jobStartTime, jobId, counter.value)
+    counter.value++
+  }
+}
+
+async function fetchTracePeriodically(dateNow, jobId) {
+  // TODO: to measure trace fetching delay
+  const pollPeriodinMs = 200
+  const counter = {
+    value: 0,
+  }
+
+  // delay it for 1 sec
+  await new Promise((resolve) => setTimeout(() => {
+    console.log('#### wait for 1 sec')
+    resolve()
+  }, 1000))
+  while (counter.value < 30) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
+    const startTime = dateNow / 1000
+    const endTime = Date.now() / 1000
+    // eslint-disable-next-line no-await-in-loop
+    const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
+
+    const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
+
+    console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
+
+    const currentTimeStamp = moment.utc().valueOf()
+    console.log('+++currentTimeStamp', currentTimeStamp)
+
+    const traceResult = {
+      jobStartTimeStamp: dateNow,
+      arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
+      traceCloseTimeStamp: traceCloseTimeStampAnnotation,
+      currentTimeStamp,
+      elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
+    }
+
+    console.log('+++traceSummary.TraceSummaries', traceSummary.TraceSummaries)
+
+    // TODO: remove break statement => only for first fetch to record trace delay
+    counter.value++
+    if (traceSummary.TraceSummaries.length > 0) {
+      console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
+      fs.appendFileSync(
+        'traceFetchingDelays.csv',
+        `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
+      )
+      break
+    }
+  }
+}
+
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.text({
@@ -62,57 +162,8 @@ app.post('/start-tracing', async (req, res) => {
   console.log('+++response.statusCode', response.statusCode)
   console.log('+++response.body', response.body)
 
-  // TODO: to measure trace fetching delay
-  const pollPeriodinMs = 200
-  const counter = {
-    value: 0,
-  }
-
-  async function fetchTracePeriodically() {
-    // delay it for 2 sec
-    await new Promise((resolve) => setTimeout(() => {
-      console.log('#### wait for 1 sec')
-      resolve()
-    }, 1000))
-    while (counter.value < 30) {
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
-      const startTime = dateNow / 1000
-      const endTime = Date.now() / 1000
-      // eslint-disable-next-line no-await-in-loop
-      const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
-
-      const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
-
-      console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
-
-      const currentTimeStamp = moment.utc().valueOf()
-      console.log('+++currentTimeStamp', currentTimeStamp)
-
-      const traceResult = {
-        jobStartTimeStamp: dateNow,
-        arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
-        traceCloseTimeStamp: traceCloseTimeStampAnnotation,
-        currentTimeStamp,
-        elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
-      }
-
-      console.log('+++traceSummary.TraceSummaries', traceSummary.TraceSummaries)
-
-      // TODO: remove break statement => only for first fetch to record trace delay
-      counter.value++
-      if (traceSummary.TraceSummaries.length > 0) {
-        console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
-        fs.appendFileSync(
-          'traceFetchingDelays.csv',
-          `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
-        )
-        break
-      }
-    }
-  }
-
-  fetchTracePeriodically()
+  // fetchTracePeriodically(dateNow, jobId)
+  calculateJobCostsPeriodically(dateNow, jobId)
 
   res.status(HttpStatus.OK).json({
     jobUrl,
@@ -274,9 +325,9 @@ app.get('/test-get-xraysummary/:startTime', async (req, res) => {
 curl http://localhost:8080/test-job-tracing-summary/:startTime/:jobId
 */
 
-app.get('/test-job-tracing-summary/:startTime/:jobId', async (req, res) => {
-  const { jobId } = req.params
-  const startTime = parseInt(req.params.startTime, 10) / 1000
+app.get('/test-job-tracing-summary/:jobStartTime/:jobId', async (req, res) => {
+  const { jobId, jobStartTime } = req.params
+  const startTime = parseInt(jobStartTime, 10) / 1000
 
   const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
