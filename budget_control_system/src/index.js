@@ -11,6 +11,8 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
+import controller from './controller'
+
 import {
   createServiceTracingMap,
 } from './service/cost-control/utils'
@@ -19,7 +21,7 @@ const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
 
-const traceStore = new DynamoDB()
+const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()
 const tracer = new Tracer()
 
@@ -179,6 +181,9 @@ app.post('/start-tracing', async (req, res) => {
 app.post('/stop', () => {
 
 })
+
+// example curl: curl -X POST http://localhost:8080/register-app -H "Content-Type: application/json" -d "@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json"
+app.post('/register-app', controller.registerApp)
 
 // **************
 // TEST ROUTES!?!

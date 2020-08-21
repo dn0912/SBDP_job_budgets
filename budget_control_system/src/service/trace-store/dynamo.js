@@ -14,17 +14,18 @@ const dynamoDocClient = new AWS.DynamoDB.DocumentClient()
 // const update = promisify(dynamoDb.update.bind(dynamoDb))
 
 class DynamoDB {
-  constructor() {
-    this.tableName = 'trace-record'
+  constructor(tableName) {
+    // this.tableName = 'trace-record'
+    this.tableName = tableName
     this.ddb = dynamoDocClient
   }
 
-  async put(traceRecord) {
+  async put(storeItem) {
     try {
-      const storeItem = {
-        traceId: uuid.v4(),
-        hello: 'world',
-      }
+      // const storeItem = {
+      //   traceId: uuid.v4(),
+      //   hello: 'world',
+      // }
 
       const docClientParams = {
         TableName: this.tableName,
