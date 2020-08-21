@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk'
-import uuid from 'node-uuid'
+// import uuid from 'node-uuid'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
