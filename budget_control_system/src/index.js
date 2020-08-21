@@ -4,6 +4,7 @@ import HttpStatus from 'http-status-codes'
 import { get } from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
+import multer from 'multer'
 
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
@@ -72,12 +73,19 @@ async function fetchTracePeriodically(dateNow, jobId) {
     }
   }
 }
-
+const upload = multer({ dest: 'uploads/' })
 const app = express()
+
+// for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
+
+// for parsing application/json
 app.use(bodyParser.text({
   type: ['json', 'text']
 }))
+
+// for parsing multipart/form-data
+// app.use(express.static('public'))
 
 app.get('/', (req, res) => res.status(200).json({
   hello: 'world!',
@@ -104,8 +112,8 @@ app.post('/stop', () => {
 
 })
 
-// example curl: curl -X POST http://localhost:8080/register-app -H "Content-Type: application/json" -d "@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json"
-app.post('/register-app', controller.registerApp)
+// example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
+app.post('/register-app', upload.single('data'), controller.registerApp)
 
 // **************
 // TEST ROUTES!?!

@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes'
 import { set } from 'lodash'
 import uuid from 'node-uuid'
 import superagent from 'superagent'
+import fs from 'fs'
 
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
@@ -13,8 +14,9 @@ const tracer = new Tracer()
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
+  const jsonString = fs.readFileSync(req.file.path, 'utf-8')
 
-  const cloudFormationTemplate = JSON.parse(req.body)
+  const cloudFormationTemplate = JSON.parse(jsonString)
   const resourceNames = Object.keys(cloudFormationTemplate.Resources)
 
   const sqsResourceNames = resourceNames.filter(
