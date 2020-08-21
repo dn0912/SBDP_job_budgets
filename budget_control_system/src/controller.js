@@ -7,6 +7,7 @@ import fs from 'fs'
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
+import PriceCalculator from './service/cost-control/price-calculator'
 
 const appRegisterStore = new DynamoDB('app-register-store')
 const priceList = new PriceList()
@@ -47,18 +48,18 @@ const registerApp = async (req, res) => {
   res.status(HttpStatus.CREATED).json(storeItem)
 }
 
-const calculateJobCosts = async (jobStartTime, jobId, iterationNumber) => {
+const calculateJobCosts = async (jobStartTime, jobId, priceCalculator, iterationNumber) => {
   const startTime = parseInt(jobStartTime, 10) / 1000
   const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
   // lambda
-  const lambdaPrices = await priceList.calculateLambdaPrice(allTraceSegments)
+  const lambdaPrices = priceCalculator.calculateLambdaPrice(allTraceSegments)
 
   // sqs
-  const sqsPrices = await priceList.calculateSqsPrice(allTraceSegments)
+  const sqsPrices = priceCalculator.calculateSqsPrice(allTraceSegments)
 
   // s3
-  const s3Prices = await priceList.calculateS3Price(allTraceSegments)
+  const s3Prices = priceCalculator.calculateS3Price(allTraceSegments)
 
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
 
@@ -73,7 +74,7 @@ const calculateJobCosts = async (jobStartTime, jobId, iterationNumber) => {
   })
 }
 
-async function calculateJobCostsPeriodically(jobStartTime, jobId) {
+async function calculateJobCostsPeriodically(...args) {
   const pollPeriodinMs = 500
   const counter = {
     value: 0,
@@ -92,7 +93,7 @@ async function calculateJobCostsPeriodically(jobStartTime, jobId) {
     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
 
     // eslint-disable-next-line no-await-in-loop
-    calculateJobCosts(jobStartTime, jobId, counter.value)
+    calculateJobCosts(...args, counter.value)
     counter.value++
   }
 }
@@ -116,8 +117,20 @@ const startTracing = async (req, res) => {
   console.log('+++response.statusCode', response.statusCode)
   console.log('+++response.body', response.body)
 
+  const priceList = new PriceList()
+  const lambdaPricing = await priceList.getLambdaPricing()
+  const sqsPricing = await priceList.getSQSPricing()
+  const s3Pricing = await priceList.getS3Pricing()
+  const priceCalculator = new PriceCalculator(
+    lambdaPricing, sqsPricing, s3Pricing
+  )
+
   // fetchTracePeriodically(dateNow, jobId)
-  calculateJobCostsPeriodically(dateNow, jobId)
+  calculateJobCostsPeriodically(
+    dateNow,
+    jobId,
+    priceCalculator,
+  )
 
   res.status(HttpStatus.OK).json({
     jobUrl,
