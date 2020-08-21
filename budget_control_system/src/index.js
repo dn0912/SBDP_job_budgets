@@ -56,14 +56,14 @@ async function calculateJobCostsPeriodically(jobStartTime, jobId) {
   }
 
   // delay it for 1 sec
-  await new Promise((resolve) => setTimeout(() => {
-    console.log('#### wait for 1 sec')
-    resolve()
-  }, 1000))
+  // await new Promise((resolve) => setTimeout(() => {
+  //   console.log('#### wait for 1 sec')
+  //   resolve()
+  // }, 1000))
 
   while (counter.value < 30) {
-    console.log('++++++++++++++++++++++++++++++++++++')
-    console.log('+++counter.value', counter.value)
+    // console.log('++++++++++++++++++++++++++++++++++++')
+    // console.log('+++counter.value', counter.value)
     // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
 
