@@ -10,7 +10,6 @@ import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 
 const appRegisterStore = new DynamoDB('app-register-store')
-const priceList = new PriceList()
 const tracer = new Tracer()
 
 const registerApp = async (req, res) => {
