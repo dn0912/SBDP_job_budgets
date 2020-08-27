@@ -1,11 +1,12 @@
 const TracedAWS = require('service-cost-tracer')
-// const Redis = require('ioredis')
+const Redis = require('ioredis')
 
 const lambda = new TracedAWS.Lambda()
 
 // const redisEndpoint = 'redis-test-cluster.9sjlaw.clustercfg.euc1.cache.amazonaws.com'
 // const redisPort = 6379
 // const redisClient = new Redis(redisPort, redisEndpoint)
+const redisClient = new Redis('redis://redis-sbdp.9sjlaw.ng.0001.euc1.cache.amazonaws.com:6379')
 
 const { promisify } = require('util')
 
@@ -42,15 +43,6 @@ module.exports.startJob = async (event, context) => {
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
   // *******
 
-  // console.log('+++hello start job')
-  // // TODO: redis test
-  // const test = await redisClient.set('hello', 'world')
-  // console.log('+++test', test)
-
-  // const test2 = await redisClient.get('hello')
-  // console.log('+++test2', test2)
-
-
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
   console.log('## CONTEXT: ' + serialize(context))
   console.log('## EVENT: ' + serialize(event))
@@ -82,6 +74,14 @@ module.exports.startJob = async (event, context) => {
   await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
   // TRACING
+  console.log('+++hello start job')
+  // // TODO: redis test
+  const test = await redisClient.set(jobId, Date.now())
+  console.log('+++test', test)
+
+  // const test2 = await redisClient.get(jobId)
+  // console.log('+++test2', test2)
+  await redisClient.disconnect() // have to do this or lambda will time out
   TracedAWS.stopLambdaTracer(lambdaSubsegment)
 
   return {
