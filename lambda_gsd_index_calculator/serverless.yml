@@ -17,6 +17,8 @@ provider:
   vpc: # needed tp access elasticache in vpc
     securityGroupIds:
       - sg-07fc94f773c7575e3
+      - sg-42584e24
+      - sg-07e443ee2f0d530cc
     subnetIds:
       - subnet-16ee577c
       - subnet-58b24914

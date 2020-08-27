@@ -19,6 +19,7 @@ const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
 export const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
+console.log('+++REDIS_URL', redisUrl)
 
 const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()

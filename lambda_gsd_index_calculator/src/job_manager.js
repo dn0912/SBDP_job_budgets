@@ -56,20 +56,22 @@ module.exports.startJob = async (event, context) => {
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
-  const promises = inputArray.map(fileName => {
-    const payload = {
-      fileName,
-      jobId,
-    }
-    return invokeLambda({
-      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
-      InvocationType: 'Event',
-      Payload: JSON.stringify(payload),
-    })
-  })
+  console.log('+++inputArray', inputArray)
 
-  const result = await Promise.all(promises)
-  console.log('+++result', result)
+  // const promises = inputArray.map(fileName => {
+  //   const payload = {
+  //     fileName,
+  //     jobId,
+  //   }
+  //   return invokeLambda({
+  //     FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
+  //     InvocationType: 'Event',
+  //     Payload: JSON.stringify(payload),
+  //   })
+  // })
+
+  // const result = await Promise.all(promises)
+  // console.log('+++result', result)
 
   await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
@@ -79,14 +81,15 @@ module.exports.startJob = async (event, context) => {
   const test = await redisClient.set(jobId, Date.now())
   console.log('+++test', test)
 
-  // const test2 = await redisClient.get(jobId)
-  // console.log('+++test2', test2)
-  await redisClient.disconnect() // have to do this or lambda will time out
+  const test2 = await redisClient.get(jobId)
+  console.log('+++test2', test2)
+  redisClient.disconnect()
   TracedAWS.stopLambdaTracer(lambdaSubsegment)
 
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(result),
+    // body: JSON.stringify(result),
+    body: JSON.stringify({}),
   }
 }
