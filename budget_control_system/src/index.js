@@ -5,6 +5,7 @@ import { get } from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
 import multer from 'multer'
+import Redis from 'ioredis'
 
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
@@ -19,10 +20,12 @@ import {
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
+export const redisUrl = process.env.redisUrl || 'redis://localhost:6379'
 
 const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()
 const tracer = new Tracer()
+const redisClient = new Redis(redisUrl)
 
 async function fetchTracePeriodically(dateNow, jobId) {
   // TODO: to measure trace fetching delay
@@ -87,8 +90,8 @@ app.use(bodyParser.text({
 // for parsing multipart/form-data
 // app.use(express.static('public'))
 
-app.get('/', (req, res) => res.status(200).json({
-  hello: 'world!',
+app.get('/ping', (req, res) => res.status(200).json({
+  pong: 'Hello world!',
 }))
 
 /* Example curl:
@@ -117,6 +120,19 @@ app.post('/register-app', upload.single('data'), controller.registerApp)
 
 // **************
 // TEST ROUTES!?!
+
+// Redis
+app.post('/redis-test', async (req, res) => {
+  console.log('+++data', req.body)
+  const test = await redisClient.set('hello', 'world')
+  console.log('+++test', test)
+
+  const test2 = await redisClient.get('hello')
+  console.log('+++test2', test2)
+  res.status(HttpStatus.CREATED).json({
+    hello: 'world'
+  })
+})
 
 // AWS DynamoDB
 app.post('/test-put-db', async (req, res) => {
