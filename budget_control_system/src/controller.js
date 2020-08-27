@@ -8,6 +8,9 @@ import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
+import FlagPoleService from './service/cost-control/flag-pole'
+
+import { redisUrl } from './index'
 
 const appRegisterStore = new DynamoDB('app-register-store')
 const tracer = new Tracer()
@@ -47,7 +50,13 @@ const registerApp = async (req, res) => {
   res.status(HttpStatus.CREATED).json(storeItem)
 }
 
-const calculateJobCosts = async (jobStartTime, jobId, priceCalculator, iterationNumber) => {
+const calculateJobCosts = async (
+  jobStartTime,
+  jobId,
+  priceCalculator,
+  flagPole,
+  iterationNumber,
+) => {
   const startTime = parseInt(jobStartTime, 10) / 1000
   const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
@@ -61,15 +70,19 @@ const calculateJobCosts = async (jobStartTime, jobId, priceCalculator, iteration
   const s3Prices = priceCalculator.calculateS3Price(allTraceSegments)
 
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
+  const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
+
+  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD)
 
   console.log('+++totalJobPrice in Nano USD', {
     iteration: iterationNumber,
+    isInBudgetLimit,
     'passed time since job start': (Date.now() / 1000) - startTime,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
     'S3 total price': s3Prices,
     'Job price in Nano USD': totalJobPrice,
-    'Job price in USD': Number(`${totalJobPrice}e-9`),
+    'Job price in USD': totalJobPriceInUSD,
   })
 }
 
@@ -124,11 +137,17 @@ const startTracing = async (req, res) => {
     lambdaPricing, sqsPricing, s3Pricing
   )
 
+  // TODO: set budget limit beforehand
+  const budgetLimit = 0.025
+  // const redisClient = new Redis(redisUrl)
+  const flagPole = new FlagPoleService(redisUrl, jobId, budgetLimit)
+
   // fetchTracePeriodically(dateNow, jobId)
   calculateJobCostsPeriodically(
     dateNow,
     jobId,
     priceCalculator,
+    flagPole,
   )
 
   res.status(HttpStatus.OK).json({
