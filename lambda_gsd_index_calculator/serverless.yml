@@ -14,6 +14,13 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ${self:custom.REGION}
+  vpc: # needed tp access elasticache in vpc
+    securityGroupIds:
+      - sg-07fc94f773c7575e3
+    subnetIds:
+      - subnet-16ee577c
+      - subnet-58b24914
+      - subnet-fe9a6e82
   iamRoleStatements:
     - Effect: Allow
       Action:

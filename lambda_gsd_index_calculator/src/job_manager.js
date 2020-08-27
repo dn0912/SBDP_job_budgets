@@ -1,6 +1,11 @@
 const TracedAWS = require('service-cost-tracer')
+// const Redis = require('ioredis')
 
 const lambda = new TracedAWS.Lambda()
+
+// const redisEndpoint = 'redis-test-cluster.9sjlaw.clustercfg.euc1.cache.amazonaws.com'
+// const redisPort = 6379
+// const redisClient = new Redis(redisPort, redisEndpoint)
 
 const { promisify } = require('util')
 
@@ -36,6 +41,14 @@ module.exports.startJob = async (event, context) => {
   const jobId = eventBody.jobId
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
   // *******
+
+  // console.log('+++hello start job')
+  // // TODO: redis test
+  // const test = await redisClient.set('hello', 'world')
+  // console.log('+++test', test)
+
+  // const test2 = await redisClient.get('hello')
+  // console.log('+++test2', test2)
 
 
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
