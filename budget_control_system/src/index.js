@@ -20,12 +20,18 @@ import {
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 const port = process.env.PORT || 3000
-export const redisUrl = process.env.redisUrl || 'redis://localhost:6379'
+
+export const {
+  redisUrl = 'redis://localhost:6379',
+  redisHost,
+  redisPort,
+  redisPassword,
+} = process.env
 
 const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()
 const tracer = new Tracer()
-const redisClient = new Redis(redisUrl)
+// const redisClient = new Redis('redis://')
 
 async function fetchTracePeriodically(dateNow, jobId) {
   // TODO: to measure trace fetching delay
@@ -124,10 +130,22 @@ app.post('/register-app', upload.single('data'), controller.registerApp)
 // Redis
 app.post('/redis-test', async (req, res) => {
   console.log('+++data', req.body)
-  const test = await redisClient.set('hello', 'world')
-  console.log('+++test', test)
+  // const test = await redisClient.set('hello', 'world')
+  // console.log('+++test', test)
 
-  const test2 = await redisClient.get('hello')
+  // const test2 = await redisClient.get('hello')
+  // console.log('+++test2', test2)
+
+  const ec2RedisClient = new Redis({
+    port: 6379, // Redis port
+    host: '3.127.234.38', // Redis host
+    family: 4, // 4 (IPv4) or 6 (IPv6)
+    password: 'this-is-my-password-0000',
+    db: 0,
+  })
+  const test = await ec2RedisClient.set('hello', 'world')
+  console.log('+++test', test)
+  const test2 = await ec2RedisClient.get('hello')
   console.log('+++test2', test2)
   res.status(HttpStatus.CREATED).json({
     hello: 'world'
