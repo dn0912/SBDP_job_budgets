@@ -148,7 +148,7 @@ app.post('/redis-test', async (req, res) => {
     port: REDIS_PORT, // Redis port
     host: REDIS_HOST, // Redis host
     family: 4, // 4 (IPv4) or 6 (IPv6)
-    password: 'this-is-my-password-0000',
+    password: REDIS_PASSWORD,
     db: 0,
   })
   const test = await ec2RedisClient.set('hello', 'world')
