@@ -25,4 +25,8 @@ export default class FlagPoleService extends Redis {
     }
     return true
   }
+
+  getBudgetLimit() {
+    return this.budgetLimit
+  }
 }
