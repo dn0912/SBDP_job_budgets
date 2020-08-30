@@ -111,9 +111,10 @@ async function calculateJobCostsPeriodically(...args) {
 }
 
 const startTracing = async (req, res) => {
-  // const { jobUrl } = req.body
+  const {
+    jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  } = JSON.parse(req.body)
   const dateNow = Date.now()
-  const jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   const jobId = uuid.v4()
   const response = await superagent
     .post(jobUrl)

@@ -107,8 +107,9 @@ app.get('/ping', (req, res) => res.status(200).json({
   pong: 'Hello world!',
 }))
 
-/* Example curl:
+/* Example curls:
 curl -X POST http://localhost:8080/start-tracing
+curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world"}'
 */
 /**
  * start serverless big data processing tracing endpoint
