@@ -75,7 +75,7 @@ const calculateJobCosts = async (
   console.log('+++totalJobPrice in Nano USD', {
     iteration: iterationNumber,
     isInBudgetLimit,
-    'Budget limit': flagPole.getBudgetLimit,
+    'Budget limit': flagPole.getBudgetLimit(),
     'Time passed since job start': (Date.now() / 1000) - startTime,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
