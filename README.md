@@ -4,7 +4,10 @@
 
 ### Create ec2 instance per AWS CLI
 Note:
-- `sg-0cd4e8a87c427827e` is a Security Group with Inbound rules for SSH communication and for Redis: TCP with port 6379 open to the public 0.0.0.0/0
+- `sg-0cd4e8a87c427827e` is a Security Group with Inbound rules for
+  - SSH communication,
+  - for Redis: TCP with port 6379 open to the public 0.0.0.0/0 and
+  - TCP port 3000 open to the public 0.0.0.0/0 to access the NodeJS application.
 - `ec2_test_22_07_2020` is a generated key name for SSH connection
 
 ```bash
