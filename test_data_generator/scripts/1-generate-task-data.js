@@ -2,6 +2,7 @@ import { range } from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
 import uuid from 'node-uuid'
+import { ArgumentParser } from 'argparse'
 
 const randomStringGenerator = (prefix) => {
   // e.g. T123456
@@ -155,11 +156,29 @@ const createEvent = (newTask, oldTask = {}) => ({
 })
 
 const main = () => {
+  const parser = new ArgumentParser({
+    add_help: true,
+    description: 'Generate test data for serverless big data processing - Context: Task update data of a productivity app in Kanban context',
+  })
+
+  parser.add_argument(
+    '-n', '--number',
+    {
+      help: 'The amount of tasks for to generate task update data.',
+      required: true,
+    },
+  )
+
+  const args = parser.parse_args()
+
   const taskEvents = []
   // const randomContextSet = generateRandomContextSet(1, 1, 1)
   const randomContextSet = [CONTEXT_SET]
-  const taskAmount = 1000
+  const taskAmount = Number(args.number)
 
+  if (isNaN(taskAmount)) {
+    throw new Error('Argument is not a number!')
+  }
 
   randomContextSet.forEach(contextSet => {
     for (let i = 0; i < taskAmount; i++) {
