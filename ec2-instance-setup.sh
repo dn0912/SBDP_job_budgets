@@ -71,4 +71,4 @@ echo "AWS_RESOURCE_REGION=$AWS_RESOURCE_REGION" >> ~/SBDP_job_budgets/budget_con
 
 # start services
 redis-server $REDIS_CONFIG_FILE_PATH &
-npm run start
+REDIS_PASSWORD=$REDIS_PASSWORD npm run start

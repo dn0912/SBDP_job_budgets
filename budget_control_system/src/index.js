@@ -22,11 +22,18 @@ const serialize = (object) => JSON.stringify(object, null, 2)
 const port = process.env.PORT || 3000
 
 export const {
-  redisUrl = 'redis://localhost:6379',
-  redisHost,
-  redisPort,
-  redisPassword,
+  REDIS_URL = 'redis://localhost:6379',
+  REDIS_HOST = '127.0.0.1',
+  REDIS_PORT = 6379,
+  REDIS_PASSWORD,
 } = process.env
+
+console.log('REDIS VARS:', {
+  REDIS_URL,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_PASSWORD,
+})
 
 const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()
@@ -137,8 +144,8 @@ app.post('/redis-test', async (req, res) => {
   // console.log('+++test2', test2)
 
   const ec2RedisClient = new Redis({
-    port: 6379, // Redis port
-    host: '3.127.234.38', // Redis host
+    port: REDIS_PORT, // Redis port
+    host: REDIS_HOST, // Redis host
     family: 4, // 4 (IPv4) or 6 (IPv6)
     password: 'this-is-my-password-0000',
     db: 0,

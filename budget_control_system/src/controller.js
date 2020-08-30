@@ -10,7 +10,7 @@ import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
 
-import { redisUrl } from './index'
+import { REDIS_URL } from './index'
 
 const appRegisterStore = new DynamoDB('app-register-store')
 const tracer = new Tracer()
@@ -139,8 +139,8 @@ const startTracing = async (req, res) => {
 
   // TODO: set budget limit beforehand
   const budgetLimit = 0.025
-  // const redisClient = new Redis(redisUrl)
-  const flagPole = new FlagPoleService(redisUrl, jobId, budgetLimit)
+  // const redisClient = new Redis(REDIS_URL)
+  const flagPole = new FlagPoleService(REDIS_URL, jobId, budgetLimit)
 
   // fetchTracePeriodically(dateNow, jobId)
   calculateJobCostsPeriodically(
