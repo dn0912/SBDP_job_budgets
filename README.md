@@ -145,14 +145,22 @@ aws s3 cp test_data s3://test-task-update-data-v2/ \
 
 ### Deploy Serverless Big Data Processing application
 
-To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first
+To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first and then:
 ```bash
 # change to `./lambda_gsd_index_calculator/`
 
 npm i
 
-sls deploy --aws-profile duc
+sls deploy --aws-profile duc # get start-job endpoint (https://xxxxxx.amazonaws.com/dev/start-job)
 ```
+
+
+### Start serverless data processing through tracing app
+
+```bash
+curl -X POST http://<your EC2 public endpoint>:3000/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "https://<your deployed data processing app start-job endpoint>", "budgetLimit": 0.0248}'
+```
+
 
 ## Serverless CLI commands
 
