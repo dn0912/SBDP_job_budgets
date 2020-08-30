@@ -1,5 +1,5 @@
 import HttpStatus from 'http-status-codes'
-import { set } from 'lodash'
+import { get, set, isEmpty } from 'lodash'
 import uuid from 'node-uuid'
 import superagent from 'superagent'
 import fs from 'fs'
@@ -109,9 +109,16 @@ async function calculateJobCostsPeriodically(...args) {
 }
 
 const startTracing = async (req, res) => {
-  const {
-    jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
-  } = JSON.parse(req.body)
+  console.log('+++req.body', req.body)
+  let jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  let budgetLimit = 0.025
+
+  if (!isEmpty(req.body)) {
+    const requestBody = JSON.parse(req.body)
+    jobUrl = get(requestBody, 'jobUrl', jobUrl)
+    budgetLimit = Number(get(requestBody, 'budgetLimit', budgetLimit))
+  }
+
   const dateNow = Date.now()
   const jobId = uuid.v4()
   const response = await superagent
@@ -137,7 +144,6 @@ const startTracing = async (req, res) => {
   )
 
   // TODO: set budget limit beforehand
-  const budgetLimit = 0.025
   const flagPole = new FlagPoleService(jobId, budgetLimit)
 
   // fetchTracePeriodically(dateNow, jobId)
