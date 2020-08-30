@@ -13,13 +13,18 @@ export default class FlagPoleService extends Redis {
     })
     this.budgetLimit = budgetLimit
     this.jobId = jobId
+    this.isFlagSwitched = false
   }
 
   async isInBudgetLimit(currentCost) {
     if (currentCost > this.budgetLimit) {
       console.log('+++currentCost', currentCost)
       console.log('+++isInBudgetLimit', await this.get(this.jobId))
-      this.set(this.jobId, 'STOP')
+
+      if (!this.isFlagSwitched) {
+        this.set(this.jobId, 'STOP')
+        this.isFlagSwitched = true
+      }
 
       return false
     }
