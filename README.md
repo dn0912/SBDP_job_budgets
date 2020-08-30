@@ -84,7 +84,7 @@ S3 Bucket should have this structure
     └── test_with_description_title_change_2000_single.json
 ```
 
-
+Run following commands:
 ```bash
 # Create S3 bucket with AWS CLI. LocationConstraint specifies where the bucket will be created (default US East (N. Virginia) Region (us-east-1))
 aws s3api create-bucket \
@@ -111,9 +111,45 @@ aws s3api put-object \
 ### Generate test data
 
 Generate test data with `./test_data_generator/scripts/1-generate-task-data.js`
+
 ```bash
+./test_data_generator
+
+npm i
+
+mkdir test_data
+
+# Generate 4 data files with 500, 1000, 1500 and 2000 mocked tasks
+./node_modules/.bin/babel-node scripts/1-generate-task-data.js -n 500 | json_pp > ./test_data/test_with_description_title_change_500_single.json
+
+./node_modules/.bin/babel-node scripts/1-generate-task-data.js -n 1000 | json_pp > ./test_data/test_with_description_title_change_1000_single.json
+
+./node_modules/.bin/babel-node scripts/1-generate-task-data.js -n 1500 | json_pp > ./test_data/test_with_description_title_change_1500_single.json
+
+./node_modules/.bin/babel-node scripts/1-generate-task-data.js -n 2000 | json_pp > ./test_data/test_with_description_title_change_2000_single.json
 ```
 
+### Upload test data to S3 bucket
+
+Upload all generated test files in the `./test_data_generator/test_data` folder
+```bash
+# currently in ./test_data_generator folder
+aws s3 cp test_data s3://test-task-update-data-v2/ \
+  --recursive \
+  --profile duc \
+  --region eu-central-1
+```
+
+### Deploy Serverless Big Data Processing application
+
+To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first
+```bash
+# change to `./lambda_gsd_index_calculator/`
+
+npm i
+
+sls deploy --aws-profile duc
+```
 
 ## Serverless CLI commands
 

@@ -2,7 +2,7 @@ service: lambda-gsd-index-calculator
 
 custom:
   REGION: eu-central-1
-  S3_BUCKET: test-task-update-data-v1 # put data files here
+  S3_BUCKET: test-task-update-data-v2 # put data files here
   S3_SUBRESULT_FOLDER: test_results # subresults of the preprocessing lambdas are stored here
   S3_PIPELINE_RESULT_FOLDER: gsd # final results of the calculation lambdas are stored here
   SQS_NAME: PreprocessedDataQueue
