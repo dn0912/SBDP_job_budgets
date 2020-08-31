@@ -54,6 +54,7 @@ echo "Sucessfully created ec instance..."
 
 cd "$CURRENT_WORKING_DIR/test_data_generator"
 npm i
+rm -r test_data/
 mkdir test_data
 
 echo "Start generating mock data..."
