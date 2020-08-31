@@ -58,7 +58,7 @@ aws ec2 run-instances \
 
 ### Connect to instance for example with ssh
 ```bash
-ssh -i "ec2_test_22_07_2020.pem" ubuntu@xxxxxxxxxx.eu-central-1.compute.amazonaws.com
+ssh -i "<your key name>.pem" ubuntu@xxxxxxxxxx.eu-central-1.compute.amazonaws.com
 ```
 
 
@@ -94,7 +94,24 @@ cd ~/SBDP_job_budgets/budget_control_system
 npm run start
 ```
 
-### Find your AWS access key, AWS secret, AWS Default region and Redis password
+### Test whether you can get response of running server by curl endpoint
+
+```bash
+curl <ec-2-instance>.compute.amazonaws.com:3000/ping
+```
+
+### Test whether you can store in Redis store of running server by curl endpoint
+
+```bash
+curl -X POST <ec-2-instance>.compute.amazonaws.com:3000/redis-test
+
+# On your ec2 instance you can check in Redis for existence
+redis-cli -a <your Redis password>
+keys * # should print out "hello" key
+get hello # should print out "world"
+```
+
+### Troubleshoot: Find your AWS access key, AWS secret, AWS Default region and Redis password
 
 ```
 cat ~/.aws/credentials
