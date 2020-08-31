@@ -167,7 +167,7 @@ aws s3api put-object \
 Generate test data with `./test_data_generator/scripts/1-generate-task-data.js`
 
 ```bash
-./test_data_generator
+# in ./test_data_generator
 
 npm i
 

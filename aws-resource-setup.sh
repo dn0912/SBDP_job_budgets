@@ -17,7 +17,7 @@ read -p "AWS key name for SSH:" INPUT_AWS_KEY_NAME
 
 CURRENT_WORKING_DIR=$(pwd)
 
-# Security group
+# Create security group
 AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws ec2 create-security-group \
   --group-name job-budget-security-group \
   --description "Job budget application" \
@@ -69,7 +69,7 @@ echo "Start generating mock data..."
 
 echo "Sucessfully generated test data..."
 
-Create S3 bucket
+# Create S3 bucket
 AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws s3api create-bucket \
   --bucket test-task-update-data-v2 \
   --create-bucket-configuration LocationConstraint=$INPUT_AWS_RESOURCE_REGION \
