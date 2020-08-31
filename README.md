@@ -2,6 +2,40 @@
 
 ## Setup EC2 instance with Redis
 
+### Create security group per AWS CLI
+```bash
+# Create security group
+aws ec2 create-security-group \
+  --group-name job-budget-sec-group \
+  --description "Job budget application" \
+  --profile duc \
+  --region eu-central-1
+
+# View security group details
+aws ec2 describe-security-groups \
+  --group-names job-budget-sec-group \
+  --profile duc \
+  --region eu-central-1
+
+# Get security group id
+aws ec2 describe-security-groups \
+  --group-names job-budget-sec-group \
+  --query 'SecurityGroups[*].[GroupId]' \
+  --output text \
+  --profile duc \
+  --region eu-central-1
+
+# Add rule to allow inbound SSH traffic
+ec2 authorize-security-group-ingress \
+    --group-id $SECURITY_GROUP_ID \
+    --ip-permissions \
+      IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=0.0.0.0/0,Description="SSH"}]' \
+      IpProtocol=tcp,FromPort=6379,ToPort=6379,IpRanges='[{CidrIp=0.0.0.0/0,Description="Redis"}]' \
+      IpProtocol=tcp,FromPort=3000,ToPort=3000,IpRanges='[{CidrIp=0.0.0.0/0,Description="Node app"}]' \
+    --profile duc \
+    --region $INPUT_AWS_RESOURCE_REGION
+```
+
 ### Create ec2 instance per AWS CLI
 Note:
 - `sg-0cd4e8a87c427827e` is a Security Group with Inbound rules for
@@ -24,7 +58,7 @@ aws ec2 run-instances \
 
 ### Connect to instance for example with ssh
 ```bash
-ssh -i "ec2_test_22_07_2020.pem" root@xxxxxxxxxx.eu-central-1.compute.amazonaws.com
+ssh -i "ec2_test_22_07_2020.pem" ubuntu@xxxxxxxxxx.eu-central-1.compute.amazonaws.com
 ```
 
 
