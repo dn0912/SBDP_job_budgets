@@ -2,7 +2,9 @@
 
 ## How to setup and run this project
 
-Follow those steps to setup necessary AWS resources and this project with provided scripts. You need an AWS account with your **aws_access_key_id**, **aws_secret_access_key** and a **private key** to SSH into your EC2 instance
+Follow those steps to setup necessary AWS resources and this project with the provided scripts. You need an AWS account with your **aws_access_key_id**, **aws_secret_access_key** and a **private key** to SSH into your EC2 instance.
+
+To use the scripts you need the [AWS CLI](https://aws.amazon.com/cli/) installed on your machine.
 
 ### 1. Setup AWS resources (Security group, EC2, S3 bucket with generated test data)
 ```bash
@@ -13,24 +15,24 @@ chmod 755 ./aws-resource-setup.sh
 
 ### 2. Setup EC2 with Redis and this project
 
-#### SSH into your created EC2
+#### 2.1 SSH into your created EC2
 ```bash
 ssh -i "<your key name>.pem" ubuntu@xxxxxxxxxx.[AWS_REGION].compute.amazonaws.com
 ```
 
-#### Create a file on your ec2 instance
+#### 2.2 Create a file on your ec2 instance
 ```bash
 vim ec2-instance-setup.sh
 ```
 
-#### Copy content from `ec2-instance-setup.sh` to file and save
+#### 2.3 Copy content from `./ec2-instance-setup.sh` to file on your EC2 instance and save
 
-#### Change file modes to be able to run script
+#### 2.4 Change file modes to be able to run script
 ```bash
 chmod 755 ./ec2-instance-setup.sh
 ```
 
-#### Execute script and follow script instructions
+#### 2.5 Execute script and follow script instructions
 ```bash
 ./ec2-instance-setup.sh
 ```
@@ -38,7 +40,7 @@ chmod 755 ./ec2-instance-setup.sh
 
 After all installation, Redis server should be running on Port `6379` and job budget application on Port `3000`
 
-### 3. Test whether you can get response of running server and Redis by curl endpoint
+### 3. Test whether you get response of running server and Redis by curl endpoint
 
 ```bash
 # Test Node app
@@ -75,7 +77,7 @@ curl -X POST http://<your EC2 public endpoint>:3000/start-tracing -H "Content-Ty
 curl -X POST ec2-18-192-00-00.eu-central-1.compute.amazonaws.com:3000/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "https://17d8y00000.execute-api.eu-central-1.amazonaws.com/dev/start-job", "budgetLimit": 0.0248}'
 ```
 
-See continous cost tracing trough output console logs of EC2 instance.
+See continuous cost tracing trough output console logs of EC2 instance.
 
 
 
