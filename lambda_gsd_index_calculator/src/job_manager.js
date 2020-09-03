@@ -1,8 +1,7 @@
 const TracedAWS = require('service-cost-tracer')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-const awsTracerWithRedis = new AWSTracerWithRedis(process.env)
-console.log('+++process.env', process.env)
+const awsTracerWithRedis = new AWSTracerWithRedis(process)
 
 const lambda = new TracedAWS.Lambda()
 
@@ -37,13 +36,12 @@ module.exports.startJob = async (event, context) => {
   // *******
   // TRACING
   const eventBody = JSON.parse(event.body)
-  const jobId = eventBody.jobId
+  const { jobId } = eventBody
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
 
   // with Redis
-  const tracingInfo = awsTracerWithRedis.startLambdaTracer(event, context)
+  awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
-
 
   console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
   console.log('## CONTEXT: ' + serialize(context))
@@ -77,7 +75,8 @@ module.exports.startJob = async (event, context) => {
 
   // TRACING
   TracedAWS.stopLambdaTracer(lambdaSubsegment)
-  await awsTracerWithRedis.stopLambdaTracer(tracingInfo)
+  // with redis
+  await awsTracerWithRedis.stopLambdaTracer()
 
   return {
     statusCode: 200,

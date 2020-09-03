@@ -118,6 +118,7 @@ functions:
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       REGION: ${self:custom.REGION}
       QUEUE_NAME: ${self:custom.SQS_NAME}
+      REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
   calculate1k:
     description: >
       Single lambda - calulator lambda after receiving sqs message,
