@@ -96,8 +96,10 @@ redis-server /home/ubuntu/redis-stable/redis.conf &
 
 cd ~/SBDP_job_budgets/budget_control_system
 
-# Runs on default port is 3000 or set per env var PORT=XXXX
-npm run start
+# Start job budget application with password protected redis connection
+# Forgot Redis password? use: cat ~/redis-stable/redis.conf | grep "requirepass "
+# Info: Runs on default port is 3000, you can also set per environment variable `PORT` e.g. PORT=XXXX REDIS_PASSWORD=<your redis password> npm run start
+REDIS_PASSWORD=<your redis password> npm run start
 ```
 
 ### Test whether you can get response of running server by curl endpoint
