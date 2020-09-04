@@ -134,6 +134,7 @@ functions:
       BUCKET: ${self:custom.S3_BUCKET}
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
+      REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
   # *******************
   # THIRD ITERATION: MANAGER WHICH ORCHESTRATES LAMBDAS IN THE JOB
   start-job:

@@ -2,6 +2,10 @@ const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
 const TracedAWS = require('service-cost-tracer')
 
+const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
+
+const awsTracerWithRedis = new AWSTracerWithRedis(process)
+
 const moment = require('moment')
 const { promisify } = require('util')
 
@@ -24,6 +28,8 @@ const readFile = async (fileName) => {
   }
 
   const data = await getS3Object(params)
+  await awsTracerWithRedis.getS3ObjectIsCalled()
+
   return data.Body.toString('utf-8')
 }
 
@@ -36,6 +42,8 @@ const putFile = async (fileContent, jobId) => {
     Body: JSON.stringify(fileContent),
   }
   await tracedPutObject(params, jobId)
+  console.log('+++awsTracerWithRedis.putS3ObjectIsCalled')
+  await awsTracerWithRedis.putS3ObjectIsCalled(params)
 
   return fileName
 }
@@ -99,6 +107,8 @@ module.exports.handler = async (event, context) => {
   // Tracing
   const { jobId } = eventBody
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
+  // with Redis
+  awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
   const s3FileContentAsString = await readFile(fileName)
@@ -129,6 +139,8 @@ module.exports.handler = async (event, context) => {
 
   // TRACING
   TracedAWS.stopLambdaTracer(lambdaSubsegment)
+  // with redis
+  await awsTracerWithRedis.stopLambdaTracer()
 
   return response
 }
