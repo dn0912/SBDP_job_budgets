@@ -3,9 +3,9 @@ const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 const TracedAWS = require('service-cost-tracer')
 
 const moment = require('moment')
-const s3 = new TracedAWS.S3()
-
 const { promisify } = require('util')
+
+const s3 = new TracedAWS.S3()
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
@@ -14,7 +14,7 @@ const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
 // simulate slow function
 const slowDown = async (ms) => {
   console.log(`+++Take it easy!?! ${ms} ms`)
-  await new Promise(resolve => setTimeout(resolve, ms))
+  await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const readFile = async (fileName) => {
@@ -48,7 +48,7 @@ const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
       'T2': [startDate, endDate],
     }
   */
-  const createdAndCompletedTimeStampTasksMap = tasksUpdateArray.reduce((acc, taskUpdate, index) => {
+  const createdAndCompletedTimeStampTasksMap = tasksUpdateArray.reduce((acc, taskUpdate) => {
     const currentTaskId = taskUpdate['Keys']['taskId']
     // is task new created is created but not in completed column?
     if (
@@ -60,7 +60,9 @@ const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
         ...acc,
         [currentTaskId]: [taskCreationDate],
       }
-    } else if (
+    }
+
+    if (
       taskUpdate['OldImage']['statusId'] !== undefined
       && taskUpdate['NewImage']['statusId'] === 'completed'
     ) {
@@ -97,7 +99,7 @@ module.exports.handler = async (event, context) => {
   // Tracing
   const { jobId } = eventBody
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
-    // *******
+  // *******
 
   const s3FileContentAsString = await readFile(fileName)
   const s3FileContent = JSON.parse(s3FileContentAsString)
@@ -116,7 +118,7 @@ module.exports.handler = async (event, context) => {
   const response = {
     statusCode: 200,
     body: JSON.stringify({
-      message: "SQS event processed.",
+      message: 'SQS event processed.',
       input: event,
       averageTimeToCompleteTask,
       resultFileName,

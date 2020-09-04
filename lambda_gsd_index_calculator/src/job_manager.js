@@ -43,10 +43,10 @@ module.exports.startJob = async (event, context) => {
   awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
-  console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
-  console.log('## CONTEXT: ' + serialize(context))
-  console.log('## EVENT: ' + serialize(event))
-  console.log('## eventbody: ' + event.body)
+  console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)
+  console.log(`## CONTEXT: ${serialize(context)}`)
+  console.log(`## EVENT: ${serialize(event)}`)
+  console.log(`## eventbody: ${event.body}`)
 
   // TODO: batch files based on batch size coming from request
   const inputArray = [
@@ -56,7 +56,7 @@ module.exports.startJob = async (event, context) => {
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
-  const promises = inputArray.map(fileName => {
+  const promises = inputArray.map((fileName) => {
     const payload = {
       fileName,
       jobId,

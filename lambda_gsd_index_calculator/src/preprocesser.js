@@ -73,6 +73,8 @@ module.exports.readAndFilterFile = async (event, context) => {
   console.log('+++context', context)
   try {
     console.log('+++event+++', event)
+    // DO NOT USE object destructuring --
+    // somehow does not work and exits lambda: const { jobId } = event
     const jobId = event.jobId
     console.log('+++jobId+++', jobId)
     // Tracing
