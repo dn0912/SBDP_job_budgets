@@ -75,7 +75,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     console.log('+++event+++', event)
     // DO NOT USE object destructuring --
     // somehow does not work and exits lambda: const { jobId } = event
-    const jobId = event.jobId
+    const { jobId } = event
     console.log('+++jobId+++', jobId)
     // Tracing
     const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
@@ -107,7 +107,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // Sends single message to SQS for further process
     const test = await tracedSendMessage(sqsPayload, jobId)
-    await awsTracerWithRedis.sendSqsMessageIsCalled()
+    await awsTracerWithRedis.sendSqsMessageIsCalled(sqsPayload)
 
     await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
 
