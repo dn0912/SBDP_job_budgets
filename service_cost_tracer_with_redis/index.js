@@ -1,6 +1,7 @@
 const moment = require('moment')
 const Redis = require('ioredis')
 
+// Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
 const CACHE_KEY_PREFIX = 'tracer_'
 
 const _s3FileSizeTracer = (fileContent) => {
@@ -68,7 +69,7 @@ module.exports = class AWSTracer {
     // event object might be different, depending on source which triggers lambda
     // from http request
     if (event.body) {
-      //trigger from http request
+      // trigger from http request
       const eventBody = JSON.parse(event.body)
       this.jobId = eventBody.jobId
     } else if (event.Records) {
@@ -89,12 +90,13 @@ module.exports = class AWSTracer {
 
   async stopLambdaTracer() {
     console.log('+++redis stopLambdaTracer')
-    const {
-      lambdaMemoryAllocationInMB,
-      lambdaStartTime,
-    } = this.lambdaTraceInfo
-    await this.tracerStore.set(`${CACHE_KEY_PREFIX}${this.jobId}-lambdaMemoryAllocationInMB`, lambdaMemoryAllocationInMB)
-    await this.tracerStore.set(`${CACHE_KEY_PREFIX}${this.jobId}-lambdaStartTime`, lambdaStartTime)
+
+    const lambdaTraceSegmgent = {
+      memoryAllocationInMB: this.lambdaTraceInfo.lambdaMemoryAllocationInMB,
+      processingTime: this.lambdaTraceInfo.lambdaStartTime - moment.utc().valueOf(),
+    }
+
+    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, lambdaTraceSegmgent)
   }
   // **********
 
@@ -121,9 +123,7 @@ module.exports = class AWSTracer {
     const { QueueUrl } = sqsPayload
 
     const sqs64KiloByteChunkAmounts = _sqsPayloadSizeTracer(sqsPayload)
-    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#sqs64KiloByteChunkAmounts`, sqs64KiloByteChunkAmounts)
-
-    await this.tracerStore.incr(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#sendMessage`)
+    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
   }
   // **********
 }
