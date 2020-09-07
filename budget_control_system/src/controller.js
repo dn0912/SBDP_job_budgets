@@ -3,6 +3,7 @@ import { get, set, isEmpty } from 'lodash'
 import uuid from 'node-uuid'
 import superagent from 'superagent'
 import fs from 'fs'
+import Redis from 'ioredis'
 
 import DynamoDB from './service/trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
@@ -10,8 +11,20 @@ import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
 
+import { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } from './index'
+
+// Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
+const CACHE_KEY_PREFIX = 'tracer_'
+
 const appRegisterStore = new DynamoDB('app-register-store')
 const tracer = new Tracer()
+const redisTracerCache = new Redis({
+  port: REDIS_PORT,
+  host: REDIS_HOST,
+  family: 4,
+  password: REDIS_PASSWORD,
+  db: 0,
+})
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
@@ -48,13 +61,13 @@ const registerApp = async (req, res) => {
   res.status(HttpStatus.CREATED).json(storeItem)
 }
 
-const calculateJobCosts = async (
+const calculateJobCosts = async ({
   jobStartTime,
   jobId,
   priceCalculator,
   flagPole,
   iterationNumber,
-) => {
+}) => {
   const startTime = parseInt(jobStartTime, 10) / 1000
   const allTraceSegments = await tracer.getFullTrace(jobId, startTime)
 
@@ -85,7 +98,63 @@ const calculateJobCosts = async (
   })
 }
 
-async function calculateJobCostsPeriodically(...args) {
+const calculateJobCostsFromRedis = async ({
+  jobId,
+  priceCalculator,
+  flagPole,
+  iterationNumber,
+  queueName = 'PreprocessedDataQueue'
+}) => {
+  const tracedSqsChunks = await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)
+
+  const tracedLambdaCacheKey = `${CACHE_KEY_PREFIX}${jobId}#lambda`
+  const tracedLambdaSegments = await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1)
+
+  // returns amount of method calls
+  const tracedS3GetObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#getObject`
+  const tracedS3GetObjectCalls = await redisTracerCache.get(tracedS3GetObjectCallsCacheKey)
+
+  // returns array of file sizes
+  const tracedS3PutObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#putObject`
+  const tracedS3PutObjectCalls = await redisTracerCache.lrange(tracedS3PutObjectCallsCacheKey, 0, -1)
+
+  const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
+  const sqsPrices = priceCalculator.calculateSqsPrice(tracedSqsChunks, true)
+  const s3Prices = priceCalculator.calculateS3Price({
+    fileSizesInKB: tracedS3PutObjectCalls,
+    s3RequestsMap: {
+      GET: tracedS3PutObjectCalls.length,
+      PUT: tracedS3GetObjectCalls,
+    }
+  }, true)
+
+  console.log('+++calculateJobCostsFromRedis', {
+    tracedSqsChunks,
+    tracedLambdaSegments,
+    tracedS3GetObjectCalls,
+    tracedS3PutObjectCalls,
+  })
+
+  console.log('+++pricingFromRedis', {
+    sqsPrices,
+    lambdaPrices,
+    s3Prices,
+  })
+
+  const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
+  const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
+
+  console.log('+++totalJobPrice in Nano USD', {
+    iteration: iterationNumber,
+    'Lambda total price': lambdaPrices,
+    'SQS total price': sqsPrices,
+    'S3 total price': s3Prices,
+    'Job price in Nano USD': totalJobPrice,
+    'Job price in USD': totalJobPriceInUSD,
+  })
+}
+
+async function calculateJobCostsPeriodically(passedArgs) {
   const pollPeriodinMs = 500
   const counter = {
     value: 0,
@@ -103,8 +172,14 @@ async function calculateJobCostsPeriodically(...args) {
     // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
 
+    const args = {
+      ...passedArgs,
+      iterationNumber: counter.value,
+    }
+
     // eslint-disable-next-line no-await-in-loop
-    calculateJobCosts(...args, counter.value)
+    // calculateJobCosts(args)
+    calculateJobCostsFromRedis(args)
     counter.value++
   }
 }
@@ -148,12 +223,12 @@ const startTracing = async (req, res) => {
   const flagPole = new FlagPoleService(jobId, budgetLimit)
 
   // fetchTracePeriodically(dateNow, jobId)
-  calculateJobCostsPeriodically(
-    dateNow,
+  calculateJobCostsPeriodically({
+    jobStartTime: dateNow,
     jobId,
     priceCalculator,
     flagPole,
-  )
+  })
 
   res.status(HttpStatus.OK).json({
     jobUrl,
