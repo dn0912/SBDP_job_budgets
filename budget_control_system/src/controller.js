@@ -11,7 +11,7 @@ import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
 
-import { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } from './index'
+const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env
 
 // Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
 const CACHE_KEY_PREFIX = 'tracer_'
@@ -220,7 +220,11 @@ const startTracing = async (req, res) => {
   )
 
   // TODO: set budget limit beforehand
-  const flagPole = new FlagPoleService(jobId, budgetLimit)
+  const flagPole = new FlagPoleService(jobId, budgetLimit, {
+    REDIS_HOST,
+    REDIS_PORT,
+    REDIS_PASSWORD
+  })
 
   // fetchTracePeriodically(dateNow, jobId)
   calculateJobCostsPeriodically({

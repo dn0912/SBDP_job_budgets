@@ -1,9 +1,11 @@
 import Redis from 'ioredis'
 
-import { REDIS_PORT, REDIS_HOST, REDIS_PASSWORD } from '../../index'
-
 export default class FlagPoleService extends Redis {
-  constructor(jobId, budgetLimit) {
+  constructor(jobId, budgetLimit, {
+    REDIS_HOST,
+    REDIS_PORT,
+    REDIS_PASSWORD,
+  }) {
     super({
       port: REDIS_PORT, // Redis port
       host: REDIS_HOST, // Redis host
