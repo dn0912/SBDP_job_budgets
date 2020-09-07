@@ -122,8 +122,13 @@ module.exports = class AWSTracer {
     // TODO: for queueType
     const { QueueUrl } = sqsPayload
 
+    const _queueUrlSplitted = QueueUrl.split('/')
+    const queueName = _queueUrlSplitted[_queueUrlSplitted.length - 1]
+
+    console.log('+++queueName', queueName)
+
     const sqs64KiloByteChunkAmounts = _sqsPayloadSizeTracer(sqsPayload)
-    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
+    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
   }
   // **********
 }
