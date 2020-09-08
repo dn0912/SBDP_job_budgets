@@ -19,8 +19,10 @@ class PriceCalculator {
     let lambdaProcessingTimes
     if (isTraceFromCache) {
       lambdaProcessingTimes = fullTrace
+      console.log('+++redis lambdaProcessingTimes', lambdaProcessingTimes)
     } else {
       lambdaProcessingTimes = calculateLambdaProcessingTimes(fullTrace)
+      console.log('+++xray lambdaProcessingTimes', lambdaProcessingTimes)
     }
 
     // TODO: enhance function with lambda memory usage of each function
@@ -61,6 +63,8 @@ class PriceCalculator {
         standard: Number(fullTrace),
         fifo: 0,
       }
+
+      console.log('+++redis messageAmountsPerType', messageAmountsPerType)
     } else {
       const sqsRequestsMapPerQueue = calculateSqsRequestAmountsPerQueue(fullTrace)
       const queueUrls = Object.keys(sqsRequestsMapPerQueue)
@@ -76,6 +80,8 @@ class PriceCalculator {
         standard: 0,
         fifo: 0,
       })
+
+      console.log('+++xray messageAmountsPerType', messageAmountsPerType)
     }
 
     const { fifo, standard } = this.sqsPricing
@@ -111,8 +117,10 @@ class PriceCalculator {
       let s3ContentSizeInGB
       if (isTraceFromCache) {
         s3ContentSizeInGB = calculateS3ContentSizeInGBFromRedis(completeTrace.fileSizesInKB)
+        console.log('+++redis s3ContentSizeInGB', s3ContentSizeInGB)
       } else {
         s3ContentSizeInGB = calculateS3ContentSizeInGB(completeTrace)
+        console.log('+++xray s3ContentSizeInGB', s3ContentSizeInGB)
       }
       // console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
 
@@ -123,9 +131,11 @@ class PriceCalculator {
       let s3RequestsMap
       if (isTraceFromCache) {
         s3RequestsMap = completeTrace.s3RequestsMap
+        console.log('+++redis s3RequestsMap', s3RequestsMap)
       } else {
         const fullRequestTracingMap = createServiceTracingMap(completeTrace)
         s3RequestsMap = get(fullRequestTracingMap, 'S3', {})
+        console.log('+++xray s3RequestsMap', s3RequestsMap)
       }
 
       // TODO: add PUT, COPY, POST, LIST request as one type together

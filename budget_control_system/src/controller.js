@@ -133,7 +133,7 @@ const calculateJobCostsFromRedis = async ({
     tracedSqsChunks,
     tracedLambdaSegments,
     tracedS3GetObjectCalls,
-    tracedS3PutObjectCalls,
+    tracedS3PutObjectFileSizeArray,
   })
 
   const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
