@@ -105,14 +105,24 @@ const calculateJobCostsFromRedis = async ({
   iterationNumber,
   queueName = 'PreprocessedDataQueue'
 }) => {
-  const tracedSqsChunks = await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`) || 0
+  const tracedSqsChunks = Number(await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)) || 0
 
   const tracedLambdaCacheKey = `${CACHE_KEY_PREFIX}${jobId}#lambda`
-  const tracedLambdaSegments = await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1) || []
+  const tracedLambdaCacheEntry = (await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1) || [])
+
+  console.log('+++tracedLambdaCacheEntry', tracedLambdaCacheEntry)
+
+  const tracedLambdaSegments = tracedLambdaCacheEntry.map((delimitedString) => {
+    const [memoryAllocationInMB, processingTimeString] = delimitedString.split('::')
+    return {
+      memoryAllocationInMB: Number(memoryAllocationInMB),
+      processingTime: Number(processingTimeString),
+    }
+  })
 
   // returns amount of method calls
   const tracedS3GetObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#getObject`
-  const tracedS3GetObjectCalls = await redisTracerCache.get(tracedS3GetObjectCallsCacheKey) || 0
+  const tracedS3GetObjectCalls = Number(await redisTracerCache.get(tracedS3GetObjectCallsCacheKey)) || 0
 
   // returns array of file sizes
   const tracedS3PutObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#putObject`
@@ -120,7 +130,7 @@ const calculateJobCostsFromRedis = async ({
 
   console.log('+++calculateJobCostsFromRedis', {
     tracedSqsChunks,
-    tracedLambdaSegments: JSON.stringify(tracedLambdaSegments, "", 2),
+    tracedLambdaSegments,
     tracedS3GetObjectCalls,
     tracedS3PutObjectCalls,
   })
