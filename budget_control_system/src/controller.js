@@ -127,6 +127,7 @@ const calculateJobCostsFromRedis = async ({
   // returns array of file sizes
   const tracedS3PutObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#putObject`
   const tracedS3PutObjectCalls = await redisTracerCache.lrange(tracedS3PutObjectCallsCacheKey, 0, -1) || []
+  const tracedS3PutObjectFileSizeArray = tracedS3PutObjectCalls.map((str) => Number(str))
 
   console.log('+++calculateJobCostsFromRedis', {
     tracedSqsChunks,
@@ -138,10 +139,10 @@ const calculateJobCostsFromRedis = async ({
   const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
   const sqsPrices = priceCalculator.calculateSqsPrice(tracedSqsChunks, true)
   const s3Prices = priceCalculator.calculateS3Price({
-    fileSizesInKB: tracedS3PutObjectCalls,
+    fileSizesInKB: tracedS3PutObjectFileSizeArray,
     s3RequestsMap: {
       GET: tracedS3GetObjectCalls,
-      PUT: tracedS3PutObjectCalls.length,
+      PUT: tracedS3PutObjectFileSizeArray.length,
     }
   }, true)
 
@@ -154,7 +155,7 @@ const calculateJobCostsFromRedis = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
-  console.log('+++totalJobPrice in Nano USD', {
+  console.log('+++totalJobPriceFromRedis in Nano USD', {
     iteration: iterationNumber,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
@@ -188,7 +189,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
     }
 
     // eslint-disable-next-line no-await-in-loop
-    // calculateJobCosts(args)
+    calculateJobCosts(args)
     calculateJobCostsFromRedis(args)
     counter.value++
   }
