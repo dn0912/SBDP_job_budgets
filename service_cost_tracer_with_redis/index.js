@@ -91,12 +91,12 @@ module.exports = class AWSTracer {
   async stopLambdaTracer() {
     console.log('+++redis stopLambdaTracer')
 
-    const lambdaTraceSegmgent = {
+    const lambdaTraceSegment = {
       memoryAllocationInMB: this.lambdaTraceInfo.lambdaMemoryAllocationInMB,
       processingTime: this.lambdaTraceInfo.lambdaStartTime - moment.utc().valueOf(),
     }
 
-    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, lambdaTraceSegmgent)
+    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, lambdaTraceSegment)
   }
   // **********
 

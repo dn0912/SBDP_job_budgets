@@ -56,9 +56,9 @@ class PriceCalculator {
     // TODO: enhance funtion with queue type through queueUrl: for now all queues are standard type
     let messageAmountsPerType
     if (isTraceFromCache) {
-      const standardMessageAmount = fullTrace.reduce((acc, val) => acc + Number(val), 0)
+      // const standardMessageAmount = fullTrace.reduce((acc, val) => acc + Number(val), 0)
       messageAmountsPerType = {
-        standard: standardMessageAmount,
+        standard: Number(fullTrace),
         fifo: 0,
       }
     } else {

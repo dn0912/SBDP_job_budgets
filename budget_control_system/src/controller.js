@@ -105,35 +105,35 @@ const calculateJobCostsFromRedis = async ({
   iterationNumber,
   queueName = 'PreprocessedDataQueue'
 }) => {
-  const tracedSqsChunks = await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)
+  const tracedSqsChunks = await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`) || 0
 
   const tracedLambdaCacheKey = `${CACHE_KEY_PREFIX}${jobId}#lambda`
-  const tracedLambdaSegments = await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1)
+  const tracedLambdaSegments = await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1) || []
 
   // returns amount of method calls
   const tracedS3GetObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#getObject`
-  const tracedS3GetObjectCalls = await redisTracerCache.get(tracedS3GetObjectCallsCacheKey)
+  const tracedS3GetObjectCalls = await redisTracerCache.get(tracedS3GetObjectCallsCacheKey) || 0
 
   // returns array of file sizes
   const tracedS3PutObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#putObject`
-  const tracedS3PutObjectCalls = await redisTracerCache.lrange(tracedS3PutObjectCallsCacheKey, 0, -1)
+  const tracedS3PutObjectCalls = await redisTracerCache.lrange(tracedS3PutObjectCallsCacheKey, 0, -1) || []
+
+  console.log('+++calculateJobCostsFromRedis', {
+    tracedSqsChunks,
+    tracedLambdaSegments: JSON.stringify(tracedLambdaSegments, "", 2),
+    tracedS3GetObjectCalls,
+    tracedS3PutObjectCalls,
+  })
 
   const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
   const sqsPrices = priceCalculator.calculateSqsPrice(tracedSqsChunks, true)
   const s3Prices = priceCalculator.calculateS3Price({
     fileSizesInKB: tracedS3PutObjectCalls,
     s3RequestsMap: {
-      GET: tracedS3PutObjectCalls.length,
-      PUT: tracedS3GetObjectCalls,
+      GET: tracedS3GetObjectCalls,
+      PUT: tracedS3PutObjectCalls.length,
     }
   }, true)
-
-  console.log('+++calculateJobCostsFromRedis', {
-    tracedSqsChunks,
-    tracedLambdaSegments,
-    tracedS3GetObjectCalls,
-    tracedS3PutObjectCalls,
-  })
 
   console.log('+++pricingFromRedis', {
     sqsPrices,
