@@ -96,8 +96,11 @@ const calculateS3ContentSizeInGB = (fullTraceSegments) => {
   return totalS3ContentSizeInKiloByte / 1024 ** 2 // convert from KB into GB
 }
 
-const calculateS3ContentSizeInGBFromRedis = (S3FileSizeTrace) =>
-  S3FileSizeTrace.reduce((acc, val) => acc + Number(val), 0)
+const calculateS3ContentSizeInGBFromRedis = (S3FileSizeTrace) => {
+  const totalS3ContentSizeInKiloByte = S3FileSizeTrace.reduce((acc, val) => acc + Number(val), 0)
+
+  return totalS3ContentSizeInKiloByte / 1024 ** 2 // convert from KB into GB
+}
 
 const TRACED_SERVICES = ['S3', 'SQS']
 const createServiceTracingMap = (fullTraceSegments) => {

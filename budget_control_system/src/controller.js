@@ -141,8 +141,8 @@ const calculateJobCostsFromRedis = async ({
   const s3Prices = priceCalculator.calculateS3Price({
     fileSizesInKB: tracedS3PutObjectFileSizeArray,
     s3RequestsMap: {
-      GET: tracedS3GetObjectCalls,
-      PUT: tracedS3PutObjectFileSizeArray.length,
+      GetObject: tracedS3GetObjectCalls,
+      PutObject: tracedS3PutObjectFileSizeArray.length,
     }
   }, true)
 
