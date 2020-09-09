@@ -132,7 +132,7 @@ app.post('/stop', () => {
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)
 
-app.get('/job-status/:jobId', () => controller.getJobStatus)
+app.get('/job-status/:jobId', controller.getJobStatus)
 
 // **************
 // TEST ROUTES!?!

@@ -265,7 +265,9 @@ const startTracing = async (req, res) => {
 }
 
 const getJobStatus = async (req, res) => {
-  const jobId = req.params
+  const { jobId } = req.params
+
+  console.log('+++jobId', jobId)
 
   const priceList = new PriceList()
   const lambdaPricing = await priceList.getLambdaPricing()
@@ -287,6 +289,7 @@ const getJobStatus = async (req, res) => {
   })
 
   res.status(HttpStatus.OK).json({
+    jobId,
     lambdaPrices,
     sqsPrices,
     s3Prices,
