@@ -24,7 +24,7 @@ const serialize = (object) => JSON.stringify(object, null, 2)
 // simulate slow function
 const slowDown = async (ms) => {
   console.log(`+++Take it easy!?! ${ms} ms`)
-  await new Promise(resolve => setTimeout(resolve, ms))
+  await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /*

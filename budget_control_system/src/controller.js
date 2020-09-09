@@ -102,7 +102,7 @@ const calculateJobCostsFromRedis = async ({
   jobId,
   priceCalculator,
   flagPole,
-  iterationNumber,
+  iterationNumber = 0,
   queueName = 'PreprocessedDataQueue'
 }) => {
   const tracedSqsChunks = Number(await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)) || 0
@@ -155,6 +155,15 @@ const calculateJobCostsFromRedis = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
+  const result = {
+    iterationNumber,
+    lambdaPrices,
+    sqsPrices,
+    s3Prices,
+    totalJobPrice,
+    totalJobPriceInUSD,
+  }
+
   console.log('+++totalJobPriceFromRedis in Nano USD', {
     iteration: iterationNumber,
     'Lambda total price': lambdaPrices,
@@ -163,6 +172,8 @@ const calculateJobCostsFromRedis = async ({
     'Job price in Nano USD': totalJobPrice,
     'Job price in USD': totalJobPriceInUSD,
   })
+
+  return result
 }
 
 async function calculateJobCostsPeriodically(passedArgs) {
@@ -253,7 +264,39 @@ const startTracing = async (req, res) => {
   })
 }
 
+const getJobStatus = async (req, res) => {
+  const jobId = req.params
+
+  const priceList = new PriceList()
+  const lambdaPricing = await priceList.getLambdaPricing()
+  const sqsPricing = await priceList.getSQSPricing()
+  const s3Pricing = await priceList.getS3Pricing()
+  const priceCalculator = new PriceCalculator(
+    lambdaPricing, sqsPricing, s3Pricing
+  )
+
+  const {
+    lambdaPrices,
+    sqsPrices,
+    s3Prices,
+    totalJobPrice,
+    totalJobPriceInUSD,
+  } = await calculateJobCostsFromRedis({
+    jobId,
+    priceCalculator,
+  })
+
+  res.status(HttpStatus.OK).json({
+    lambdaPrices,
+    sqsPrices,
+    s3Prices,
+    totalJobPrice,
+    totalJobPriceInUSD,
+  })
+}
+
 export default {
   registerApp,
   startTracing,
+  getJobStatus,
 }
