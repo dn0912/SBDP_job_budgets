@@ -92,7 +92,7 @@ module.exports = class AWSTracer {
     console.log('+++redis stopLambdaTracer+++')
 
     const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
-    const processingTime = moment.utc().valueOf() - this.lambdaTraceInfo.lambdaStartTime
+    const processingTime = (moment.utc().valueOf() - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
 

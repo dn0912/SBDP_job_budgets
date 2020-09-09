@@ -8,6 +8,7 @@ import multer from 'multer'
 import Redis from 'ioredis'
 
 import DynamoDB from './service/trace-store/dynamo'
+import AppRegisterDynamoDB from './service/app-register-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 
@@ -175,6 +176,16 @@ app.post('/test-put-db', async (req, res) => {
 app.get('/test-get-db', async (req, res) => {
   const createdItem = await traceStore.get()
   console.log('+++createdItem', createdItem)
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-app/:appId', async (req, res) => {
+  const { appId } = req.params
+  const appRegisterStore = new AppRegisterDynamoDB('app-register-store')
+  const app = await appRegisterStore.get(appId)
+  console.log('+++app', app)
   res.status(HttpStatus.OK).json({
     hello: 'world'
   })

@@ -5,7 +5,7 @@ import superagent from 'superagent'
 import fs from 'fs'
 import Redis from 'ioredis'
 
-import DynamoDB from './service/trace-store/dynamo'
+import DynamoDB from './service/app-register-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
@@ -50,15 +50,15 @@ const registerApp = async (req, res) => {
 
   console.log('+++cloudFormationData', cloudFormationData)
 
-  const appId = `app-${uuid.v4()}`
-  const storeItem = {
-    appId,
-    ...cloudFormationData,
-  }
-  const createdItem = await appRegisterStore.put(storeItem)
+  // const appId = `app-${uuid.v4()}`
+  // const storeItem = {
+  //   appId,
+  //   ...cloudFormationData,
+  // }
+  const createdItem = await appRegisterStore.put(cloudFormationData)
   console.log('+++createdItem', createdItem)
 
-  res.status(HttpStatus.CREATED).json(storeItem)
+  res.status(HttpStatus.CREATED).json(createdItem)
 }
 
 const calculateJobCosts = async ({
@@ -210,11 +210,13 @@ const startTracing = async (req, res) => {
   console.log('+++req.body', req.body)
   let jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   let budgetLimit = 0.025
+  let appId
 
   if (!isEmpty(req.body)) {
     const requestBody = JSON.parse(req.body)
     jobUrl = get(requestBody, 'jobUrl', jobUrl)
     budgetLimit = Number(get(requestBody, 'budgetLimit', budgetLimit))
+    appId = get(requestBody, 'appId')
   }
 
   const dateNow = Date.now()
@@ -240,6 +242,8 @@ const startTracing = async (req, res) => {
   const priceCalculator = new PriceCalculator(
     lambdaPricing, sqsPricing, s3Pricing
   )
+
+  const queueNames = appId ? await appRegisterStore.get(appId) : []
 
   // TODO: set budget limit beforehand
   const flagPole = new FlagPoleService(jobId, budgetLimit, {
