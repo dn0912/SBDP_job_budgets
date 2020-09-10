@@ -42,7 +42,8 @@ class PriceCalculator {
     return lambdaTotalPrice
   }
 
-  calculateSqsPrice(fullTrace, isTraceFromCache = false) {
+  // NOTE: implemented SQS pricing difference by queuetype only for Redis version
+  calculateSqsPrice(fullTrace, fifoQueueChunkAmount = 0, isTraceFromCache = false) {
     // Pricing per 1 million Requests after Free tier(Monthly)
     // Standard Queue     $0.40   ($0.0000004 per request)
     // FIFO Queue         $0.50   ($0.0000005 per request)
@@ -61,7 +62,7 @@ class PriceCalculator {
       // const standardMessageAmount = fullTrace.reduce((acc, val) => acc + Number(val), 0)
       messageAmountsPerType = {
         standard: Number(fullTrace),
-        fifo: 0,
+        fifo: Number(fifoQueueChunkAmount),
       }
 
       console.log('+++redis messageAmountsPerType', messageAmountsPerType)

@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import uuid from 'node-uuid'
+import { get } from 'lodash'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -54,7 +55,7 @@ class DynamoDB {
         },
       }
       const dbRecord = await this.ddb.get(param).promise()
-      return dbRecord
+      return get(dbRecord, 'Item', {})
     } catch (err) {
       console.log('err', err)
     }

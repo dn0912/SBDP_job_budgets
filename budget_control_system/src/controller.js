@@ -11,20 +11,21 @@ import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
 
-const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env
-
-// Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
-const CACHE_KEY_PREFIX = 'tracer_'
+const {
+  REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_CONNECTION,
+} = process.env
 
 const appRegisterStore = new DynamoDB('app-register-store')
 const tracer = new Tracer()
-const redisTracerCache = new Redis({
-  port: REDIS_PORT,
-  host: REDIS_HOST,
-  family: 4,
-  password: REDIS_PASSWORD,
-  db: 0,
-})
+const redisTracerCache = REDIS_CONNECTION
+  ? new Redis(REDIS_CONNECTION)
+  : new Redis({
+    port: REDIS_PORT,
+    host: REDIS_HOST,
+    family: 4,
+    password: REDIS_PASSWORD,
+    db: 0,
+  })
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
@@ -98,19 +99,13 @@ const calculateJobCosts = async ({
   })
 }
 
-const calculateJobCostsFromRedis = async ({
-  jobId,
-  priceCalculator,
-  flagPole,
-  iterationNumber = 0,
-  queueName = 'PreprocessedDataQueue'
-}) => {
-  const tracedSqsChunks = Number(await redisTracerCache.get(`${CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)) || 0
+// Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
+const REDIS_CACHE_KEY_PREFIX = 'tracer_'
 
-  const tracedLambdaCacheKey = `${CACHE_KEY_PREFIX}${jobId}#lambda`
+const getLambdaTraceAndCalculatePrice = async (priceCalculator, jobId) => {
+  const tracedLambdaCacheKey = `${REDIS_CACHE_KEY_PREFIX}${jobId}#lambda`
+  console.log('+++tracedLambdaCacheKey', tracedLambdaCacheKey)
   const tracedLambdaCacheEntry = (await redisTracerCache.lrange(tracedLambdaCacheKey, 0, -1) || [])
-
-  console.log('+++tracedLambdaCacheEntry', tracedLambdaCacheEntry)
 
   const tracedLambdaSegments = tracedLambdaCacheEntry.map((delimitedString) => {
     const [memoryAllocationInMB, processingTimeString] = delimitedString.split('::')
@@ -120,24 +115,63 @@ const calculateJobCostsFromRedis = async ({
     }
   })
 
+  console.log('+++tracedLambdaCacheEntry', tracedLambdaCacheEntry)
+  const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
+  return lambdaPrices
+}
+
+const getSqsTraceAndCalculatePrice = async (priceCalculator, jobId, queueMap) => {
+  let sqsPrices
+  const availableQueues = Object.keys(queueMap)
+  if (availableQueues.length > 0) {
+    const { standardQueueChunks, fifoQueueChunks } = await availableQueues
+      .reduce(async (prevPromise, queueName) => {
+        const acc = await prevPromise
+        const queueType = get(queueMap, `${queueName}.queueType`, 'standard')
+
+        if (queueType === 'fifo') {
+          // get amount of sqs msg chunks from redis cache
+          // NOTE: FiFo queues must have fifo suffix in queueName
+          const tracedSqsChunks = Number(await redisTracerCache.get(`${REDIS_CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}.fifo`)) || 0
+
+          set(acc, 'fifoQueueChunks', acc.fifoQueueChunks + tracedSqsChunks)
+        } else {
+          // get amount of sqs msg chunks from redis cache
+          const tracedSqsChunks = Number(await redisTracerCache.get(`${REDIS_CACHE_KEY_PREFIX}${jobId}#sqs#${queueName}`)) || 0
+          set(acc, 'standardQueueChunks', acc.standardQueueChunks + tracedSqsChunks)
+        }
+
+        return acc
+      }, {
+        standardQueueChunks: 0,
+        fifoQueueChunks: 0,
+      })
+    sqsPrices = priceCalculator.calculateSqsPrice(standardQueueChunks, fifoQueueChunks, true)
+  } else {
+    const tracedSqsChunks = Number(await redisTracerCache.get(`${REDIS_CACHE_KEY_PREFIX}${jobId}#sqs`)) || 0
+    sqsPrices = priceCalculator.calculateSqsPrice(tracedSqsChunks, null, true)
+  }
+  return sqsPrices
+}
+
+const getS3TraceAndCalculatePrice = async (priceCalculator, jobId) => {
   // returns amount of method calls
-  const tracedS3GetObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#getObject`
-  const tracedS3GetObjectCalls = Number(await redisTracerCache.get(tracedS3GetObjectCallsCacheKey)) || 0
+  const tracedS3GetObjectCallsCacheKey = `${REDIS_CACHE_KEY_PREFIX}${jobId}#s3#getObject`
+  const tracedS3GetObjectCalls = Number(
+    await redisTracerCache.get(tracedS3GetObjectCallsCacheKey)
+  ) || 0
 
   // returns array of file sizes
-  const tracedS3PutObjectCallsCacheKey = `${CACHE_KEY_PREFIX}${jobId}#s3#putObject`
-  const tracedS3PutObjectCalls = await redisTracerCache.lrange(tracedS3PutObjectCallsCacheKey, 0, -1) || []
+  const tracedS3PutObjectCallsCacheKey = `${REDIS_CACHE_KEY_PREFIX}${jobId}#s3#putObject`
+  const tracedS3PutObjectCalls = await redisTracerCache
+    .lrange(tracedS3PutObjectCallsCacheKey, 0, -1) || []
   const tracedS3PutObjectFileSizeArray = tracedS3PutObjectCalls.map((str) => Number(str))
 
-  console.log('+++calculateJobCostsFromRedis', {
-    tracedSqsChunks,
-    tracedLambdaSegments,
+  console.log('+++getS3TraceAndCalculatePrice', {
     tracedS3GetObjectCalls,
     tracedS3PutObjectFileSizeArray,
   })
 
-  const lambdaPrices = priceCalculator.calculateLambdaPrice(tracedLambdaSegments, true)
-  const sqsPrices = priceCalculator.calculateSqsPrice(tracedSqsChunks, true)
   const s3Prices = priceCalculator.calculateS3Price({
     fileSizesInKB: tracedS3PutObjectFileSizeArray,
     s3RequestsMap: {
@@ -145,6 +179,20 @@ const calculateJobCostsFromRedis = async ({
       PutObject: tracedS3PutObjectFileSizeArray.length,
     }
   }, true)
+
+  return s3Prices
+}
+
+const calculateJobCostsFromRedis = async ({
+  jobId,
+  priceCalculator,
+  flagPole,
+  iterationNumber = 0,
+  queueMap,
+}) => {
+  const lambdaPrices = await getLambdaTraceAndCalculatePrice(priceCalculator, jobId)
+  const sqsPrices = await getSqsTraceAndCalculatePrice(priceCalculator, jobId, queueMap)
+  const s3Prices = await getS3TraceAndCalculatePrice(priceCalculator, jobId)
 
   console.log('+++pricingFromRedis', {
     sqsPrices,
@@ -200,7 +248,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
     }
 
     // eslint-disable-next-line no-await-in-loop
-    calculateJobCosts(args)
+    // calculateJobCosts(args)
     calculateJobCostsFromRedis(args)
     counter.value++
   }
@@ -242,14 +290,16 @@ const startTracing = async (req, res) => {
   const priceCalculator = new PriceCalculator(
     lambdaPricing, sqsPricing, s3Pricing
   )
+  const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
 
-  const queueNames = appId ? await appRegisterStore.get(appId) : []
+  console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
 
   // TODO: set budget limit beforehand
   const flagPole = new FlagPoleService(jobId, budgetLimit, {
     REDIS_HOST,
     REDIS_PORT,
-    REDIS_PASSWORD
+    REDIS_PASSWORD,
+    REDIS_CONNECTION,
   })
 
   // fetchTracePeriodically(dateNow, jobId)
@@ -258,6 +308,7 @@ const startTracing = async (req, res) => {
     jobId,
     priceCalculator,
     flagPole,
+    queueMap: registeredSqsQueuesMap,
   })
 
   res.status(HttpStatus.OK).json({
@@ -269,9 +320,9 @@ const startTracing = async (req, res) => {
 }
 
 const getJobStatus = async (req, res) => {
-  const { jobId } = req.params
+  const { jobId, appId = '' } = req.params
 
-  console.log('+++jobId', jobId)
+  console.log('+++jobId', { jobId, appId })
 
   const priceList = new PriceList()
   const lambdaPricing = await priceList.getLambdaPricing()
@@ -280,6 +331,7 @@ const getJobStatus = async (req, res) => {
   const priceCalculator = new PriceCalculator(
     lambdaPricing, sqsPricing, s3Pricing
   )
+  const registeredSqsQueuesMap = appId ? await appRegisterStore.get(appId) : {}
 
   const {
     lambdaPrices,
@@ -290,6 +342,7 @@ const getJobStatus = async (req, res) => {
   } = await calculateJobCostsFromRedis({
     jobId,
     priceCalculator,
+    queueMap: registeredSqsQueuesMap,
   })
 
   res.status(HttpStatus.OK).json({

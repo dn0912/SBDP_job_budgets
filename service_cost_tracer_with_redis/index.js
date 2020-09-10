@@ -129,6 +129,8 @@ module.exports = class AWSTracer {
 
     const sqs64KiloByteChunkAmounts = _sqsPayloadSizeTracer(sqsPayload)
     await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
+    // in case queue names are not known from trace start bc no app is registered
+    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
   }
   // **********
 }

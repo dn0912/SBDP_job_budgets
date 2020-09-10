@@ -27,6 +27,7 @@ export const {
   REDIS_HOST = '127.0.0.1',
   REDIS_PORT = 6379,
   REDIS_PASSWORD,
+  REDIS_CONNECTION,
 } = process.env
 
 console.log('REDIS VARS:', {
@@ -34,12 +35,12 @@ console.log('REDIS VARS:', {
   REDIS_HOST,
   REDIS_PORT,
   REDIS_PASSWORD,
+  REDIS_CONNECTION,
 })
 
 const traceStore = new DynamoDB('trace-record')
 const priceList = new PriceList()
 const tracer = new Tracer()
-// const redisClient = new Redis('redis://')
 
 async function fetchTracePeriodically(dateNow, jobId) {
   // TODO: to measure trace fetching delay
@@ -111,13 +112,14 @@ app.get('/ping', (req, res) => res.status(200).json({
 /* Example curls:
 curl -X POST http://localhost:8080/start-tracing
 curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world"}'
+curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world", "appId": "helloWorld"}'
 */
 /**
  * start serverless big data processing tracing endpoint
  *
  * @param {string} jobUrl - start endpoint of the serverless big data processing job
  * @param {string} appId - to read app configuration from store for pricing calculation
- * @param {string} jobBudget - max budget of big data processing app
+ * @param {string} budgetLimit - max budget of big data processing app
  *
  * @returns {object}
 */
@@ -141,19 +143,16 @@ app.get('/job-status/:jobId', controller.getJobStatus)
 // Redis
 app.post('/redis-test', async (req, res) => {
   console.log('+++data', req.body)
-  // const test = await redisClient.set('hello', 'world')
-  // console.log('+++test', test)
 
-  // const test2 = await redisClient.get('hello')
-  // console.log('+++test2', test2)
-
-  const ec2RedisClient = new Redis({
-    port: REDIS_PORT, // Redis port
-    host: REDIS_HOST, // Redis host
-    family: 4, // 4 (IPv4) or 6 (IPv6)
-    password: REDIS_PASSWORD,
-    db: 0,
-  })
+  const ec2RedisClient = REDIS_CONNECTION
+    ? new Redis(REDIS_CONNECTION)
+    : new Redis({
+      port: REDIS_PORT, // Redis port
+      host: REDIS_HOST, // Redis host
+      family: 4, // 4 (IPv4) or 6 (IPv6)
+      password: REDIS_PASSWORD,
+      db: 0,
+    })
   const test = await ec2RedisClient.set('hello', 'world')
   console.log('+++test', test)
   const test2 = await ec2RedisClient.get('hello')
