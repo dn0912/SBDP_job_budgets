@@ -6,6 +6,7 @@ custom:
   S3_SUBRESULT_FOLDER: test_results # subresults of the preprocessing lambdas are stored here
   S3_PIPELINE_RESULT_FOLDER: gsd # final results of the calculation lambdas are stored here
   SQS_NAME: PreprocessedDataQueue
+  SQS_NAME_FIFO: PreprocessedDataQueueFiFo
   SQS_NAME_XRAY: PreprocessedDataQueueXRay
   SQS_NAME_REDIS: PreprocessedDataQueueRedis
   S3_FILE: test_pretty.json
@@ -42,6 +43,8 @@ provider:
         - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
         - arn:aws:sqs:*:*:${self:custom.SQS_NAME_XRAY}
         - arn:aws:sqs:*:*:${self:custom.SQS_NAME_REDIS}
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME_FIFO}.fifo
+        # - arn:aws:sqs:*:*:*
     - Effect: Allow
       Action:
         - lambda:InvokeFunction
@@ -121,7 +124,8 @@ functions:
       FILE: ${self:custom.S3_PREPROCESS_1000TASKS}
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       REGION: ${self:custom.REGION}
-      QUEUE_NAME: ${self:custom.SQS_NAME}
+      # QUEUE_NAME: ${self:custom.SQS_NAME}
+      QUEUE_NAME: ${self:custom.SQS_NAME_FIFO}.fifo # must end with fifo suffix
       REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
   calculate1k:
     description: >
@@ -132,7 +136,8 @@ functions:
       - sqs:
           arn:
             Fn::GetAtt:
-              - PreprocessedDataQueue
+              # - PreprocessedDataQueue
+              - PreprocessedDataQueueFiFo
               - Arn
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
@@ -234,6 +239,11 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: ${self:custom.SQS_NAME}
+    PreprocessedDataQueueFiFo:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME_FIFO}.fifo # must end with fifo suffix
+        FifoQueue: true
     PreprocessedDataQueueXRay:
       Type: "AWS::SQS::Queue"
       Properties:

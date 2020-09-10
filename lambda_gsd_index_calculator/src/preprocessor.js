@@ -100,9 +100,18 @@ module.exports.readAndFilterFile = async (event, context) => {
       // junk: ('x').repeat(1024*240)
     }
 
+    const isFifoQueue = queueUrl.includes('.fifo')
+    const necessaryFiFoParams = isFifoQueue ? {
+      MessageGroupId: 'test-fifo-message-group-id',
+      MessageDeduplicationId: `msg-dedup-id-${moment().valueOf()}`
+    } : {}
+
+    console.log('+++isFifoQueue', { isFifoQueue, necessaryFiFoParams })
+
     const sqsPayload = {
       MessageBody: JSON.stringify(messageBody),
       QueueUrl: queueUrl,
+      ...necessaryFiFoParams,
     }
 
     // Sends single message to SQS for further process
