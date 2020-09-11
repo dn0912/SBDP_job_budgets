@@ -189,6 +189,7 @@ const calculateJobCostsFromRedis = async ({
   flagPole,
   iterationNumber = 0,
   queueMap,
+  jobStartTime,
 }) => {
   const lambdaPrices = await getLambdaTraceAndCalculatePrice(priceCalculator, jobId)
   const sqsPrices = await getSqsTraceAndCalculatePrice(priceCalculator, jobId, queueMap)
@@ -212,14 +213,25 @@ const calculateJobCostsFromRedis = async ({
     totalJobPriceInUSD,
   }
 
+  const startTime = parseInt(jobStartTime, 10) / 1000
+
   console.log('+++totalJobPriceFromRedis in Nano USD', {
     iteration: iterationNumber,
+    'Time passed since job start': (Date.now() / 1000) - startTime,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
     'S3 total price': s3Prices,
     'Job price in Nano USD': totalJobPrice,
     'Job price in USD': totalJobPriceInUSD,
   })
+
+  // TODO: for testing purpose only
+  const testFlag = await redisTracerCache.get(`TEST_FLAG#####${jobId}`)
+  console.log('+++testFlag', testFlag)
+
+  // if (testFlag > 5) {
+  //   await redisTracerCache.set(`flag_${jobId}`, 'STOP')
+  // }
 
   return result
 }
@@ -256,7 +268,8 @@ async function calculateJobCostsPeriodically(passedArgs) {
 
 const startTracing = async (req, res) => {
   console.log('+++req.body', req.body)
-  let jobUrl = 'https://17d8y590d2.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  const jobId = uuid.v4()
+  let jobUrl = 'https://8agbbl596b.execute-api.eu-central-1.amazonaws.com/dev/start-job'
   let budgetLimit = 0.025
   let appId
 
@@ -267,8 +280,25 @@ const startTracing = async (req, res) => {
     appId = get(requestBody, 'appId')
   }
 
+  const priceList = new PriceList()
+  const lambdaPricing = await priceList.getLambdaPricing()
+  const sqsPricing = await priceList.getSQSPricing()
+  const s3Pricing = await priceList.getS3Pricing()
+  const priceCalculator = new PriceCalculator(
+    lambdaPricing, sqsPricing, s3Pricing
+  )
+  const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
+
+  // TODO: set budget limit beforehand
+  const flagPole = new FlagPoleService(jobId, budgetLimit, {
+    REDIS_HOST,
+    REDIS_PORT,
+    REDIS_PASSWORD,
+    REDIS_CONNECTION,
+  })
+
+  // TRIGGER THE JOB
   const dateNow = Date.now()
-  const jobId = uuid.v4()
   const response = await superagent
     .post(jobUrl)
     .set('Content-Type', 'application/json')
@@ -283,24 +313,7 @@ const startTracing = async (req, res) => {
   console.log('+++response.statusCode', response.statusCode)
   console.log('+++response.body', response.body)
 
-  const priceList = new PriceList()
-  const lambdaPricing = await priceList.getLambdaPricing()
-  const sqsPricing = await priceList.getSQSPricing()
-  const s3Pricing = await priceList.getS3Pricing()
-  const priceCalculator = new PriceCalculator(
-    lambdaPricing, sqsPricing, s3Pricing
-  )
-  const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
-
   console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
-
-  // TODO: set budget limit beforehand
-  const flagPole = new FlagPoleService(jobId, budgetLimit, {
-    REDIS_HOST,
-    REDIS_PORT,
-    REDIS_PASSWORD,
-    REDIS_CONNECTION,
-  })
 
   // fetchTracePeriodically(dateNow, jobId)
   calculateJobCostsPeriodically({

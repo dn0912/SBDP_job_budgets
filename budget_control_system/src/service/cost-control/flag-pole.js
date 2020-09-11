@@ -1,5 +1,7 @@
 import Redis from 'ioredis'
 
+const createFlagPoleCacheKey = (jobId) => `flag_${jobId}`
+
 export default class FlagPoleService extends Redis {
   constructor(jobId, budgetLimit, {
     REDIS_HOST,
@@ -24,13 +26,17 @@ export default class FlagPoleService extends Redis {
     this.isFlagSwitched = false
   }
 
+  async createFlag() {
+    this.set(createFlagPoleCacheKey(this.jobId), 'RUNNING')
+  }
+
   async isInBudgetLimit(currentCost) {
     if (currentCost > this.budgetLimit) {
       console.log('+++currentCost', currentCost)
       console.log('+++isInBudgetLimit', await this.get(this.jobId))
 
       if (!this.isFlagSwitched) {
-        this.set(this.jobId, 'STOP')
+        this.set(createFlagPoleCacheKey(this.jobId), 'STOP')
         this.isFlagSwitched = true
       }
 

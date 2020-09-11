@@ -1,0 +1,1956 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "CleanupLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-cleanup"
+      }
+    },
+    "CalculateLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-calculate"
+      }
+    },
+    "Calculate5LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-calculate5"
+      }
+    },
+    "Preprocess1kLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-preprocess1k"
+      }
+    },
+    "Calculate1kLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-calculate1k"
+      }
+    },
+    "StartDashjobLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-start-job"
+      }
+    },
+    "StartDashjobDashwithDashxrayLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-start-job-with-xray"
+      }
+    },
+    "PreprocessDashwithDashxrayLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-preprocess-with-xray"
+      }
+    },
+    "CalculateDashwithDashxrayLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-calculate-with-xray"
+      }
+    },
+    "StartDashjobDashwithDashredisLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-start-job-with-redis"
+      }
+    },
+    "PreprocessDashwithDashredisLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-preprocess-with-redis"
+      }
+    },
+    "CalculateDashwithDashredisLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/lambda-gsd-index-calculator-dev-calculate-with-redis"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "lambda-gsd-index-calculator",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-gsd-index-calculator-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-gsd-index-calculator-dev*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:ListBucket",
+                    "s3:DeleteObject"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::test-task-update-data-v2",
+                    "arn:aws:s3:::test-task-update-data-v2/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "apigateway:POST"
+                  ],
+                  "Resource": [
+                    "arn:aws:apigateway:::/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:sqs:*:*:PreprocessedDataQueue",
+                    "arn:aws:sqs:*:*:PreprocessedDataQueueXRay",
+                    "arn:aws:sqs:*:*:PreprocessedDataQueueRedis",
+                    "arn:aws:sqs:*:*:PreprocessedDataQueueFiFo.fifo"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    "arn:aws:lambda:eu-central-1:*:function:*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords",
+                    "xray:GetSamplingRules",
+                    "xray:GetSamplingTargets",
+                    "xray:GetSamplingStatisticSummaries"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "PreprocessedDataQueue",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "PreprocessedDataQueueXRay",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "PreprocessedDataQueueRedis",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "lambda-gsd-index-calculator",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "CleanupLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-cleanup",
+        "Handler": "src/helper.cleanup",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "cleanup S3 directories",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "PIPELINE_RESULT_FOLDER": "gsd"
+          }
+        }
+      },
+      "DependsOn": [
+        "CleanupLogGroup"
+      ]
+    },
+    "CleanupLambdaVersionWUXJifcByplKGs4YcyDerbpIkTDgmIeFavEdG1RrM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CleanupLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "cleanup S3 directories"
+      }
+    },
+    "CalculateLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-calculate",
+        "Handler": "handler.calculateGSDIndex",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single lambda - reads S3 file, filters and calculates GSD index function in one run",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "FILE": "test_pretty.json"
+          }
+        }
+      },
+      "DependsOn": [
+        "CalculateLogGroup"
+      ]
+    },
+    "CalculateLambdaVersionhmEolvuL3f5giY2uz4DE1nYVLR466vJIqtQao16Q": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CalculateLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single lambda - reads S3 file, filters and calculates GSD index function in one run"
+      }
+    },
+    "Calculate5LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-calculate5",
+        "Handler": "handler.calculateGSDIndex",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Same as calculate function: Single lambda - 1. reads S3 file (data consists of only 5 tasks + tasks updates), 2. filters and 3. calculates GSD index function - test data consists of 5 tasks\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "FILE": "test_5tasks.json"
+          }
+        }
+      },
+      "DependsOn": [
+        "Calculate5LogGroup"
+      ]
+    },
+    "Calculate5LambdaVersionJWE717AS26llmh6WWkBxS8Tty5HdcU41qxxaDlAXkY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "Calculate5LambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Same as calculate function: Single lambda - 1. reads S3 file (data consists of only 5 tasks + tasks updates), 2. filters and 3. calculates GSD index function - test data consists of 5 tasks\n"
+      }
+    },
+    "Preprocess1kLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-preprocess1k",
+        "Handler": "src/preprocessor.readAndFilterFile",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "FILE": "test_with_description_title_change_1000_single.json",
+            "SUBRESULT_FOLDER": "test_results",
+            "REGION": "eu-central-1",
+            "QUEUE_NAME": "PreprocessedDataQueue",
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "Preprocess1kLogGroup"
+      ]
+    },
+    "Preprocess1kLambdaVersion9rYnZTTWo0eYpGUjOQtRaTPzRS1cyQoPjOPAJMHN8": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "Preprocess1kLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n"
+      }
+    },
+    "Calculate1kLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-calculate1k",
+        "Handler": "src/calculator.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "PIPELINE_RESULT_FOLDER": "gsd",
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "Calculate1kLogGroup"
+      ]
+    },
+    "Calculate1kLambdaVersionEGF0Aab4cRGdyBoNp5PbGL7mBawqKzTO1zawhTJdtzM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "Calculate1kLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n"
+      }
+    },
+    "StartDashjobLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-start-job",
+        "Handler": "src/job_manager.startJob",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single endpoint to trigger a job\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "StartDashjobLogGroup"
+      ]
+    },
+    "StartDashjobLambdaVersionU7fvmL6zyD2g79NcwjqXwKA3R7jejI27B1qnksLDCA": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartDashjobLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single endpoint to trigger a job\n"
+      }
+    },
+    "StartDashjobDashwithDashxrayLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-start-job-with-xray",
+        "Handler": "src/xray_version/job_manager-xray.startJob",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single endpoint to trigger a job\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        }
+      },
+      "DependsOn": [
+        "StartDashjobDashwithDashxrayLogGroup"
+      ]
+    },
+    "StartDashjobDashwithDashxrayLambdaVersionczVD8y6ACTh7G4BFi5BD10RZAiIig7w19R2JFWLsXig": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartDashjobDashwithDashxrayLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single endpoint to trigger a job\n"
+      }
+    },
+    "PreprocessDashwithDashxrayLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-preprocess-with-xray",
+        "Handler": "src/xray_version/preprocessor-xray.readAndFilterFile",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "REGION": "eu-central-1",
+            "QUEUE_NAME": "PreprocessedDataQueueXRay"
+          }
+        }
+      },
+      "DependsOn": [
+        "PreprocessDashwithDashxrayLogGroup"
+      ]
+    },
+    "PreprocessDashwithDashxrayLambdaVersionMLrV4lPdPSHYcLTDGnPGEA7Uk8qIIuwW0QPRQuHeJM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PreprocessDashwithDashxrayLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n"
+      }
+    },
+    "CalculateDashwithDashxrayLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-calculate-with-xray",
+        "Handler": "src/xray_version/calculator-xray.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "PIPELINE_RESULT_FOLDER": "gsd"
+          }
+        }
+      },
+      "DependsOn": [
+        "CalculateDashwithDashxrayLogGroup"
+      ]
+    },
+    "CalculateDashwithDashxrayLambdaVersionU28Z7wztlrX7zIsh5sjOSpX5fBObQSazLM2vS50TNE": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CalculateDashwithDashxrayLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n"
+      }
+    },
+    "StartDashjobDashwithDashredisLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-start-job-with-redis",
+        "Handler": "src/redis_version/job_manager-redis.startJob",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single endpoint to trigger a job\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "StartDashjobDashwithDashredisLogGroup"
+      ]
+    },
+    "StartDashjobDashwithDashredisLambdaVersionhOS23MzssvIBxe1UrZtnNhDhTXCMRAOcHuXFTI8mm0": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartDashjobDashwithDashredisLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single endpoint to trigger a job\n"
+      }
+    },
+    "PreprocessDashwithDashredisLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-preprocess-with-redis",
+        "Handler": "src/redis_version/preprocessor-redis.readAndFilterFile",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "REGION": "eu-central-1",
+            "QUEUE_NAME": "PreprocessedDataQueueRedis",
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "PreprocessDashwithDashredisLogGroup"
+      ]
+    },
+    "PreprocessDashwithDashredisLambdaVersionDu599qs3N2tx5kWuvjZAlQYB8UmdeBXZQlajdCVEaM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PreprocessDashwithDashredisLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Preprocess lambda which sends SQS message afterwards: preprocess task update data (test data consists of 1000 tasks)\n"
+      }
+    },
+    "CalculateDashwithDashredisLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/lambda-gsd-index-calculator/dev/1599814296085-2020-09-11T08:51:36.085Z/lambda-gsd-index-calculator.zip"
+        },
+        "FunctionName": "lambda-gsd-index-calculator-dev-calculate-with-redis",
+        "Handler": "src/redis_version/calculator-redis.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 30,
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n",
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": "test-task-update-data-v2",
+            "SUBRESULT_FOLDER": "test_results",
+            "PIPELINE_RESULT_FOLDER": "gsd",
+            "REDIS_CONNECTION": "redis://:redis-password@18.192.55.33:6379"
+          }
+        }
+      },
+      "DependsOn": [
+        "CalculateDashwithDashredisLogGroup"
+      ]
+    },
+    "CalculateDashwithDashredisLambdaVersion3e7P5lIYRzQH410Vf5qJHS76srcSTC1XJvwEGNfgmF4": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CalculateDashwithDashredisLambdaFunction"
+        },
+        "CodeSha256": "jReaHZ1ypD/NwOTnCvS84bPx11+RsosOkYieCQ7oi7g=",
+        "Description": "Single lambda - calulator lambda after receiving sqs message, fetch cleaned up test data from S3 and calculates GSD index\n"
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "dev-lambda-gsd-index-calculator",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Policy": ""
+      }
+    },
+    "ApiGatewayResourceCleanup": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "cleanup",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceCalculate": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "calculate",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceCalculate5": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "calculate5",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourcePreprocess1k": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "preprocess1k",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceStartDashjob": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "start-job",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceStartDashjobDashwithDashxray": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "start-job-with-xray",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourcePreprocessDashwithDashxray": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "preprocess-with-xray",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceStartDashjobDashwithDashredis": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "start-job-with-redis",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourcePreprocessDashwithDashredis": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "preprocess-with-redis",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodCleanupGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceCleanup"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "CleanupLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodCalculateGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceCalculate"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "CalculateLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodCalculate5Get": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceCalculate5"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "Calculate5LambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodPreprocess1kPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourcePreprocess1k"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "Preprocess1kLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodStartDashjobPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceStartDashjob"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "StartDashjobLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodStartDashjobDashwithDashxrayPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceStartDashjobDashwithDashxray"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "StartDashjobDashwithDashxrayLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodPreprocessDashwithDashxrayPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourcePreprocessDashwithDashxray"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "PreprocessDashwithDashxrayLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodStartDashjobDashwithDashredisPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceStartDashjobDashwithDashredis"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "StartDashjobDashwithDashredisLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodPreprocessDashwithDashredisPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourcePreprocessDashwithDashredis"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "PreprocessDashwithDashredisLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1599814272057": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "dev"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodCleanupGet",
+        "ApiGatewayMethodCalculateGet",
+        "ApiGatewayMethodCalculate5Get",
+        "ApiGatewayMethodPreprocess1kPost",
+        "ApiGatewayMethodStartDashjobPost",
+        "ApiGatewayMethodStartDashjobDashwithDashxrayPost",
+        "ApiGatewayMethodPreprocessDashwithDashxrayPost",
+        "ApiGatewayMethodStartDashjobDashwithDashredisPost",
+        "ApiGatewayMethodPreprocessDashwithDashredisPost"
+      ]
+    },
+    "CleanupLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CleanupLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "CalculateLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CalculateLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "Calculate5LambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Calculate5LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "Preprocess1kLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Preprocess1kLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "StartDashjobLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartDashjobLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "StartDashjobDashwithDashxrayLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartDashjobDashwithDashxrayLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "PreprocessDashwithDashxrayLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "PreprocessDashwithDashxrayLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "StartDashjobDashwithDashredisLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartDashjobDashwithDashredisLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "PreprocessDashwithDashredisLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "PreprocessDashwithDashredisLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "Calculate1kEventSourceMappingSQSPreprocessedDataQueue": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": "IamRoleLambdaExecution",
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "PreprocessedDataQueue",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Calculate1kLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true
+      }
+    },
+    "CalculateDashwithDashxrayEventSourceMappingSQSPreprocessedDataQueueXRay": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": "IamRoleLambdaExecution",
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "PreprocessedDataQueueXRay",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CalculateDashwithDashxrayLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true
+      }
+    },
+    "CalculateDashwithDashredisEventSourceMappingSQSPreprocessedDataQueueRedis": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": "IamRoleLambdaExecution",
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "PreprocessedDataQueueRedis",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CalculateDashwithDashredisLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true
+      }
+    },
+    "PreprocessedDataQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "PreprocessedDataQueue"
+      }
+    },
+    "PreprocessedDataQueueFiFo": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "PreprocessedDataQueueFiFo.fifo",
+        "FifoQueue": true
+      }
+    },
+    "PreprocessedDataQueueXRay": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "PreprocessedDataQueueXRay"
+      }
+    },
+    "PreprocessedDataQueueRedis": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": "PreprocessedDataQueueRedis"
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    },
+    "CleanupLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CleanupLambdaVersionWUXJifcByplKGs4YcyDerbpIkTDgmIeFavEdG1RrM"
+      }
+    },
+    "CalculateLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CalculateLambdaVersionhmEolvuL3f5giY2uz4DE1nYVLR466vJIqtQao16Q"
+      }
+    },
+    "Calculate5LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "Calculate5LambdaVersionJWE717AS26llmh6WWkBxS8Tty5HdcU41qxxaDlAXkY"
+      }
+    },
+    "Preprocess1kLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "Preprocess1kLambdaVersion9rYnZTTWo0eYpGUjOQtRaTPzRS1cyQoPjOPAJMHN8"
+      }
+    },
+    "Calculate1kLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "Calculate1kLambdaVersionEGF0Aab4cRGdyBoNp5PbGL7mBawqKzTO1zawhTJdtzM"
+      }
+    },
+    "StartDashjobLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartDashjobLambdaVersionU7fvmL6zyD2g79NcwjqXwKA3R7jejI27B1qnksLDCA"
+      }
+    },
+    "StartDashjobDashwithDashxrayLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartDashjobDashwithDashxrayLambdaVersionczVD8y6ACTh7G4BFi5BD10RZAiIig7w19R2JFWLsXig"
+      }
+    },
+    "PreprocessDashwithDashxrayLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PreprocessDashwithDashxrayLambdaVersionMLrV4lPdPSHYcLTDGnPGEA7Uk8qIIuwW0QPRQuHeJM"
+      }
+    },
+    "CalculateDashwithDashxrayLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CalculateDashwithDashxrayLambdaVersionU28Z7wztlrX7zIsh5sjOSpX5fBObQSazLM2vS50TNE"
+      }
+    },
+    "StartDashjobDashwithDashredisLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartDashjobDashwithDashredisLambdaVersionhOS23MzssvIBxe1UrZtnNhDhTXCMRAOcHuXFTI8mm0"
+      }
+    },
+    "PreprocessDashwithDashredisLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PreprocessDashwithDashredisLambdaVersionDu599qs3N2tx5kWuvjZAlQYB8UmdeBXZQlajdCVEaM"
+      }
+    },
+    "CalculateDashwithDashredisLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CalculateDashwithDashredisLambdaVersion3e7P5lIYRzQH410Vf5qJHS76srcSTC1XJvwEGNfgmF4"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/dev"
+          ]
+        ]
+      }
+    }
+  }
+}
