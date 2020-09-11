@@ -5,7 +5,8 @@ import superagent from 'superagent'
 import fs from 'fs'
 import Redis from 'ioredis'
 
-import DynamoDB from './service/app-register-store/dynamo'
+import AppRegisterStore from './service/app-register-store/dynamo'
+import JobTracerStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
@@ -15,7 +16,8 @@ const {
   REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_CONNECTION,
 } = process.env
 
-const appRegisterStore = new DynamoDB('app-register-store')
+const appRegisterStore = new AppRegisterStore()
+const jobTraceStore = new JobTracerStore()
 const tracer = new Tracer()
 const redisTracerCache = REDIS_CONNECTION
   ? new Redis(REDIS_CONNECTION)
@@ -297,8 +299,16 @@ const startTracing = async (req, res) => {
     REDIS_CONNECTION,
   })
 
-  // TRIGGER THE JOB
   const dateNow = Date.now()
+  await jobTraceStore.put({
+    jobId,
+    jobUrl,
+    budgetLimit,
+    appId,
+    dateNow,
+  })
+
+  // TRIGGER THE JOB
   const response = await superagent
     .post(jobUrl)
     .set('Content-Type', 'application/json')

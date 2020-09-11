@@ -7,7 +7,7 @@ import fs from 'fs'
 import multer from 'multer'
 import Redis from 'ioredis'
 
-import DynamoDB from './service/trace-store/dynamo'
+import JobTraceStore from './service/job-trace-store/dynamo'
 import AppRegisterDynamoDB from './service/app-register-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
@@ -38,7 +38,7 @@ console.log('REDIS VARS:', {
   REDIS_CONNECTION,
 })
 
-const traceStore = new DynamoDB('trace-record')
+const jobTraceStore = new JobTraceStore()
 const priceList = new PriceList()
 const tracer = new Tracer()
 
@@ -165,15 +165,16 @@ app.post('/redis-test', async (req, res) => {
 // AWS DynamoDB
 app.post('/test-put-db', async (req, res) => {
   console.log('+++data', req.body)
-  const createdItem = await traceStore.put('test')
+  const createdItem = await jobTraceStore.put({ hello: 'world' })
   console.log('+++createdItem', createdItem)
   res.status(HttpStatus.CREATED).json({
     hello: 'world'
   })
 })
 
-app.get('/test-get-db', async (req, res) => {
-  const createdItem = await traceStore.get()
+app.get('/test-get-db/:id', async (req, res) => {
+  const { id } = req.params
+  const createdItem = await jobTraceStore.get(id)
   console.log('+++createdItem', createdItem)
   res.status(HttpStatus.OK).json({
     hello: 'world'
@@ -182,7 +183,7 @@ app.get('/test-get-db', async (req, res) => {
 
 app.get('/test-get-app/:appId', async (req, res) => {
   const { appId } = req.params
-  const appRegisterStore = new AppRegisterDynamoDB('app-register-store')
+  const appRegisterStore = new AppRegisterDynamoDB()
   const app = await appRegisterStore.get(appId)
   console.log('+++app', app)
   res.status(HttpStatus.OK).json({

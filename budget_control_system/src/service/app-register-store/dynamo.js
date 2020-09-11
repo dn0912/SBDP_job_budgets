@@ -14,6 +14,8 @@ AWS.config.update({
 const dynamoDocClient = new AWS.DynamoDB.DocumentClient()
 // const update = promisify(dynamoDb.update.bind(dynamoDb))
 
+const tableName = 'app-register-store'
+
 class DynamoDB {
   constructor(tableName) {
     // this.tableName = 'trace-record'
@@ -35,7 +37,7 @@ class DynamoDB {
       }
 
       const docClientParams = {
-        TableName: this.tableName,
+        TableName: tableName,
         Item: storeItem,
         ReturnValues: 'ALL_OLD',
       }
@@ -49,7 +51,7 @@ class DynamoDB {
   async get(appId) {
     try {
       const param = {
-        TableName: this.tableName,
+        TableName: tableName,
         Key: {
           appId,
         },
