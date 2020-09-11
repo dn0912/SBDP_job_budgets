@@ -105,7 +105,7 @@ module.exports.handler = async (event, context) => {
 
   // *******
   // Tracing with Redis
-  awsTracerWithRedis.startLambdaTracer(event, context)
+  await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
   const s3FileContentAsString = await readFile(fileName)

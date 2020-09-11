@@ -4,6 +4,8 @@ const Redis = require('ioredis')
 // Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
 const CACHE_KEY_PREFIX = 'tracer_'
 
+const createFlagPoleCacheKey = (jobId) => `flag_${jobId}`
+
 const _s3FileSizeTracer = (fileContent) => {
   const contentByteSize = Buffer.byteLength(JSON.stringify(fileContent), 'utf8')
   const s3ContentKiloByteSize = contentByteSize / 1024
@@ -23,7 +25,7 @@ const _sqsPayloadSizeTracer = (sqsPayload) => {
 }
 
 module.exports = class AWSTracer {
-  constructor(process) {
+  constructor() {
     const {
       REDIS_HOST,
       REDIS_PORT,
@@ -49,15 +51,23 @@ module.exports = class AWSTracer {
       lambdaStartTime: null,
       lambdaMemoryAllocationInMB: null,
     }
+  }
 
-    this.currentRunningProcess = process
+  async checkFlag() {
+    const flagStatus = await this.tracerStore.get(createFlagPoleCacheKey(this.jobId))
+    if (flagStatus === 'STOP') {
+      process.exit(0)
+    }
+
+    // TODO: for testing purpose only
+    this.tracerStore.incr(`TEST_FLAG#####${this.jobId}`)
   }
 
   // **********
   // LAMBDA
 
   // use in Lambda as early as possible
-  startLambdaTracer(event, context) {
+  async startLambdaTracer(event, context) {
     this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
     this.lambdaTraceInfo.lambdaMemoryAllocationInMB = context.memoryLimitInMB
 
@@ -86,6 +96,8 @@ module.exports = class AWSTracer {
     // console.log('+++ STOP HERE1')
     // this.currentRunningProcess.exit()
     // console.log('+++ STOP HERE2')
+
+    await this.checkFlag()
   }
 
   async stopLambdaTracer() {
@@ -97,6 +109,21 @@ module.exports = class AWSTracer {
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
 
     await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
+    await this.checkFlag()
+  }
+
+  async checkForBudget() {
+    console.log('+++redis stopLambdaTracer+++')
+
+    const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
+    const processingTime = (moment.utc().valueOf() - this.lambdaTraceInfo.lambdaStartTime) / 1000
+
+    this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
+
+    const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
+    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
+
+    await this.checkFlag()
   }
   // **********
 
@@ -105,6 +132,8 @@ module.exports = class AWSTracer {
   async getS3ObjectIsCalled() {
     console.log('+++redis getS3ObjectIsCalled+++')
     await this.tracerStore.incr(`${CACHE_KEY_PREFIX}${this.jobId}#s3#getObject`)
+
+    await this.checkFlag()
   }
 
   async putS3ObjectIsCalled(params) {
@@ -112,6 +141,8 @@ module.exports = class AWSTracer {
     const fileContent = params.Body
     const fileSize = _s3FileSizeTracer(fileContent)
     await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#s3#putObject`, fileSize)
+
+    await this.checkFlag()
   }
   // **********
 
@@ -131,6 +162,8 @@ module.exports = class AWSTracer {
     await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
     // in case queue names are not known from trace start bc no app is registered
     await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
+
+    await this.checkFlag()
   }
   // **********
 }

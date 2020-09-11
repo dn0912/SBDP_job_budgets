@@ -74,7 +74,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     // somehow does not work and exits lambda: const { jobId } = event
     const { jobId } = event
     // Tracing with Redis
-    awsTracerWithRedis.startLambdaTracer(event, context)
+    await awsTracerWithRedis.startLambdaTracer(event, context)
 
     const inputFileName = (event && event.fileName) || FILE
     const s3FileContentAsString = await _readFile(inputFileName)

@@ -37,7 +37,7 @@ module.exports.startJob = async (event, context) => {
   const eventBody = JSON.parse(event.body)
   const { jobId } = eventBody
 
-  awsTracerWithRedis.startLambdaTracer(event, context)
+  await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
   console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)

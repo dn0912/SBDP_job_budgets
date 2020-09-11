@@ -1,7 +1,11 @@
 const TracedAWS = require('service-cost-tracer')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-const awsTracerWithRedis = new AWSTracerWithRedis(process)
+// TracedAWS.config.update({
+//   maxRetries: 0
+// })
+
+const awsTracerWithRedis = new AWSTracerWithRedis()
 
 const lambda = new TracedAWS.Lambda()
 
@@ -40,7 +44,7 @@ module.exports.startJob = async (event, context) => {
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
 
   // with Redis
-  awsTracerWithRedis.startLambdaTracer(event, context)
+  await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
   console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)
@@ -55,6 +59,8 @@ module.exports.startJob = async (event, context) => {
     // 'test_with_description_title_change_1500_single.json',
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
+
+  await slowDown(2000)
 
   const promises = inputArray.map((fileName) => {
     const payload = {
@@ -71,7 +77,8 @@ module.exports.startJob = async (event, context) => {
   const result = await Promise.all(promises)
   console.log('+++result', result)
 
-  await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
+  // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
+  await slowDown(3000)
 
   // TRACING
   TracedAWS.stopLambdaTracer(lambdaSubsegment)

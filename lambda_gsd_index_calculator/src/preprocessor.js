@@ -6,10 +6,14 @@ const AWSXRay = require('aws-xray-sdk-core')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const TracedAWS = require('service-cost-tracer')
 
+// TracedAWS.config.update({
+//   maxRetries: 0
+// })
+
 const moment = require('moment')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-const awsTracerWithRedis = new AWSTracerWithRedis(process)
+const awsTracerWithRedis = new AWSTracerWithRedis()
 
 const tracedS3 = new TracedAWS.S3()
 
@@ -80,12 +84,14 @@ module.exports.readAndFilterFile = async (event, context) => {
     // Tracing
     const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
     // with Redis
-    awsTracerWithRedis.startLambdaTracer(event, context)
+    await awsTracerWithRedis.startLambdaTracer(event, context)
 
     const inputFileName = (event && event.fileName) || FILE
     const s3FileContentAsString = await _readFile(inputFileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = _filterUnnecessaryUpdates(s3FileContent)
+
+    await _slowDown(3000)
 
     const fileName = await _putFile(cleanTaskUpdates, jobId)
 
@@ -114,11 +120,13 @@ module.exports.readAndFilterFile = async (event, context) => {
       ...necessaryFiFoParams,
     }
 
+    await _slowDown(2000)
+
     // Sends single message to SQS for further process
     const test = await tracedSendMessage(sqsPayload, jobId)
     await awsTracerWithRedis.sendSqsMessageIsCalled(sqsPayload)
 
-    await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
+    // await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)
@@ -131,6 +139,8 @@ module.exports.readAndFilterFile = async (event, context) => {
       statusCode: 200,
       body: JSON.stringify(responseBody),
     }
+
+    await _slowDown(2000)
 
     // TRACING
     TracedAWS.stopLambdaTracer(lambdaSubsegment)
