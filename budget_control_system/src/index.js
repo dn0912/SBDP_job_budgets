@@ -11,6 +11,7 @@ import JobTraceStore from './service/job-trace-store/dynamo'
 import AppRegisterDynamoDB from './service/app-register-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
+import Notifier from './service/notification/notifier'
 
 import controller from './controller'
 
@@ -187,6 +188,34 @@ app.get('/test-get-app/:appId', async (req, res) => {
   const app = await appRegisterStore.get(appId)
   console.log('+++app', app)
   res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+// AWS SNS
+// curl -X POST http://localhost:8080/test-subscribe-sns -H "Content-Type: application/json" -d '{"mail": "abc@def.com"}'
+app.post('/test-subscribe-sns', async (req, res) => {
+  console.log('+++data', req.body)
+  const requestBody = JSON.parse(req.body)
+  const { mail } = requestBody
+  const notifier = new Notifier()
+
+  await notifier.subscribe(mail)
+
+  console.log('++++ YOU NEED TO CONFIRM EMAIL')
+
+  res.status(HttpStatus.CREATED).json({
+    hello: '++++ YOU NEED TO CONFIRM EMAIL'
+  })
+})
+
+app.post('/test-publish-sns', async (req, res) => {
+  console.log('+++data', req.body)
+  const notifier = new Notifier()
+
+  await notifier.publish('hello', 'world')
+
+  res.status(HttpStatus.CREATED).json({
     hello: 'world'
   })
 })

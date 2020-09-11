@@ -8,7 +8,7 @@ export default class FlagPoleService extends Redis {
     REDIS_PORT,
     REDIS_PASSWORD,
     REDIS_CONNECTION,
-  }) {
+  }, notifier) {
     if (REDIS_CONNECTION) {
       super(REDIS_CONNECTION)
     } else {
@@ -24,6 +24,7 @@ export default class FlagPoleService extends Redis {
     this.budgetLimit = budgetLimit
     this.jobId = jobId
     this.isFlagSwitched = false
+    this.notifier = notifier
   }
 
   async createFlag() {
@@ -38,6 +39,10 @@ export default class FlagPoleService extends Redis {
       if (!this.isFlagSwitched) {
         this.set(createFlagPoleCacheKey(this.jobId), 'STOP')
         this.isFlagSwitched = true
+
+        const msgSubject = `Job ${this.jobId} reached budget limit`
+        const msgContent = `Job with ID: ${this.jobId} reached budget limit of ${this.budgetLimit}$`
+        this.notifier.publish(msgSubject, msgContent)
       }
 
       return false

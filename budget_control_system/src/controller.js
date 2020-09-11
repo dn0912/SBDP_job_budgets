@@ -11,11 +11,13 @@ import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
+import Notifier from './service/notification/notifier'
 
 const {
   REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_CONNECTION,
 } = process.env
 
+const priceList = new PriceList()
 const appRegisterStore = new AppRegisterStore()
 const jobTraceStore = new JobTracerStore()
 const tracer = new Tracer()
@@ -28,6 +30,8 @@ const redisTracerCache = REDIS_CONNECTION
     password: REDIS_PASSWORD,
     db: 0,
   })
+
+const notifier = new Notifier()
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
@@ -206,6 +210,8 @@ const calculateJobCostsFromRedis = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
+  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD)
+
   const result = {
     iterationNumber,
     lambdaPrices,
@@ -219,6 +225,7 @@ const calculateJobCostsFromRedis = async ({
 
   console.log('+++totalJobPriceFromRedis in Nano USD', {
     iteration: iterationNumber,
+    isInBudgetLimit,
     'Time passed since job start': (Date.now() / 1000) - startTime,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
@@ -271,7 +278,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
 const startTracing = async (req, res) => {
   console.log('+++req.body', req.body)
   const jobId = uuid.v4()
-  let jobUrl = 'https://8agbbl596b.execute-api.eu-central-1.amazonaws.com/dev/start-job'
+  let jobUrl = process.env.TEMP_JOB_URL
   let budgetLimit = 0.025
   let appId
 
@@ -282,7 +289,6 @@ const startTracing = async (req, res) => {
     appId = get(requestBody, 'appId')
   }
 
-  const priceList = new PriceList()
   const lambdaPricing = await priceList.getLambdaPricing()
   const sqsPricing = await priceList.getSQSPricing()
   const s3Pricing = await priceList.getS3Pricing()
@@ -292,12 +298,13 @@ const startTracing = async (req, res) => {
   const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
 
   // TODO: set budget limit beforehand
-  const flagPole = new FlagPoleService(jobId, budgetLimit, {
+  const redisParams = {
     REDIS_HOST,
     REDIS_PORT,
     REDIS_PASSWORD,
     REDIS_CONNECTION,
-  })
+  }
+  const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
 
   const dateNow = Date.now()
   await jobTraceStore.put({
