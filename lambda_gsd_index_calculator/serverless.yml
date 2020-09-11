@@ -124,8 +124,8 @@ functions:
       FILE: ${self:custom.S3_PREPROCESS_1000TASKS}
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       REGION: ${self:custom.REGION}
-      # QUEUE_NAME: ${self:custom.SQS_NAME}
-      QUEUE_NAME: ${self:custom.SQS_NAME_FIFO}.fifo # must end with fifo suffix
+      QUEUE_NAME: ${self:custom.SQS_NAME}
+      # QUEUE_NAME: ${self:custom.SQS_NAME_FIFO}.fifo # # TODO: enable for FIFO, must end with fifo suffix
       REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
   calculate1k:
     description: >
@@ -136,8 +136,8 @@ functions:
       - sqs:
           arn:
             Fn::GetAtt:
-              # - PreprocessedDataQueue
-              - PreprocessedDataQueueFiFo
+              - PreprocessedDataQueue
+              # - PreprocessedDataQueueFiFo # TODO: enable for FIFO
               - Arn
     environment:
       BUCKET: ${self:custom.S3_BUCKET}
