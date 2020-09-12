@@ -358,11 +358,7 @@ const startTracing = async (req, res) => {
   })
 }
 
-const getJobStatus = async (req, res) => {
-  const { jobId, appId = '' } = req.params
-
-  console.log('+++jobId', { jobId, appId })
-
+export const getJobStatus = async (jobId, appId = '') => {
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = appId ? await appRegisterStore.get(appId) : {}
 
@@ -385,18 +381,28 @@ const getJobStatus = async (req, res) => {
     queueMap: registeredSqsQueuesMap,
   })
 
-  res.status(HttpStatus.OK).json({
+  return {
     jobId,
     lambdaPrices,
     sqsPrices,
     s3Prices,
     totalJobPrice,
     totalJobPriceInUSD,
-  })
+  }
+}
+
+const getJobStatusRouteHandler = async (req, res) => {
+  const { jobId, appId = '' } = req.params
+
+  console.log('+++jobId', { jobId, appId })
+
+  const jobCostDetails = await getJobStatus(jobId, appId)
+
+  res.status(HttpStatus.OK).json(jobCostDetails)
 }
 
 export default {
   registerApp,
   startTracing,
-  getJobStatus,
+  getJobStatusRouteHandler,
 }

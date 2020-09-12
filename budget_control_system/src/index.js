@@ -15,7 +15,7 @@ import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import Notifier from './service/notification/notifier'
 
-import controller from './controller'
+import controller, { getJobStatus } from './controller'
 
 import {
   createServiceTracingMap,
@@ -101,13 +101,17 @@ const io = socketio(httpServer)
 
 io.on('connect', (socket) => {
   console.log('socket io connection')
-  let counter = 0
-  setInterval(() => {
-    socket.emit('hello', ++counter)
-  }, 1000)
 
   socket.on('disconnect', () => {
     console.log('disconnected')
+  })
+
+  socket.on('get-job-trace-data', async (jobId) => {
+    console.log('Socket event: get-job-trace-data', { jobId })
+
+    const jobCostsDetails = await getJobStatus(jobId)
+
+    io.emit('return-job-trace-data', jobCostsDetails)
   })
 })
 
@@ -152,7 +156,7 @@ app.post('/stop', () => {
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)
 
-app.get('/job-status/:jobId', controller.getJobStatus)
+app.get('/job-status/:jobId', controller.getJobStatusRouteHandler)
 
 app.get('/live-job-status', (req, res) => {
   console.log('+++req.query', req.query)
