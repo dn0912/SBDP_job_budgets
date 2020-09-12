@@ -196,6 +196,7 @@ const calculateJobCostsFromRedis = async ({
   iterationNumber = 0,
   queueMap,
   jobStartTime,
+  budgetLimit,
 }) => {
   const lambdaPrices = await getLambdaTraceAndCalculatePrice(priceCalculator, jobId)
   const sqsPrices = await getSqsTraceAndCalculatePrice(priceCalculator, jobId, queueMap)
@@ -238,9 +239,9 @@ const calculateJobCostsFromRedis = async ({
   const testFlag = await redisTracerCache.get(`TEST_FLAG#####${jobId}`)
   console.log('+++testFlag', testFlag)
 
-  // if (testFlag > 5) {
-  //   await redisTracerCache.set(`flag_${jobId}`, 'STOP')
-  // }
+  if (testFlag > 2) {
+    await redisTracerCache.set(`flag_${jobId}`, budgetLimit)
+  }
 
   return result
 }
@@ -339,6 +340,7 @@ const startTracing = async (req, res) => {
     priceCalculator,
     flagPole,
     queueMap: registeredSqsQueuesMap,
+    budgetLimit,
   })
 
   res.status(HttpStatus.OK).json({

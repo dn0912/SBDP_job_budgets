@@ -17,6 +17,7 @@ const s3 = new TracedAWS.S3()
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
+// const tracedPutObject = awsTracerWithRedis.myWrapper(promisify(s3.putObject).bind(s3))
 
 // TODO: remove later
 // simulate slow function

@@ -91,7 +91,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = _filterUnnecessaryUpdates(s3FileContent)
 
-    await _slowDown(3000)
+    await _slowDown(4000)
 
     const fileName = await _putFile(cleanTaskUpdates, jobId)
 

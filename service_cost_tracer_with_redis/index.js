@@ -53,14 +53,23 @@ module.exports = class AWSTracer {
     }
   }
 
+  // myWrapper(fn) {
+  //   return async (...args) => {
+  //     await fn(...args)
+  //     this.putS3ObjectIsCalled(...args)
+  //     console.log('+++myWrapper called', args)
+  //   }
+  // }
+
   async checkFlag() {
     const flagStatus = await this.tracerStore.get(createFlagPoleCacheKey(this.jobId))
-    if (flagStatus === 'STOP') {
-      process.exit(0)
+    if (flagStatus) {
+      // process.exit(0)
+      throw new Error(`Job budget of ${flagStatus}$ exceeded`)
     }
 
     // TODO: for testing purpose only
-    this.tracerStore.incr(`TEST_FLAG#####${this.jobId}`)
+    await this.tracerStore.incr(`TEST_FLAG#####${this.jobId}`)
   }
 
   // **********
