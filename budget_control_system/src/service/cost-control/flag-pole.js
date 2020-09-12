@@ -27,24 +27,28 @@ export default class FlagPoleService extends Redis {
     this.notifier = notifier
   }
 
-  async isInBudgetLimit(currentCost) {
-    if (this.budgetLimit === 0 || this.budgetLimit > currentCost) {
+  async isInBudgetLimit(currentCost = 0) {
+    if (this.budgetLimit === 0) {
       return true
     }
 
-    console.log('+++currentCost', currentCost)
-    console.log('+++isInBudgetLimit', await this.get(this.jobId))
+    if (currentCost > this.budgetLimit) {
+      console.log('+++currentCost', currentCost)
+      console.log('+++isInBudgetLimit', await this.get(this.jobId))
 
-    if (!this.isFlagSwitched) {
-      this.set(createFlagPoleCacheKey(this.jobId), this.budgetLimit)
-      this.isFlagSwitched = true
+      if (!this.isFlagSwitched) {
+        this.set(createFlagPoleCacheKey(this.jobId), this.budgetLimit)
+        this.isFlagSwitched = true
 
-      const msgSubject = `Job ${this.jobId} reached budget limit`
-      const msgContent = `Job with ID: ${this.jobId} reached budget limit of ${this.budgetLimit}$`
-      this.notifier.publish(msgSubject, msgContent)
+        const msgSubject = `Job ${this.jobId} reached budget limit`
+        const msgContent = `Job with ID: ${this.jobId} reached budget limit of ${this.budgetLimit}$`
+        this.notifier.publish(msgSubject, msgContent)
+      }
+
+      return false
     }
 
-    return false
+    return true
   }
 
   getBudgetLimit() {
