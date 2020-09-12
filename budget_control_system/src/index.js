@@ -1,5 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import http from 'http'
+import socketio from 'socket.io'
 import HttpStatus from 'http-status-codes'
 import { get } from 'lodash'
 import moment from 'moment'
@@ -94,6 +96,20 @@ async function fetchTracePeriodically(dateNow, jobId) {
 }
 const upload = multer({ dest: 'uploads/' })
 const app = express()
+const httpServer = http.createServer(app)
+const io = socketio(httpServer)
+
+io.on('connect', (socket) => {
+  console.log('socket io connection')
+  let counter = 0
+  setInterval(() => {
+    socket.emit('hello', ++counter)
+  }, 1000)
+
+  socket.on('disconnect', () => {
+    console.log('disconnected')
+  })
+})
 
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -137,6 +153,11 @@ app.post('/stop', () => {
 app.post('/register-app', upload.single('data'), controller.registerApp)
 
 app.get('/job-status/:jobId', controller.getJobStatus)
+
+app.get('/live-job-status', (req, res) => {
+  console.log('+++req.query', req.query)
+  res.sendFile(`${__dirname}/public/index.html`)
+})
 
 // **************
 // TEST ROUTES!?!
@@ -380,7 +401,7 @@ app.get('/test-job-tracing-summary/:jobStartTime/:jobId', async (req, res) => {
 // TEST ROUTES!?!
 // **************
 
-app.listen(
+httpServer.listen(
   port,
   () => console.log(`App listening at http://localhost:${port}`),
 )
