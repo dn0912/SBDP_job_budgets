@@ -90,14 +90,14 @@
       $('#messages').append($('<li>').text('Disconnected'));
     });
 
-    socket.on('return-job-trace-data', function (msg) {
-      console.log('+++msg', msg)
+    socket.on('return-job-trace-data', function (jobCostsDetails) {
+      console.log('+++jobCostsDetails', jobCostsDetails)
       const { lambdaPrices,
         sqsPrices,
         s3Prices,
         totalJobPrice,
         totalJobPriceInUSD,
-      } = msg
+      } = jobCostsDetails
 
       const lambdaPricesListItem = `<strong>Lambda price:</strong> ${lambdaPrices}   `
       const sqsPricesListItem = `<strong>SQS price:</strong> ${sqsPrices}   `
@@ -107,6 +107,10 @@
 
       $('#messages').append('<li>' + lambdaPricesListItem + sqsPricesListItem + s3PricesListItem + totalJobPriceInUSDListItem + totalJobPriceInUSDListItem + '</li>');
     });
+
+    socket.on('no-job-found', function (jobId) {
+      $('#messages').append($('<li>').text(`Job does not exists with job id ${jobId}`))
+    })
   </script>
 </body>
 

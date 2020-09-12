@@ -109,9 +109,15 @@ io.on('connect', (socket) => {
   socket.on('get-job-trace-data', async (jobId) => {
     console.log('Socket event: get-job-trace-data', { jobId })
 
-    const jobCostsDetails = await getJobStatus(jobId)
+    const jobRecord = await jobTraceStore.get(jobId)
 
-    io.emit('return-job-trace-data', jobCostsDetails)
+    if (jobRecord) {
+      const jobCostsDetails = await getJobStatus(jobId)
+      io.emit('return-job-trace-data', jobCostsDetails)
+    } else {
+      
+      io.emit('no-job-found', jobId)
+    }
   })
 })
 
