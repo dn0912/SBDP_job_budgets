@@ -49,7 +49,7 @@ class DynamoDB {
       }
       const dbRecord = await this.ddb.get(param).promise()
       console.log('+++dbRecord', dbRecord)
-      return dbRecord
+      return dbRecord.Item || null
     } catch (err) {
       console.log('err', err)
     }

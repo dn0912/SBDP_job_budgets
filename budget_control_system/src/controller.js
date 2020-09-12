@@ -17,6 +17,13 @@ const {
   REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_CONNECTION,
 } = process.env
 
+const redisParams = {
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_PASSWORD,
+  REDIS_CONNECTION,
+}
+
 const priceList = new PriceList()
 const appRegisterStore = new AppRegisterStore()
 const jobTraceStore = new JobTracerStore()
@@ -196,7 +203,7 @@ const calculateJobCostsFromRedis = async ({
   iterationNumber = 0,
   queueMap,
   jobStartTime,
-  budgetLimit,
+  budgetLimit = 0,
 }) => {
   const lambdaPrices = await getLambdaTraceAndCalculatePrice(priceCalculator, jobId)
   const sqsPrices = await getSqsTraceAndCalculatePrice(priceCalculator, jobId, queueMap)
@@ -276,6 +283,17 @@ async function calculateJobCostsPeriodically(passedArgs) {
   }
 }
 
+const initPriceCalculator = async () => {
+  const lambdaPricing = await priceList.getLambdaPricing()
+  const sqsPricing = await priceList.getSQSPricing()
+  const s3Pricing = await priceList.getS3Pricing()
+  const priceCalculator = new PriceCalculator(
+    lambdaPricing, sqsPricing, s3Pricing
+  )
+
+  return priceCalculator
+}
+
 const startTracing = async (req, res) => {
   console.log('+++req.body', req.body)
   const jobId = uuid.v4()
@@ -290,21 +308,10 @@ const startTracing = async (req, res) => {
     appId = get(requestBody, 'appId')
   }
 
-  const lambdaPricing = await priceList.getLambdaPricing()
-  const sqsPricing = await priceList.getSQSPricing()
-  const s3Pricing = await priceList.getS3Pricing()
-  const priceCalculator = new PriceCalculator(
-    lambdaPricing, sqsPricing, s3Pricing
-  )
+  const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
 
   // TODO: set budget limit beforehand
-  const redisParams = {
-    REDIS_HOST,
-    REDIS_PORT,
-    REDIS_PASSWORD,
-    REDIS_CONNECTION,
-  }
   const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
 
   const dateNow = Date.now()
@@ -356,14 +363,14 @@ const getJobStatus = async (req, res) => {
 
   console.log('+++jobId', { jobId, appId })
 
-  const priceList = new PriceList()
-  const lambdaPricing = await priceList.getLambdaPricing()
-  const sqsPricing = await priceList.getSQSPricing()
-  const s3Pricing = await priceList.getS3Pricing()
-  const priceCalculator = new PriceCalculator(
-    lambdaPricing, sqsPricing, s3Pricing
-  )
+  const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = appId ? await appRegisterStore.get(appId) : {}
+
+  const jobRecord = await jobTraceStore.get(jobId)
+  const budgetLimit = get(jobRecord, 'budgetLimit', 0)
+  console.log('+++jobRecord', jobRecord)
+
+  const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
 
   const {
     lambdaPrices,
@@ -374,6 +381,7 @@ const getJobStatus = async (req, res) => {
   } = await calculateJobCostsFromRedis({
     jobId,
     priceCalculator,
+    flagPole,
     queueMap: registeredSqsQueuesMap,
   })
 
