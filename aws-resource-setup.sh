@@ -17,6 +17,34 @@ read -p "AWS key name for SSH:" INPUT_AWS_KEY_NAME
 
 CURRENT_WORKING_DIR=$(pwd)
 
+# Create DynamoDB tables
+AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws dynamodb create-table \
+    --table-name app-register-store \
+    --attribute-definitions \
+        AttributeName=appId,AttributeType=S \
+    --key-schema \
+        AttributeName=appId,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --region $INPUT_AWS_RESOURCE_REGION
+
+AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws dynamodb create-table \
+    --table-name job-trace-record \
+    --attribute-definitions \
+        AttributeName=jobId,AttributeType=S \
+    --key-schema \
+        AttributeName=jobId,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --region $INPUT_AWS_RESOURCE_REGION
+
+echo "Sucessfully created DynamoDB tables..."
+
+# Create SNS topic
+AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws sns create-topic \
+  --name job-budget-alarm \
+  --region $INPUT_AWS_RESOURCE_REGION
+
 # Create security group
 AWS_ACCESS_KEY_ID=$INPUT_AWS_KEY AWS_SECRET_ACCESS_KEY=$INPUT_AWS_SECRET aws ec2 create-security-group \
   --group-name job-budget-security-group \
