@@ -4,9 +4,10 @@ import uuid from 'node-uuid'
 import superagent from 'superagent'
 import fs from 'fs'
 import Redis from 'ioredis'
+import moment from 'moment'
 
 import AppRegisterStore from './service/app-register-store/dynamo'
-import JobTracerStore from './service/job-trace-store/dynamo'
+import JobTraceStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
@@ -26,7 +27,7 @@ const redisParams = {
 
 const priceList = new PriceList()
 const appRegisterStore = new AppRegisterStore()
-const jobTraceStore = new JobTracerStore()
+const jobTraceStore = new JobTraceStore()
 const tracer = new Tracer()
 const redisTracerCache = REDIS_CONNECTION
   ? new Redis(REDIS_CONNECTION)
@@ -222,6 +223,9 @@ const calculateJobCostsFromRedis = async ({
 
   const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD, skipNotifying)
 
+  const startTime = parseInt(jobStartTime, 10) / 1000
+  const timePassedSinceJobStartInSec = parseFloat((Date.now() / 1000) - startTime).toFixed(2)
+
   const result = {
     iterationNumber,
     lambdaPrices,
@@ -229,14 +233,14 @@ const calculateJobCostsFromRedis = async ({
     s3Prices,
     totalJobPrice,
     totalJobPriceInUSD,
+    formatedTimePassedSinceJobStart: moment.utc(timePassedSinceJobStartInSec * 1000).format('HH:mm:ss.SSS'),
+    budgetLimit,
   }
-
-  const startTime = parseInt(jobStartTime, 10) / 1000
 
   console.log('+++totalJobPriceFromRedis in Nano USD', {
     iteration: iterationNumber,
     isInBudgetLimit,
-    'Time passed since job start': (Date.now() / 1000) - startTime,
+    'Time passed since job start': timePassedSinceJobStartInSec,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
     'S3 total price': s3Prices,
@@ -269,7 +273,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
   //   resolve()
   // }, 1000))
 
-  while (counter.value < 300) {
+  while (counter.value < 30) {
     // console.log('++++++++++++++++++++++++++++++++++++')
     // console.log('+++counter.value', counter.value)
     // eslint-disable-next-line no-await-in-loop
@@ -298,6 +302,8 @@ const initPriceCalculator = async () => {
   return priceCalculator
 }
 
+const getRegisteredSqsQueuesMap = async (appId) => (appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {})
+
 const startTracing = (eventBus) => async (req, res) => {
   console.log('+++req.body', req.body)
   const jobId = uuid.v4()
@@ -313,7 +319,7 @@ const startTracing = (eventBus) => async (req, res) => {
   }
 
   const priceCalculator = await initPriceCalculator()
-  const registeredSqsQueuesMap = appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {}
+  const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
 
   // TODO: set budget limit beforehand
   const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
@@ -325,7 +331,7 @@ const startTracing = (eventBus) => async (req, res) => {
     jobUrl,
     budgetLimit,
     appId,
-    dateNow,
+    jobStartTime: dateNow,
   })
 
   // TRIGGER THE JOB
@@ -364,12 +370,17 @@ const startTracing = (eventBus) => async (req, res) => {
   })
 }
 
-export const getJobStatus = async (eventBus, jobId, appId = '') => {
+export const getJobStatus = async ({
+  eventBus,
+  jobId,
+}) => {
   const priceCalculator = await initPriceCalculator()
-  const registeredSqsQueuesMap = appId ? await appRegisterStore.get(appId) : {}
 
   const jobRecord = await jobTraceStore.get(jobId)
   const budgetLimit = get(jobRecord, 'budgetLimit', 0)
+  const jobStartTime = get(jobRecord, 'jobStartTime')
+  const appId = get(jobRecord, 'appId')
+  const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
   console.log('+++jobRecord', jobRecord)
 
   const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
@@ -387,6 +398,8 @@ export const getJobStatus = async (eventBus, jobId, appId = '') => {
     queueMap: registeredSqsQueuesMap,
     eventBus,
     skipNotifying: true,
+    jobStartTime,
+    budgetLimit,
   })
 
   return {
@@ -404,7 +417,7 @@ const getJobStatusRouteHandler = async (req, res) => {
 
   console.log('+++jobId', { jobId, appId })
 
-  const jobCostDetails = await getJobStatus(jobId, appId)
+  const jobCostDetails = await getJobStatus({ jobId })
 
   res.status(HttpStatus.OK).json(jobCostDetails)
 }

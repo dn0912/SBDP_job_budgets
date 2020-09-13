@@ -131,8 +131,11 @@ io.on('connect', (socket) => {
     const jobRecord = await jobTraceStore.get(jobId)
 
     if (jobRecord) {
-      const jobCostsDetails = await getJobStatus(eventEmitter, jobId)
-      io.emit('return-job-trace-data', jobCostsDetails)
+      const jobCostsDetails = await getJobStatus({
+        eventBus: eventEmitter,
+        jobId,
+      })
+      // io.emit('return-job-trace-data', jobCostsDetails)
     } else {
       io.emit('no-job-found', jobId)
     }
@@ -159,11 +162,7 @@ io.on('connect', (socket) => {
 
 eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
   console.log('+++eventEmitter.addListener', jobId, jobCost)
-  io.emit('stream-job-costs', {
-    ...jobCost,
-    jobId,
-    hello: 'world',
-  })
+  io.emit('stream-job-costs', { ...jobCost, jobId })
 })
 
 // for parsing application/x-www-form-urlencoded
