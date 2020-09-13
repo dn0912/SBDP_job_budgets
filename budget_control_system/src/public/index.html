@@ -20,9 +20,8 @@
     form {
       background: #5E6772;
       padding: 3px;
-      /* position: fixed;
-      bottom: 0; */
       width: 100%;
+      border-radius: 5px;
     }
   
     form input {
@@ -44,8 +43,7 @@
   
     #messages {
       list-style-type: none;
-      margin: 0;
-      padding: 10px 0 0 0;
+      margin: 60px 0 0 0;
     }
   
     #messages li {
@@ -57,23 +55,31 @@
     }
 
     #clear-button {
-      padding: 10px;
       border-radius: 5px;
       color: #d24336;
+    }
+
+    .header {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
+      box-shadow: 0 0 5px 5px #c3c3c3;
     }
   </style>
 </head>
 
 <body>
-  <form action="">
-    <input
-      id="get-job-costs-button"
-      autocomplete="off"
-      placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'"
-    />
-    <button>Get job costs</button>
-  </form>
-  <button id="clear-button">Clear page</button>
+  <div class="header">
+    <form action="">
+      <input id="get-job-costs-button" autocomplete="off"
+        placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
+      <button>Get job costs</button>
+    </form>
+    <button id="clear-button">Clear page</button>
+  </div>
   <ul id="messages"></ul>
 
   <script src="/socket.io/socket.io.js"></script>
