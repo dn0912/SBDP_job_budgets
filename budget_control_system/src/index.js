@@ -183,7 +183,7 @@ app.get('/ping', (req, res) => res.status(200).json({
 /* Example curls:
 curl -X POST http://localhost:8080/start-tracing
 curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world"}'
-curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world", "appId": "helloWorld"}'
+curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world", "appId": "helloWorld", "budgetLimit": "0.0248"}'
 */
 /**
  * start serverless big data processing tracing endpoint
@@ -206,7 +206,11 @@ app.post('/stop', () => {
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)
 
-app.get('/job-status/:jobId', controller.getJobStatusRouteHandler)
+app.get('/get-app-info/:appId', controller.getRegisteredApp)
+
+app.get('/get-job-info/:jobId', controller.getJobRecord)
+
+app.get('/job-status/:jobId', controller.getJobStatusRouteHandler(eventEmitter))
 
 app.get('/live-job-status', (req, res) => {
   console.log('+++req.query', req.query)

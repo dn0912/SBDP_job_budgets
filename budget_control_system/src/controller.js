@@ -412,18 +412,38 @@ export const getJobStatus = async ({
   }
 }
 
-const getJobStatusRouteHandler = async (req, res) => {
+const getJobStatusRouteHandler = (eventBus) => async (req, res) => {
   const { jobId, appId = '' } = req.params
 
   console.log('+++jobId', { jobId, appId })
 
-  const jobCostDetails = await getJobStatus({ jobId })
+  const jobCostDetails = await getJobStatus({ jobId, eventBus })
 
   res.status(HttpStatus.OK).json(jobCostDetails)
+}
+
+const getRegisteredApp = async (req, res) => {
+  const { appId } = req.params
+  console.log('+++appId', appId)
+
+  const registeredApp = await appRegisterStore.get(appId)
+
+  res.status(HttpStatus.OK).json(registeredApp)
+}
+
+const getJobRecord = async (req, res) => {
+  const { jobId } = req.params
+  console.log('+++jobId', jobId)
+
+  const jobRecord = await jobTraceStore.get(jobId)
+
+  res.status(HttpStatus.OK).json(jobRecord)
 }
 
 export default {
   registerApp,
   startTracing,
   getJobStatusRouteHandler,
+  getRegisteredApp,
+  getJobRecord,
 }
