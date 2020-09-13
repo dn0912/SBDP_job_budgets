@@ -45,7 +45,7 @@
     #messages {
       list-style-type: none;
       margin: 0;
-      padding: 0;
+      padding: 10px 0 0 0;
     }
   
     #messages li {
@@ -56,9 +56,10 @@
       background: #eee;
     }
 
-    #test-button {
+    #clear-button {
       padding: 10px;
       border-radius: 5px;
+      color: #d24336;
     }
   </style>
 </head>
@@ -72,7 +73,7 @@
     />
     <button>Get job costs</button>
   </form>
-  <button id="test-button">Test</button>
+  <button id="clear-button">Clear page</button>
   <ul id="messages"></ul>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -132,8 +133,9 @@
 
     const socket = io();
 
-    $('#test-button').click(function () {
+    $('#clear-button').click(function () {
       socket.emit('test-event', 'hello-world');
+      location.reload();
     });
 
     socket.on('connect', () => {
