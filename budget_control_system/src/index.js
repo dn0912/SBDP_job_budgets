@@ -8,6 +8,7 @@ import moment from 'moment'
 import fs from 'fs'
 import multer from 'multer'
 import Redis from 'ioredis'
+import events from 'events'
 
 import JobTraceStore from './service/job-trace-store/dynamo'
 import AppRegisterDynamoDB from './service/app-register-store/dynamo'
@@ -44,6 +45,7 @@ console.log('REDIS VARS:', {
 const jobTraceStore = new JobTraceStore()
 const priceList = new PriceList()
 const tracer = new Tracer()
+const eventEmitter = new events.EventEmitter()
 
 async function fetchTracePeriodically(dateNow, jobId) {
   // TODO: to measure trace fetching delay
@@ -99,6 +101,23 @@ const app = express()
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
 
+function _getRoomsByUser(id) {
+  const usersRooms = []
+  const { rooms } = io.sockets.adapter
+
+  // eslint-disable-next-line
+  for (let room in rooms) {
+    if (rooms.hasOwnProperty(room)) {
+      const { sockets } = rooms[room]
+      if (id in sockets) {
+        usersRooms.push(room)
+      }
+    }
+  }
+
+  return usersRooms
+}
+
 io.on('connect', (socket) => {
   console.log('socket io connection')
 
@@ -112,12 +131,38 @@ io.on('connect', (socket) => {
     const jobRecord = await jobTraceStore.get(jobId)
 
     if (jobRecord) {
-      const jobCostsDetails = await getJobStatus(jobId)
+      const jobCostsDetails = await getJobStatus(eventEmitter, jobId)
       io.emit('return-job-trace-data', jobCostsDetails)
     } else {
-      
       io.emit('no-job-found', jobId)
     }
+  })
+
+  socket.on('subscribe', (jobId) => {
+    console.log(`+++join room of jobId: ${jobId}`)
+    socket.join(jobId)
+    console.log(socket.id + " now in rooms ", _getRoomsByUser(socket.id))
+  })
+
+  socket.on('unsubscribe', (jobId) => {
+    console.log(`+++leave room of jobId: ${jobId}`)
+    socket.leave(jobId)
+  })
+
+  socket.on('test-event', (arg) => {
+    console.log(arg)
+    io.in('63b51cca-fe39-4b9e-be23-3d9b49bb916c').clients((err, clients) => {
+      console.log('+++clients', clients)
+    })
+  })
+})
+
+eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
+  console.log('+++eventEmitter.addListener', jobId, jobCost)
+  io.emit('stream-job-costs', {
+    ...jobCost,
+    jobId,
+    hello: 'world',
   })
 })
 
@@ -150,7 +195,7 @@ curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/j
  *
  * @returns {object}
 */
-app.post('/start-tracing', controller.startTracing)
+app.post('/start-tracing', controller.startTracing(eventEmitter))
 
 /**
  * stop serverless big data processing tracing endpoint

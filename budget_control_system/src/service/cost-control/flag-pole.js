@@ -27,7 +27,7 @@ export default class FlagPoleService extends Redis {
     this.notifier = notifier
   }
 
-  async isInBudgetLimit(currentCost = 0) {
+  async isInBudgetLimit(currentCost = 0, skipNotifying = false) {
     if (this.budgetLimit === 0) {
       return true
     }
@@ -42,7 +42,10 @@ export default class FlagPoleService extends Redis {
 
         const msgSubject = `Job ${this.jobId} reached budget limit`
         const msgContent = `Job with ID: ${this.jobId} reached budget limit of ${this.budgetLimit}$`
-        this.notifier.publish(msgSubject, msgContent)
+        if (!skipNotifying) {
+          console.log('+++send sns notification')
+          this.notifier.publish(msgSubject, msgContent)
+        }
       }
 
       return false

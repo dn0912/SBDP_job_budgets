@@ -64,6 +64,8 @@
     <button>Get job costs</button>
   </form>
 
+  <button id="test-button">Test</button>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
@@ -71,28 +73,23 @@
         var socket = io();
         $('form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
-          const inputVal = $('#get-job-costs-button').val()
-          socket.emit('get-job-trace-data', inputVal);
+          const inputJobId = $('#get-job-costs-button').val()
+          socket.emit('get-job-trace-data', inputJobId);
+          socket.emit('subscribe', inputJobId)
+
+          // clear input
           $('#get-job-costs-button').val('');
 
-          $('#messages').append($('<li>').text(`Fetching data from job ID ${inputVal} ...`));
+          $('#messages').append($('<li>').text(`Fetching data from job ID ${inputJobId} ...`));
           return false;
         });
       });
 
-    const socket = io();
-
-    socket.on('connect', () => {
-      $('#messages').append($('<li>').text('Ready'));
-    });
-
-    socket.on('disconnect', () => {
-      $('#messages').append($('<li>').text('Disconnected'));
-    });
-
-    socket.on('return-job-trace-data', function (jobCostsDetails) {
+    function displayJobCostsContent(jobCostsDetails) {
       console.log('+++jobCostsDetails', jobCostsDetails)
-      const { lambdaPrices,
+      const {
+        jobId,
+        lambdaPrices,
         sqsPrices,
         s3Prices,
         totalJobPrice,
@@ -104,8 +101,40 @@
       const s3PricesListItem = `<strong>S3 price:</strong> ${s3Prices}   `
       const totalJobPriceListItem = `<strong>Total job price (in nano $):</strong> ${totalJobPrice}   `
       const totalJobPriceInUSDListItem = `<strong>Total job price in $:</strong> ${totalJobPriceInUSD}   `
+      const jobIdListItem = `<strong>Job ID:</strong> ${jobId}   `
 
-      $('#messages').append('<li>' + lambdaPricesListItem + sqsPricesListItem + s3PricesListItem + totalJobPriceInUSDListItem + totalJobPriceInUSDListItem + '</li>');
+      $('#messages').append('<li>'
+        + jobCostsDetails.iterationNumber + ' - '
+        + lambdaPricesListItem
+        + sqsPricesListItem
+        + s3PricesListItem
+        + totalJobPriceListItem
+        + totalJobPriceInUSDListItem
+        + jobIdListItem
+        + '</li>');
+    };
+
+    const socket = io();
+
+    $('#test-button').click(function () {
+      socket.emit('test-event', 'hello-world');
+    });
+
+    socket.on('connect', () => {
+      $('#messages').append($('<li>').text('Ready'));
+    });
+
+    socket.on('disconnect', () => {
+      $('#messages').append($('<li>').text('Disconnected'));
+    });
+
+    socket.on('stream-job-costs', function(jobCostsDetails) {
+      console.log('+++stream-job-costs')
+      displayJobCostsContent(jobCostsDetails)
+    })
+
+    socket.on('return-job-trace-data', function (jobCostsDetails) {
+      displayJobCostsContent(jobCostsDetails)
     });
 
     socket.on('no-job-found', function (jobId) {

@@ -15,8 +15,6 @@ export default class Tracer {
     this.xray = XRay
   }
 
-  // startTracing() {}
-
   async getXRayTraces(traceIds) {
     console.log('+++xray', this.xray)
     const param = {

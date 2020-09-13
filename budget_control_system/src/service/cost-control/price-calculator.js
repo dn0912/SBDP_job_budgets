@@ -166,10 +166,10 @@ class PriceCalculator {
 
     const s3Totalprice = storagePrice + requestAndDataRetrievalsPrice
 
-    // console.log('+++s3Totalprice', {
-    //   storagePrice,
-    //   requestAndDataRetrievalsPrice,
-    // })
+    console.log('+++s3Totalprice', {
+      storagePrice,
+      requestAndDataRetrievalsPrice,
+    })
 
     // nano USD
     return Number(`${s3Totalprice}e9`)

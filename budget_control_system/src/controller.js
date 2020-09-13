@@ -204,6 +204,8 @@ const calculateJobCostsFromRedis = async ({
   queueMap,
   jobStartTime,
   budgetLimit = 0,
+  eventBus,
+  skipNotifying,
 }) => {
   const lambdaPrices = await getLambdaTraceAndCalculatePrice(priceCalculator, jobId)
   const sqsPrices = await getSqsTraceAndCalculatePrice(priceCalculator, jobId, queueMap)
@@ -218,7 +220,7 @@ const calculateJobCostsFromRedis = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
-  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD)
+  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD, skipNotifying)
 
   const result = {
     iterationNumber,
@@ -246,9 +248,11 @@ const calculateJobCostsFromRedis = async ({
   const testFlag = await redisTracerCache.get(`TEST_FLAG#####${jobId}`)
   console.log('+++testFlag', testFlag)
 
-  if (testFlag > 2) {
-    await redisTracerCache.set(`flag_${jobId}`, budgetLimit)
-  }
+  // if (testFlag > 2) {
+  //   await redisTracerCache.set(`flag_${jobId}`, budgetLimit)
+  // }
+
+  eventBus.emit('job-costs-calculated', jobId, result)
 
   return result
 }
@@ -265,7 +269,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
   //   resolve()
   // }, 1000))
 
-  while (counter.value < 30) {
+  while (counter.value < 300) {
     // console.log('++++++++++++++++++++++++++++++++++++')
     // console.log('+++counter.value', counter.value)
     // eslint-disable-next-line no-await-in-loop
@@ -294,7 +298,7 @@ const initPriceCalculator = async () => {
   return priceCalculator
 }
 
-const startTracing = async (req, res) => {
+const startTracing = (eventBus) => async (req, res) => {
   console.log('+++req.body', req.body)
   const jobId = uuid.v4()
   let jobUrl = process.env.TEMP_JOB_URL
@@ -314,6 +318,7 @@ const startTracing = async (req, res) => {
   // TODO: set budget limit beforehand
   const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
 
+  // store job details
   const dateNow = Date.now()
   await jobTraceStore.put({
     jobId,
@@ -348,6 +353,7 @@ const startTracing = async (req, res) => {
     flagPole,
     queueMap: registeredSqsQueuesMap,
     budgetLimit,
+    eventBus,
   })
 
   res.status(HttpStatus.OK).json({
@@ -358,7 +364,7 @@ const startTracing = async (req, res) => {
   })
 }
 
-export const getJobStatus = async (jobId, appId = '') => {
+export const getJobStatus = async (eventBus, jobId, appId = '') => {
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = appId ? await appRegisterStore.get(appId) : {}
 
@@ -379,6 +385,8 @@ export const getJobStatus = async (jobId, appId = '') => {
     priceCalculator,
     flagPole,
     queueMap: registeredSqsQueuesMap,
+    eventBus,
+    skipNotifying: true,
   })
 
   return {
