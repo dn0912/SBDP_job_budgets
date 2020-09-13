@@ -172,7 +172,7 @@ class PriceCalculator {
     })
 
     // nano USD
-    return Number(`${s3Totalprice}e9`)
+    return s3Totalprice * 10 ** 9
   }
 }
 
