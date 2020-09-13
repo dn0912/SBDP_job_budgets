@@ -61,6 +61,30 @@ module.exports = class AWSTracer {
   //   }
   // }
 
+  traceS3GetObject(fn) {
+    return async (...args) => {
+      const result = await fn(...args)
+      await this.getS3ObjectIsCalled(...args)
+      return result
+    }
+  }
+
+  traceS3PutObject(fn) {
+    return async (...args) => {
+      const result = await fn(...args)
+      await this.putS3ObjectIsCalled(...args)
+      return result
+    }
+  }
+
+  traceSQSSendMessage(fn) {
+    return async (...args) => {
+      const result = await fn(...args)
+      await this.sendSqsMessageIsCalled(...args)
+      return result
+    }
+  }
+
   async checkFlag() {
     const flagStatus = await this.tracerStore.get(createFlagPoleCacheKey(this.jobId))
     if (flagStatus) {
