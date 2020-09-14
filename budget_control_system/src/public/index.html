@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Serverless Big Data Processing Budget Tool</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    body {
+      font: 13px Helvetica, Arial;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    form {
+      background: #5E6772;
+      padding: 3px;
+      width: 100%;
+      border-radius: 5px;
+    }
+  
+    form input {
+      border: 0;
+      padding: 10px;
+      width: 90%;
+      margin-right: 0.5%;
+      border-radius: 5px;
+    }
+  
+    form button {
+      width: 9%;
+      background: rgb(130, 224, 255);
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+    }
+  
+    #messages {
+      list-style-type: none;
+      margin: 60px 0 0 0;
+    }
+  
+    #messages li {
+      padding: 5px 10px;
+    }
+  
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+
+    #clear-button {
+      border-radius: 5px;
+      color: #d24336;
+    }
+
+    .header {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
+      box-shadow: 0 0 5px 5px #c3c3c3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <form action="">
+      <input id="get-job-costs-button" autocomplete="off"
+        placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
+      <button>Get job costs</button>
+    </form>
+    <button id="clear-button">Clear page</button>
+  </div>
+  <ul id="messages"></ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script>
+    $(function () {
+        var socket = io();
+        $('form').submit(function (e) {
+          e.preventDefault(); // prevents page reloading
+          const inputJobId = $('#get-job-costs-button').val()
+          socket.emit('get-job-trace-data', inputJobId);
+          socket.emit('subscribe', inputJobId)
+
+          // clear input
+          $('#get-job-costs-button').val('');
+
+          $('#messages').append($('<li>').text(`Fetching data from job ID ${inputJobId} ...`));
+          return false;
+        });
+      });
+
+    function displayJobCostsContent(jobCostsDetails) {
+      console.log('+++jobCostsDetails', jobCostsDetails)
+      const {
+        jobId,
+        iterationNumber,
+        lambdaPrices,
+        sqsPrices,
+        s3Prices,
+        totalJobPrice,
+        totalJobPriceInUSD,
+        formatedTimePassedSinceJobStart,
+        budgetLimit,
+      } = jobCostsDetails
+
+      const lambdaPricesListItem = `<strong>Lambda n$:</strong> ${lambdaPrices}  `
+      const sqsPricesListItem = `<strong>SQS n$:</strong> ${sqsPrices}  `
+      const s3PricesListItem = `<strong>S3 n$:</strong> ${s3Prices}  `
+      const totalJobPriceListItem = `<strong>Total job price (in nano $):</strong> ${totalJobPrice}  `
+      const totalJobPriceInUSDListItem = `<strong>Total job price in $:</strong> ${totalJobPriceInUSD}  `
+      const jobIdListItem = `<strong>Job ID:</strong> ${jobId}   `
+      const timepassedListItem = `<strong>Time passed:</strong> ${formatedTimePassedSinceJobStart}   `
+      const budgetLimitListItem = `<strong>Job budget:</strong> ${budgetLimit}$   `
+
+      $('#messages').append('<li>'
+        + `${iterationNumber >= 0 ? iterationNumber + ' - ' : ''}`
+        + lambdaPricesListItem
+        + sqsPricesListItem
+        + s3PricesListItem
+        + totalJobPriceListItem
+        + totalJobPriceInUSDListItem
+        + budgetLimitListItem
+        + timepassedListItem
+        + jobIdListItem
+        + '</li>');
+    };
+
+    const socket = io();
+
+    $('#clear-button').click(function () {
+      socket.emit('test-event', 'hello-world');
+      location.reload();
+    });
+
+    socket.on('connect', () => {
+      $('#messages').append($('<li>').text('Ready'));
+    });
+
+    socket.on('disconnect', () => {
+      $('#messages').append($('<li>').text('Disconnected'));
+    });
+
+    socket.on('stream-job-costs', function(jobCostsDetails) {
+      console.log('+++stream-job-costs')
+      displayJobCostsContent(jobCostsDetails)
+    })
+
+    socket.on('return-job-trace-data', function (jobCostsDetails) {
+      displayJobCostsContent(jobCostsDetails)
+    });
+
+    socket.on('no-job-found', function (jobId) {
+      $('#messages').append($('<li>').text(`Job does not exists with job id ${jobId}`))
+    })
+  </script>
+</body>
+
+</html>

@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk'
-// import uuid from 'node-uuid'
+import uuid from 'node-uuid'
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
@@ -10,25 +10,25 @@ AWS.config.update({
   region: process.env.AWS_RESOURCE_REGION,
 })
 
-const dynamoDocClient = new AWS.DynamoDB.DocumentClient()
 // const update = promisify(dynamoDb.update.bind(dynamoDb))
 
+const tableName = 'job-trace-record'
+
 class DynamoDB {
-  constructor(tableName) {
+  constructor() {
     // this.tableName = 'trace-record'
-    this.tableName = tableName
-    this.ddb = dynamoDocClient
+    this.ddb = new AWS.DynamoDB.DocumentClient()
   }
 
-  async put(storeItem) {
+  async put(item) {
     try {
-      // const storeItem = {
-      //   traceId: uuid.v4(),
-      //   hello: 'world',
-      // }
+      const storeItem = {
+        jobId: uuid.v4(),
+        ...item,
+      }
 
       const docClientParams = {
-        TableName: this.tableName,
+        TableName: tableName,
         Item: storeItem,
         ReturnValues: 'ALL_OLD',
       }
@@ -39,17 +39,17 @@ class DynamoDB {
     }
   }
 
-  async get(traceId) {
+  async get(jobId) {
     try {
       const param = {
-        TableName: this.tableName,
+        TableName: tableName,
         Key: {
-          traceId,
+          jobId,
         },
       }
       const dbRecord = await this.ddb.get(param).promise()
       console.log('+++dbRecord', dbRecord)
-      return dbRecord
+      return dbRecord.Item || null
     } catch (err) {
       console.log('err', err)
     }

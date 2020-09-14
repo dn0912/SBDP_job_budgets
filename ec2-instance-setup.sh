@@ -69,6 +69,12 @@ npm i
 
 echo "AWS_RESOURCE_REGION=$AWS_RESOURCE_REGION" >> ~/SBDP_job_budgets/budget_control_system/.env
 
+# set SNS topic arn in .env file
+AWS_ACCOUNT_ID="$(AWS_ACCESS_KEY_ID="$AWS_KEY" AWS_SECRET_ACCESS_KEY="$AWS_SECRET" aws sns list-topics --output text --region "$AWS_RESOURCE_REGION" | grep job-budget-alarm | cut -d ':' -f 5)"
+echo "SNS_TOPIC_ARN=arn:aws:sns:$AWS_RESOURCE_REGION:$AWS_ACCOUNT_ID:job-budget-alarm" >> ~/SBDP_job_budgets/budget_control_system/.env
+
+echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> ~/SBDP_job_budgets/budget_control_system/.env
+
 # start services
 redis-server $REDIS_CONFIG_FILE_PATH &
 REDIS_PASSWORD=$REDIS_PASSWORD npm run start

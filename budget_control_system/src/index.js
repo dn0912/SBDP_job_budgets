@@ -1,17 +1,22 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import http from 'http'
+import socketio from 'socket.io'
 import HttpStatus from 'http-status-codes'
 import { get } from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
 import multer from 'multer'
 import Redis from 'ioredis'
+import events from 'events'
 
-import DynamoDB from './service/trace-store/dynamo'
+import JobTraceStore from './service/job-trace-store/dynamo'
+import AppRegisterDynamoDB from './service/app-register-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import Tracer from './service/tracer'
+import Notifier from './service/notification/notifier'
 
-import controller from './controller'
+import controller, { getJobStatus } from './controller'
 
 import {
   createServiceTracingMap,
@@ -26,6 +31,7 @@ export const {
   REDIS_HOST = '127.0.0.1',
   REDIS_PORT = 6379,
   REDIS_PASSWORD,
+  REDIS_CONNECTION,
 } = process.env
 
 console.log('REDIS VARS:', {
@@ -33,12 +39,13 @@ console.log('REDIS VARS:', {
   REDIS_HOST,
   REDIS_PORT,
   REDIS_PASSWORD,
+  REDIS_CONNECTION,
 })
 
-const traceStore = new DynamoDB('trace-record')
+const jobTraceStore = new JobTraceStore()
 const priceList = new PriceList()
 const tracer = new Tracer()
-// const redisClient = new Redis('redis://')
+const eventEmitter = new events.EventEmitter()
 
 async function fetchTracePeriodically(dateNow, jobId) {
   // TODO: to measure trace fetching delay
@@ -91,6 +98,72 @@ async function fetchTracePeriodically(dateNow, jobId) {
 }
 const upload = multer({ dest: 'uploads/' })
 const app = express()
+const httpServer = http.createServer(app)
+const io = socketio(httpServer)
+
+function _getRoomsByUser(id) {
+  const usersRooms = []
+  const { rooms } = io.sockets.adapter
+
+  // eslint-disable-next-line
+  for (let room in rooms) {
+    if (rooms.hasOwnProperty(room)) {
+      const { sockets } = rooms[room]
+      if (id in sockets) {
+        usersRooms.push(room)
+      }
+    }
+  }
+
+  return usersRooms
+}
+
+io.on('connect', (socket) => {
+  console.log('socket io connection')
+
+  socket.on('disconnect', () => {
+    console.log('disconnected')
+  })
+
+  socket.on('get-job-trace-data', async (jobId) => {
+    console.log('Socket event: get-job-trace-data', { jobId })
+
+    const jobRecord = await jobTraceStore.get(jobId)
+
+    if (jobRecord) {
+      const jobCostsDetails = await getJobStatus({
+        eventBus: eventEmitter,
+        jobId,
+      })
+      // io.emit('return-job-trace-data', jobCostsDetails)
+    } else {
+      io.emit('no-job-found', jobId)
+    }
+  })
+
+  socket.on('subscribe', (jobId) => {
+    console.log(`+++join room of jobId: ${jobId}`)
+    socket.join(jobId)
+    console.log(socket.id + " now in rooms ", _getRoomsByUser(socket.id))
+  })
+
+  socket.on('unsubscribe', (jobId) => {
+    console.log(`+++leave room of jobId: ${jobId}`)
+    socket.leave(jobId)
+  })
+
+  socket.on('test-event', (arg) => {
+    console.log(arg)
+    io.in('63b51cca-fe39-4b9e-be23-3d9b49bb916c').clients((err, clients) => {
+      console.log('+++clients', clients)
+    })
+  })
+})
+
+eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
+  console.log('+++eventEmitter.addListener', jobId, jobCost)
+  io.emit('stream-job-costs', { ...jobCost, jobId })
+})
 
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -110,17 +183,18 @@ app.get('/ping', (req, res) => res.status(200).json({
 /* Example curls:
 curl -X POST http://localhost:8080/start-tracing
 curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world"}'
+curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "hello:world", "appId": "helloWorld", "budgetLimit": "0.0248"}'
 */
 /**
  * start serverless big data processing tracing endpoint
  *
  * @param {string} jobUrl - start endpoint of the serverless big data processing job
  * @param {string} appId - to read app configuration from store for pricing calculation
- * @param {string} jobBudget - max budget of big data processing app
+ * @param {string} budgetLimit - max budget of big data processing app
  *
  * @returns {object}
 */
-app.post('/start-tracing', controller.startTracing)
+app.post('/start-tracing', controller.startTracing(eventEmitter))
 
 /**
  * stop serverless big data processing tracing endpoint
@@ -132,25 +206,33 @@ app.post('/stop', () => {
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)
 
+app.get('/get-app-info/:appId', controller.getRegisteredApp)
+
+app.get('/get-job-info/:jobId', controller.getJobRecord)
+
+app.get('/job-status/:jobId', controller.getJobStatusRouteHandler(eventEmitter))
+
+app.get('/live-job-status', (req, res) => {
+  console.log('+++req.query', req.query)
+  res.sendFile(`${__dirname}/public/index.html`)
+})
+
 // **************
 // TEST ROUTES!?!
 
 // Redis
 app.post('/redis-test', async (req, res) => {
   console.log('+++data', req.body)
-  // const test = await redisClient.set('hello', 'world')
-  // console.log('+++test', test)
 
-  // const test2 = await redisClient.get('hello')
-  // console.log('+++test2', test2)
-
-  const ec2RedisClient = new Redis({
-    port: REDIS_PORT, // Redis port
-    host: REDIS_HOST, // Redis host
-    family: 4, // 4 (IPv4) or 6 (IPv6)
-    password: REDIS_PASSWORD,
-    db: 0,
-  })
+  const ec2RedisClient = REDIS_CONNECTION
+    ? new Redis(REDIS_CONNECTION)
+    : new Redis({
+      port: REDIS_PORT, // Redis port
+      host: REDIS_HOST, // Redis host
+      family: 4, // 4 (IPv4) or 6 (IPv6)
+      password: REDIS_PASSWORD,
+      db: 0,
+    })
   const test = await ec2RedisClient.set('hello', 'world')
   console.log('+++test', test)
   const test2 = await ec2RedisClient.get('hello')
@@ -163,17 +245,56 @@ app.post('/redis-test', async (req, res) => {
 // AWS DynamoDB
 app.post('/test-put-db', async (req, res) => {
   console.log('+++data', req.body)
-  const createdItem = await traceStore.put('test')
+  const createdItem = await jobTraceStore.put({ hello: 'world' })
   console.log('+++createdItem', createdItem)
   res.status(HttpStatus.CREATED).json({
     hello: 'world'
   })
 })
 
-app.get('/test-get-db', async (req, res) => {
-  const createdItem = await traceStore.get()
+app.get('/test-get-db/:id', async (req, res) => {
+  const { id } = req.params
+  const createdItem = await jobTraceStore.get(id)
   console.log('+++createdItem', createdItem)
   res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+app.get('/test-get-app/:appId', async (req, res) => {
+  const { appId } = req.params
+  const appRegisterStore = new AppRegisterDynamoDB()
+  const app = await appRegisterStore.get(appId)
+  console.log('+++app', app)
+  res.status(HttpStatus.OK).json({
+    hello: 'world'
+  })
+})
+
+// AWS SNS
+// curl -X POST http://localhost:8080/test-subscribe-sns -H "Content-Type: application/json" -d '{"mail": "abc@def.com"}'
+app.post('/test-subscribe-sns', async (req, res) => {
+  console.log('+++data', req.body)
+  const requestBody = JSON.parse(req.body)
+  const { mail } = requestBody
+  const notifier = new Notifier()
+
+  await notifier.subscribe(mail)
+
+  console.log('++++ YOU NEED TO CONFIRM EMAIL')
+
+  res.status(HttpStatus.CREATED).json({
+    hello: '++++ YOU NEED TO CONFIRM EMAIL'
+  })
+})
+
+app.post('/test-publish-sns', async (req, res) => {
+  console.log('+++data', req.body)
+  const notifier = new Notifier()
+
+  await notifier.publish('hello', 'world')
+
+  res.status(HttpStatus.CREATED).json({
     hello: 'world'
   })
 })
@@ -338,7 +459,7 @@ app.get('/test-job-tracing-summary/:jobStartTime/:jobId', async (req, res) => {
 // TEST ROUTES!?!
 // **************
 
-app.listen(
+httpServer.listen(
   port,
   () => console.log(`App listening at http://localhost:${port}`),
 )

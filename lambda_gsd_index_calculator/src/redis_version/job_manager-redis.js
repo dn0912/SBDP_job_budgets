@@ -1,11 +1,10 @@
-const TracedAWS = require('service-cost-tracer')
+const AWS = require('aws-sdk')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
-
-const awsTracerWithRedis = new AWSTracerWithRedis()
-
-const lambda = new TracedAWS.Lambda()
-
 const { promisify } = require('util')
+
+const awsTracerWithRedis = new AWSTracerWithRedis(process)
+
+const lambda = new AWS.Lambda()
 
 const invokeLambda = promisify(lambda.invoke).bind(lambda)
 
@@ -34,12 +33,10 @@ const slowDown = async (ms) => {
 */
 module.exports.startJob = async (event, context) => {
   // *******
-  // TRACING
+  // TRACING with Redis
   const eventBody = JSON.parse(event.body)
   const { jobId } = eventBody
-  const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
 
-  // with Redis
   await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
@@ -64,7 +61,7 @@ module.exports.startJob = async (event, context) => {
       jobId,
     }
     return invokeLambda({
-      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
+      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess-with-redis',
       InvocationType: 'Event',
       Payload: JSON.stringify(payload),
     })
@@ -76,9 +73,7 @@ module.exports.startJob = async (event, context) => {
   // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
   await slowDown(3000)
 
-  // TRACING
-  TracedAWS.stopLambdaTracer(lambdaSubsegment)
-  // with redis
+  // TRACING with redis
   await awsTracerWithRedis.stopLambdaTracer()
 
   return {

@@ -69,6 +69,7 @@ const s3FileSizeTracer = function (fileContent, jobId) {
 }
 
 AWS.S3.prototype.tracedPutObject = function (params, jobId, callback) {
+  console.log('+++tracedPutObject')
   const fileContent = params.Body
   s3FileSizeTracer(fileContent, jobId)
   return this.putObject(params, callback)

@@ -1,7 +1,4 @@
 const TracedAWS = require('service-cost-tracer')
-const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
-
-const awsTracerWithRedis = new AWSTracerWithRedis()
 
 const lambda = new TracedAWS.Lambda()
 
@@ -39,10 +36,6 @@ module.exports.startJob = async (event, context) => {
   const { jobId } = eventBody
   const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
 
-  // with Redis
-  await awsTracerWithRedis.startLambdaTracer(event, context)
-  // *******
-
   console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)
   console.log(`## CONTEXT: ${serialize(context)}`)
   console.log(`## EVENT: ${serialize(event)}`)
@@ -56,15 +49,13 @@ module.exports.startJob = async (event, context) => {
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
-  await slowDown(2000)
-
   const promises = inputArray.map((fileName) => {
     const payload = {
       fileName,
       jobId,
     }
     return invokeLambda({
-      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
+      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess-with-xray',
       InvocationType: 'Event',
       Payload: JSON.stringify(payload),
     })
@@ -73,13 +64,10 @@ module.exports.startJob = async (event, context) => {
   const result = await Promise.all(promises)
   console.log('+++result', result)
 
-  // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
-  await slowDown(3000)
+  await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
   // TRACING
   TracedAWS.stopLambdaTracer(lambdaSubsegment)
-  // with redis
-  await awsTracerWithRedis.stopLambdaTracer()
 
   return {
     statusCode: 200,

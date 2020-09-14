@@ -13,6 +13,12 @@
     "aws-xray-sdk": "^3.1.0",
     "aws-xray-sdk-core": "^3.1.0",
     "moment": "^2.26.0",
-    "service-cost-tracer": "file:../service_cost_tracer"
+    "service-cost-tracer": "file:../service_cost_tracer",
+    "service-cost-tracer-with-redis": "file:../service_cost_tracer_with_redis"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0"
   }
 }

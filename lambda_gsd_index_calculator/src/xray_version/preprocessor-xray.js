@@ -1,10 +1,11 @@
-const { BUCKET, FILE, SUBRESULT_FOLDER, REGION, QUEUE_NAME } = process.env
+const {
+  BUCKET, SUBRESULT_FOLDER, REGION, QUEUE_NAME,
+} = process.env
 
-const AWSXRay = require('aws-xray-sdk-core')
-const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const TracedAWS = require('service-cost-tracer')
 
 const moment = require('moment')
+
 const tracedS3 = new TracedAWS.S3()
 
 const tracedSQS = new TracedAWS.SQS({
@@ -21,7 +22,7 @@ const tracedSendMessage = promisify(tracedSQS.tracedSendMessage).bind(tracedSQS)
 // simulate slow function
 const _slowDown = async (ms) => {
   console.log(`+++Take it easy!?! ${ms} ms`)
-  await new Promise(resolve => setTimeout(resolve, ms))
+  await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const _readFile = async (fileName) => {
@@ -31,27 +32,32 @@ const _readFile = async (fileName) => {
   }
 
   const data = await getS3Object(params)
+
   return data.Body.toString('utf-8')
 }
 
 const _putFile = async (fileContent, jobId) => {
   const currentTimeStamp = moment().valueOf()
+
+  console.log('+++currentTimeStamp', currentTimeStamp)
   const fileName = `${currentTimeStamp}_processedUpdates.json`
   const params = {
     Bucket: BUCKET,
     Key: `${SUBRESULT_FOLDER}/${fileName}`,
     Body: JSON.stringify(fileContent),
   }
+  console.log('+++tracedPutObject')
   await tracedPutObject(params, jobId)
+  console.log('+++awsTracerWithRedis.putS3ObjectIsCalled')
 
   return fileName
 }
 
 // TODO:
 const _filterUnnecessaryUpdates = (tasksUpdateArray) => {
-  const filteredTaskUpdateArray = tasksUpdateArray.filter(updateEntry =>
+  const filteredTaskUpdateArray = tasksUpdateArray.filter((updateEntry) =>
     updateEntry['OldImage']['statusId'] !== updateEntry['NewImage']['statusId'])
-  
+
   return filteredTaskUpdateArray
 }
 
@@ -59,11 +65,15 @@ module.exports.readAndFilterFile = async (event, context) => {
   console.log('+++event', JSON.stringify(event, undefined, 2))
   console.log('+++context', context)
   try {
-    const jobId = event.jobId
+    console.log('+++event+++', event)
+    // DO NOT USE object destructuring --
+    // somehow does not work and exits lambda: const { jobId } = event
+    const { jobId } = event
+    console.log('+++jobId+++', jobId)
     // Tracing
     const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
 
-    const inputFileName = (event && event.fileName) || FILE
+    const inputFileName = (event && event.fileName)
     const s3FileContentAsString = await _readFile(inputFileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
     const cleanTaskUpdates = _filterUnnecessaryUpdates(s3FileContent)
@@ -72,7 +82,7 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     console.log('+++fileName', fileName)
 
-    const accountId = context.invokedFunctionArn.split(":")[4]
+    const accountId = context.invokedFunctionArn.split(':')[4]
     const queueUrl = `https://sqs.${REGION}.amazonaws.com/${accountId}/${QUEUE_NAME}`
 
     const messageBody = {

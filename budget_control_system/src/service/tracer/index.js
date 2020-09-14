@@ -8,14 +8,12 @@ AWS.config.update({
 
 const XRay = new AWS.XRay()
 
-const serialize = (object) => JSON.stringify(object, null, 2)
+// const serialize = (object) => JSON.stringify(object, null, 2)
 
 export default class Tracer {
   constructor() {
     this.xray = XRay
   }
-
-  // startTracing() {}
 
   async getXRayTraces(traceIds) {
     console.log('+++xray', this.xray)
@@ -28,7 +26,7 @@ export default class Tracer {
   }
 
   async getXRayTraceSummaries(startTime, endTime, jobId) {
-    // console.log('+++getXRayTraceSummaries', { startTime, endTime, passedSec: endTime - startTime })
+    // console.log('+++getXRayTraceSum', { startTime, endTime, passedSec: endTime - startTime })
     const FilterExpression = jobId ? `annotation.jobId = "${jobId}"` : ''
     const param = {
       StartTime: startTime,

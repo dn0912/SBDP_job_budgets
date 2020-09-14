@@ -8,6 +8,39 @@
 
 ## Setup EC2 instance with Redis and job budget application
 
+### Create DynamoDB tables
+```bash
+aws dynamodb create-table \
+    --table-name app-register-store \
+    --attribute-definitions \
+        AttributeName=appId,AttributeType=S \
+    --key-schema \
+        AttributeName=appId,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --profile [PROFILE] \
+    --region [AWS_REGION]
+
+aws dynamodb create-table \
+    --table-name job-trace-record \
+    --attribute-definitions \
+        AttributeName=jobId,AttributeType=S \
+    --key-schema \
+        AttributeName=jobId,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --profile [PROFILE] \
+    --region [AWS_REGION]
+```
+
+### Create SNS topics for notification purpose
+```bash
+aws sns create-topic \
+    --name job-budget-alarm \
+    --profile [PROFILE] \
+    --region [AWS_REGION]
+```
+
 ### Create security group per AWS CLI
 ```bash
 # Create security group

@@ -1,21 +1,21 @@
 const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
-const TracedAWS = require('service-cost-tracer')
+const AWS = require('aws-sdk')
 
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-const awsTracerWithRedis = new AWSTracerWithRedis()
+const awsTracerWithRedis = new AWSTracerWithRedis(process)
 
 const moment = require('moment')
 const { promisify } = require('util')
 
-const s3 = new TracedAWS.S3()
+const s3 = new AWS.S3()
 
 const getS3Object = awsTracerWithRedis.traceS3GetObject(
   promisify(s3.getObject).bind(s3),
 )
-const tracedPutObject = awsTracerWithRedis.traceS3PutObject(
-  promisify(s3.tracedPutObject).bind(s3),
+const putS3Object = awsTracerWithRedis.traceS3PutObject(
+  promisify(s3.putObject).bind(s3),
 )
 
 // TODO: remove later
@@ -36,7 +36,7 @@ const readFile = async (fileName) => {
   return data.Body.toString('utf-8')
 }
 
-const putFile = async (fileContent, jobId) => {
+const putFile = async (fileContent) => {
   const currentmTimeStamp = moment().valueOf()
   const fileName = `${currentmTimeStamp}_gsd_calculated.json`
   const params = {
@@ -44,8 +44,7 @@ const putFile = async (fileContent, jobId) => {
     Key: `${PIPELINE_RESULT_FOLDER}/${fileName}`,
     Body: JSON.stringify(fileContent),
   }
-  await tracedPutObject(params, jobId)
-  console.log('+++awsTracerWithRedis.putS3ObjectIsCalled')
+  await putS3Object(params)
 
   return fileName
 }
@@ -106,10 +105,7 @@ module.exports.handler = async (event, context) => {
   const { fileName } = eventBody
 
   // *******
-  // Tracing
-  const { jobId } = eventBody
-  const lambdaSubsegment = TracedAWS.startLambdaTracer(context, jobId)
-  // with Redis
+  // Tracing with Redis
   await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
@@ -124,8 +120,8 @@ module.exports.handler = async (event, context) => {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
   }
-  // s3FileSizeTracer(jobId, fileContent)
-  const resultFileName = await putFile(fileContent, jobId)
+
+  const resultFileName = await putFile(fileContent)
 
   // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
 
@@ -143,9 +139,7 @@ module.exports.handler = async (event, context) => {
 
   console.log('+++response', response)
 
-  // TRACING
-  TracedAWS.stopLambdaTracer(lambdaSubsegment)
-  // with redis
+  // TRACING with redis
   await awsTracerWithRedis.stopLambdaTracer()
 
   return response

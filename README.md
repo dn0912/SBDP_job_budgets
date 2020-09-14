@@ -6,11 +6,13 @@ Follow those steps to setup necessary AWS resources and this project with the pr
 
 To use the scripts you need the [AWS CLI](https://aws.amazon.com/cli/) installed on your machine.
 
-### 1. Setup AWS resources (Security group, EC2, S3 bucket with generated test data)
+### 1. Setup AWS resources (Security group, EC2, S3 bucket with generated test data, SNS topic, DynamoDb tables)
 ```bash
+# chmod script to be executable
 chmod 755 ./aws-resource-setup.sh
+
+# execute script and follow instructions of that script
 ./aws-resource-setup.sh
-# Follow instructions of that script
 ```
 
 ### 2. Setup EC2 with Redis and this project
