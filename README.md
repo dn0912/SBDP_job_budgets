@@ -57,7 +57,13 @@ keys * # should print out "hello" key
 get hello # should print out "world"
 ```
 
-### 4. Deploy Serverless Big Data Processing application and start tracing job
+### 4. Edit serverless.yml of Serverless Big Data Processing application with Redis env vars
+
+In `./lambda_gsd_index_calculator/serverless.yml`
+
+Edit `REDIS_HOST: xx.xxx.xx.xxx` and `REDIS_CONNECTION: 'redis://:redis-password@xx.xxx.xx.xxx:6379'` with your `EC2 Public IPv4 address`
+
+### 5. Deploy Serverless Big Data Processing application and start tracing job
 
 To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first and then:
 
@@ -69,6 +75,9 @@ npm i
 sls deploy --aws-profile [PROFILE] # get `start-job` function endpoint (https://xxxxxx.amazonaws.com/dev/start-job)
 ```
 
+
+Visit `http://<EC2 Public address>:<PORT>/live-job-status` (Default port *3000*) to see continuous cost tracing (or trough output console logs of EC2 instance)
+
 Start serverless data processing through tracing app:
 
 ```bash
@@ -78,8 +87,6 @@ curl -X POST http://<your EC2 public endpoint>:3000/start-tracing -H "Content-Ty
 # e.g:
 curl -X POST ec2-18-192-00-00.eu-central-1.compute.amazonaws.com:3000/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "https://17d8y00000.execute-api.eu-central-1.amazonaws.com/dev/start-job", "budgetLimit": 0.0248}'
 ```
-
-See continuous cost tracing trough output console logs of EC2 instance.
 
 
 

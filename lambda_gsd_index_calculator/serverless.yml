@@ -12,10 +12,10 @@ custom:
   S3_FILE: test_pretty.json
   S3_FILE_5TASKS: test_5tasks.json
   S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
-  REDIS_HOST: '18.192.55.33' # either pass HOST, PORT and PASSWORD or through REDIS_CONNECTION
+  REDIS_HOST: '18.156.33.173' # either pass HOST, PORT and PASSWORD or through REDIS_CONNECTION
   REDIS_PORT: 6379
   REDIS_PASSWORD: 'redis-password'
-  REDIS_CONNECTION: 'redis://:redis-password@18.192.55.33:6379' # necessary for tracer to store in Redis
+  REDIS_CONNECTION: 'redis://:redis-password@18.156.33.173:6379' # necessary for tracer to store in Redis
 
 provider:
   name: aws
