@@ -92,22 +92,22 @@ const app = express()
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
 
-function _getRoomsByUser(id) {
-  const usersRooms = []
-  const { rooms } = io.sockets.adapter
+// function _getRoomsByUser(id) {
+//   const usersRooms = []
+//   const { rooms } = io.sockets.adapter
 
-  // eslint-disable-next-line
-  for (let room in rooms) {
-    if (rooms.hasOwnProperty(room)) {
-      const { sockets } = rooms[room]
-      if (id in sockets) {
-        usersRooms.push(room)
-      }
-    }
-  }
+//   // eslint-disable-next-line
+//   for (let room in rooms) {
+//     if (rooms.hasOwnProperty(room)) {
+//       const { sockets } = rooms[room]
+//       if (id in sockets) {
+//         usersRooms.push(room)
+//       }
+//     }
+//   }
 
-  return usersRooms
-}
+//   return usersRooms
+// }
 
 io.on('connect', (socket) => {
   console.log('socket io connection')
@@ -122,7 +122,7 @@ io.on('connect', (socket) => {
     const jobRecord = await jobTraceStore.get(jobId)
 
     if (jobRecord) {
-      const jobCostsDetails = await getJobStatus({
+      await getJobStatus({
         eventBus: eventEmitter,
         jobId,
       })
@@ -135,7 +135,7 @@ io.on('connect', (socket) => {
   socket.on('subscribe', (jobId) => {
     console.log(`+++join room of jobId: ${jobId}`)
     socket.join(jobId)
-    console.log(socket.id + " now in rooms ", _getRoomsByUser(socket.id))
+    // console.log(`${socket.id} now in rooms `, _getRoomsByUser(socket.id))
   })
 
   socket.on('unsubscribe', (jobId) => {
@@ -208,6 +208,7 @@ app.get('/live-job-status', (req, res) => {
   res.sendFile(`${__dirname}/public/index.html`)
 })
 
+// TODO: will be removed, just test routes
 initiateTestRoutes({
   app,
   jobTraceStore,

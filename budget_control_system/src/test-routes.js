@@ -25,7 +25,6 @@ export default ({
   priceList,
   tracer,
 }) => {
-  console.log('++++++++afdasd')
   const testRoutes = [
     app.get('/hello', (req, res) => res.status(200).json({
       pong: 'Hello kfkfkk!',
