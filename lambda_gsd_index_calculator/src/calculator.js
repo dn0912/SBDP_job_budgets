@@ -2,10 +2,6 @@ const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
 const TracedAWS = require('service-cost-tracer')
 
-// TracedAWS.config.update({
-//   maxRetries: 0
-// })
-
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
 const awsTracerWithRedis = new AWSTracerWithRedis()
@@ -15,9 +11,12 @@ const { promisify } = require('util')
 
 const s3 = new TracedAWS.S3()
 
-const getS3Object = promisify(s3.getObject).bind(s3)
-const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
-// const tracedPutObject = awsTracerWithRedis.myWrapper(promisify(s3.putObject).bind(s3))
+const getS3Object = awsTracerWithRedis.traceS3GetObject(
+  promisify(s3.getObject).bind(s3),
+)
+const tracedPutObject = awsTracerWithRedis.traceS3PutObject(
+  promisify(s3.tracedPutObject).bind(s3),
+)
 
 // TODO: remove later
 // simulate slow function
@@ -33,7 +32,6 @@ const readFile = async (fileName) => {
   }
 
   const data = await getS3Object(params)
-  await awsTracerWithRedis.getS3ObjectIsCalled()
 
   return data.Body.toString('utf-8')
 }
@@ -48,7 +46,6 @@ const putFile = async (fileContent, jobId) => {
   }
   await tracedPutObject(params, jobId)
   console.log('+++awsTracerWithRedis.putS3ObjectIsCalled')
-  await awsTracerWithRedis.putS3ObjectIsCalled(params)
 
   return fileName
 }

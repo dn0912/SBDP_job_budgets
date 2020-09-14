@@ -11,8 +11,12 @@ const { promisify } = require('util')
 
 const s3 = new AWS.S3()
 
-const getS3Object = promisify(s3.getObject).bind(s3)
-const putS3Object = promisify(s3.putObject).bind(s3)
+const getS3Object = awsTracerWithRedis.traceS3GetObject(
+  promisify(s3.getObject).bind(s3),
+)
+const putS3Object = awsTracerWithRedis.traceS3PutObject(
+  promisify(s3.putObject).bind(s3),
+)
 
 // TODO: remove later
 // simulate slow function
@@ -28,7 +32,6 @@ const readFile = async (fileName) => {
   }
 
   const data = await getS3Object(params)
-  await awsTracerWithRedis.getS3ObjectIsCalled()
 
   return data.Body.toString('utf-8')
 }
@@ -42,8 +45,6 @@ const putFile = async (fileContent) => {
     Body: JSON.stringify(fileContent),
   }
   await putS3Object(params)
-  console.log('+++awsTracerWithRedis.putS3ObjectIsCalled')
-  await awsTracerWithRedis.putS3ObjectIsCalled(params)
 
   return fileName
 }
@@ -113,14 +114,16 @@ module.exports.handler = async (event, context) => {
 
   const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)
 
+  await slowDown(2000)
+
   const fileContent = {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
   }
-  // s3FileSizeTracer(jobId, fileContent)
+
   const resultFileName = await putFile(fileContent)
 
-  await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
+  // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
 
   const response = {
     statusCode: 200,
@@ -131,6 +134,8 @@ module.exports.handler = async (event, context) => {
       resultFileName,
     }),
   }
+
+  await slowDown(2000)
 
   console.log('+++response', response)
 

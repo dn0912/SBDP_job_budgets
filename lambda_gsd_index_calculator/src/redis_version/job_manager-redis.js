@@ -53,6 +53,8 @@ module.exports.startJob = async (event, context) => {
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
   ]
 
+  await slowDown(2000)
+
   const promises = inputArray.map((fileName) => {
     const payload = {
       fileName,
@@ -68,7 +70,8 @@ module.exports.startJob = async (event, context) => {
   const result = await Promise.all(promises)
   console.log('+++result', result)
 
-  await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
+  // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
+  await slowDown(3000)
 
   // TRACING with redis
   await awsTracerWithRedis.stopLambdaTracer()

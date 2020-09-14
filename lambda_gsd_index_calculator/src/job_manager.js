@@ -1,10 +1,6 @@
 const TracedAWS = require('service-cost-tracer')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-// TracedAWS.config.update({
-//   maxRetries: 0
-// })
-
 const awsTracerWithRedis = new AWSTracerWithRedis()
 
 const lambda = new TracedAWS.Lambda()
