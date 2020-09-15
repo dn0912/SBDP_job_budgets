@@ -231,7 +231,7 @@ redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel
 
   console.log('+++command', command)
 
-  if (command === 'set') {
+  if (command === 'set' && message.startsWith('arn:aws:lambda')) {
     const redisTsValue = await redisClient.get(message)
     const passedTime = moment.utc().valueOf() - redisTsValue
     console.log('+++passedTimeSinceTrace', redisTsValue, passedTime)

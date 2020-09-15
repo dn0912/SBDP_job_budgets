@@ -1,6 +1,8 @@
 const moment = require('moment')
 const Redis = require('ioredis')
 
+const BudgetError = require('./budget-error')
+
 // Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
 const CACHE_KEY_PREFIX = 'tracer_'
 
@@ -91,7 +93,7 @@ module.exports = class AWSTracer {
     const flagStatus = await this.tracerStore.get(createFlagPoleCacheKey(this.jobId))
     if (flagStatus) {
       // process.exit(0)
-      throw new Error(`Job budget of ${flagStatus}$ exceeded`)
+      throw new BudgetError(`Job budget of ${flagStatus}$ exceeded`)
     }
 
     // TODO: for testing purpose only
