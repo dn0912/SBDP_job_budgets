@@ -50,6 +50,8 @@ module.exports = class AWSTracer {
     this.lambdaTraceInfo = {
       lambdaStartTime: null,
       lambdaMemoryAllocationInMB: null,
+      lambdaFunctionName: null,
+      lambdaInvokedFunctionArn: null,
     }
   }
 
@@ -103,6 +105,8 @@ module.exports = class AWSTracer {
   async startLambdaTracer(event, context) {
     this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
     this.lambdaTraceInfo.lambdaMemoryAllocationInMB = context.memoryLimitInMB
+    this.lambdaTraceInfo.lambdaFunctionName = context.functionName
+    this.lambdaTraceInfo.lambdaInvokedFunctionArn = context.invokedFunctionArn
 
     console.log('+++redis lambdaStartTime+++', this.lambdaTraceInfo.lambdaStartTime)
 
@@ -126,10 +130,6 @@ module.exports = class AWSTracer {
 
     console.log('+++this.jobId+++', this.jobId)
 
-    // console.log('+++ STOP HERE1')
-    // this.currentRunningProcess.exit()
-    // console.log('+++ STOP HERE2')
-
     await this.checkFlag()
   }
 
@@ -137,14 +137,21 @@ module.exports = class AWSTracer {
     console.log('+++redis stopLambdaTracer+++')
 
     const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
-    const processingTime = (moment.utc().valueOf() - this.lambdaTraceInfo.lambdaStartTime) / 1000
+    const stopLambdaTs = moment.utc().valueOf()
+    const processingTime = (stopLambdaTs - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
 
     await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
+
+    // TODO: for evaluation of redis speed
+    await this.tracerStore.set(`${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
     await this.checkFlag()
   }
 
+  /**
+   * For intermediate budget checking in lambda code.
+   */
   async checkForBudget() {
     console.log('+++redis stopLambdaTracer+++')
 

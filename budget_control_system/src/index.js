@@ -85,7 +85,7 @@ io.on('connect', (socket) => {
 })
 
 eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
-  console.log('+++eventEmitter.addListener', jobId, jobCost)
+  // console.log('+++eventEmitter.addListener', jobId, jobCost)
   io.emit('stream-job-costs', { ...jobCost, jobId })
 })
 

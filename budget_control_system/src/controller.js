@@ -217,12 +217,23 @@ const redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
   })
 
 // redisKeyspaceNotificationSubscriberClient.on('ready', () => {
-  redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
+  // redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
 // })
 
-redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@*__:*')
-redisKeyspaceNotificationSubscriberClient.on('pmessage', (pattern, channel, message) => {
+redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
+
+redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:*')
+redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
   console.log('+++channel, message', { pattern, channel, message })
+  const command = channel.split(':')[1]
+
+  console.log('+++command', command)
+
+  if (command === 'set') {
+    const redisTsValue = await redisTracerCache.get(message)
+    const passedTime = moment.utc().valueOf() - redisTsValue
+    console.log('+++passedTimeSinceTrace', redisTsValue, passedTime)
+  }
 })
 
 const initPriceCalculator = async () => {
