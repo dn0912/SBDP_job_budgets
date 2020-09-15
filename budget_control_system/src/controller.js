@@ -28,20 +28,10 @@ const redisParams = {
   REDIS_CONNECTION,
 }
 
-const priceList = new PriceList()
 const appRegisterStore = new AppRegisterStore()
 const jobTraceStore = new JobTraceStore()
 const xrayTracer = new XRayTracer()
 const redisTracer = new RedisTracer(redisParams)
-const redisTracerCache = REDIS_CONNECTION
-  ? new Redis(REDIS_CONNECTION)
-  : new Redis({
-    port: REDIS_PORT,
-    host: REDIS_HOST,
-    family: 4,
-    password: REDIS_PASSWORD,
-    db: 0,
-  })
 
 const notifier = new Notifier()
 
@@ -73,7 +63,7 @@ const registerApp = async (req, res) => {
   res.status(HttpStatus.CREATED).json(createdItem)
 }
 
-const calculateJobCosts = async ({
+const calculateJobCostsWithXRay = async ({
   jobStartTime,
   jobId,
   priceCalculator,
@@ -121,14 +111,14 @@ const calculateJobCostsFromRedis = async ({
   eventBus,
   skipNotifying,
 }) => {
-  const lambdaTrace = await redisTracer.getLambdaTraceAndCalculatePrice(jobId)
+  const lambdaTrace = await redisTracer.getLambdaTrace(jobId)
   const lambdaPrices = priceCalculator.calculateLambdaPrice(lambdaTrace, true)
 
-  const sqsTrace = await redisTracer.getSqsTraceAndCalculatePrice(jobId, queueMap)
+  const sqsTrace = await redisTracer.getSqsTrace(jobId, queueMap)
   const { standard, fifo } = sqsTrace
   const sqsPrices = priceCalculator.calculateSqsPrice(standard, fifo, true)
 
-  const s3Trace = await redisTracer.getS3TraceAndCalculatePrice(jobId)
+  const s3Trace = await redisTracer.getS3Trace(jobId)
   const s3Prices = priceCalculator.calculateS3Price(s3Trace, true)
 
   console.log('+++pricingFromRedis', {
@@ -168,11 +158,11 @@ const calculateJobCostsFromRedis = async ({
   })
 
   // TODO: for testing purpose only
-  const testFlag = await redisTracerCache.get(`TEST_FLAG#####${jobId}`)
+  const testFlag = await redisTracer.get(`TEST_FLAG#####${jobId}`)
   console.log('+++testFlag', testFlag)
 
   // if (testFlag > 2) {
-  //   await redisTracerCache.set(`flag_${jobId}`, budgetLimit)
+  //   await redisTracer.set(`flag_${jobId}`, budgetLimit)
   // }
 
   eventBus.emit('job-costs-calculated', jobId, result)
@@ -199,7 +189,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
       iterationNumber: counter.value,
     }
 
-    // calculateJobCosts(args)
+    // calculateJobCostsWithXRay(args)
     calculateJobCostsFromRedis(args)
     counter.value++
   }
@@ -216,8 +206,20 @@ const redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
     db: 0,
   })
 
+const redisClient = REDIS_CONNECTION
+  ? new Redis(REDIS_CONNECTION)
+  : new Redis({
+    port: REDIS_PORT,
+    host: REDIS_HOST,
+    family: 4,
+    password: REDIS_PASSWORD,
+    db: 0,
+  })
+
 // redisKeyspaceNotificationSubscriberClient.on('ready', () => {
-  // redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
+// redisKeyspaceNotificationSubscriberClient.config(
+//   'set', 'notify-keyspace-events', 'KEA',
+// )
 // })
 
 redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
@@ -230,13 +232,14 @@ redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel
   console.log('+++command', command)
 
   if (command === 'set') {
-    const redisTsValue = await redisTracerCache.get(message)
+    const redisTsValue = await redisClient.get(message)
     const passedTime = moment.utc().valueOf() - redisTsValue
     console.log('+++passedTimeSinceTrace', redisTsValue, passedTime)
   }
 })
 
 const initPriceCalculator = async () => {
+  const priceList = new PriceList()
   const lambdaPricing = await priceList.getLambdaPricing()
   const sqsPricing = await priceList.getSQSPricing()
   const s3Pricing = await priceList.getS3Pricing()

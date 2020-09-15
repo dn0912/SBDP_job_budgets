@@ -89,6 +89,10 @@ eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
   io.emit('stream-job-costs', { ...jobCost, jobId })
 })
 
+eventEmitter.addListener('start-job', (jobId) => {
+
+})
+
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
 
