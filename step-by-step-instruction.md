@@ -124,6 +124,17 @@ redis-server --version
 ```
 
 ### Manually start Redis server and job budget application
+
+You can use the `./start-app-script.sh` script to startup the Redis server and the NodeJS app with following command:
+
+```bash
+# to make script executable
+chmod 755 start-app-script.sh
+
+./start-app-script.sh
+```
+
+Start redis services and app individually:
 ```bash
 redis-server /home/ubuntu/redis-stable/redis.conf &
 

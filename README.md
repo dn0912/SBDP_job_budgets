@@ -94,9 +94,18 @@ curl -X POST ec2-18-192-00-00.eu-central-1.compute.amazonaws.com:3000/start-trac
 ## Additional info:
 A [step-by-step instruction](./step-by-step-instruction.md) to setup all AWS resources and more informations can be found [here](./step-by-step-instruction.md).
 
+### If you closed the Redis server and NodeJS app you can restart those services by running:
+
+```bash
+# to make script executable
+chmod 755 start-app-script.sh
+
+./start-app-script.sh
+```
+
 ### Troubleshoot: Find your AWS access key, AWS secret, AWS Default region and Redis password on your EC2 instance
 
-``` 
+```bash
 cat ~/.aws/credentials
 
 cat ~/SBDP_job_budgets/budget_control_system/.env
