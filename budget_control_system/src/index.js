@@ -2,18 +2,17 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import http from 'http'
 import socketio from 'socket.io'
-import { get } from 'lodash'
-import moment from 'moment'
-import fs from 'fs'
 import multer from 'multer'
 import events from 'events'
 
 import JobTraceStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
-import Tracer from './service/tracer'
+import XRayTracer from './service/tracer/xray-tracer'
 
 import controller, { getJobStatus } from './controller'
 import initiateTestRoutes from './test-routes'
+
+// import { _getRoomsByUser } from './utils'
 
 const port = process.env.PORT || 3000
 
@@ -35,79 +34,13 @@ console.log('REDIS VARS:', {
 
 const jobTraceStore = new JobTraceStore()
 const priceList = new PriceList()
-const tracer = new Tracer()
+const xRayTracer = new XRayTracer()
 const eventEmitter = new events.EventEmitter()
 
-async function fetchTracePeriodically(dateNow, jobId) {
-  // TODO: to measure trace fetching delay
-  const pollPeriodinMs = 200
-  const counter = {
-    value: 0,
-  }
-
-  // delay it for 1 sec
-  await new Promise((resolve) => setTimeout(() => {
-    console.log('#### wait for 1 sec')
-    resolve()
-  }, 1000))
-  while (counter.value < 30) {
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
-    const startTime = dateNow / 1000
-    const endTime = Date.now() / 1000
-    // eslint-disable-next-line no-await-in-loop
-    const traceSummary = await tracer.getXRayTraceSummaries(startTime, endTime, jobId)
-
-    const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
-
-    console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
-
-    const currentTimeStamp = moment.utc().valueOf()
-    console.log('+++currentTimeStamp', currentTimeStamp)
-
-    const traceResult = {
-      jobStartTimeStamp: dateNow,
-      arn: get(traceSummary, 'TraceSummaries[0].ResourceARNs[0].ARN', undefined),
-      traceCloseTimeStamp: traceCloseTimeStampAnnotation,
-      currentTimeStamp,
-      elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
-    }
-
-    console.log('+++traceSummary.TraceSummaries', traceSummary.TraceSummaries)
-
-    // TODO: remove break statement => only for first fetch to record trace delay
-    counter.value++
-    if (traceSummary.TraceSummaries.length > 0) {
-      console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
-      fs.appendFileSync(
-        'traceFetchingDelays.csv',
-        `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
-      )
-      break
-    }
-  }
-}
 const upload = multer({ dest: 'uploads/' })
 const app = express()
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
-
-// function _getRoomsByUser(id) {
-//   const usersRooms = []
-//   const { rooms } = io.sockets.adapter
-
-//   // eslint-disable-next-line
-//   for (let room in rooms) {
-//     if (rooms.hasOwnProperty(room)) {
-//       const { sockets } = rooms[room]
-//       if (id in sockets) {
-//         usersRooms.push(room)
-//       }
-//     }
-//   }
-
-//   return usersRooms
-// }
 
 io.on('connect', (socket) => {
   console.log('socket io connection')
@@ -135,7 +68,7 @@ io.on('connect', (socket) => {
   socket.on('subscribe', (jobId) => {
     console.log(`+++join room of jobId: ${jobId}`)
     socket.join(jobId)
-    // console.log(`${socket.id} now in rooms `, _getRoomsByUser(socket.id))
+    // console.log(`${socket.id} now in rooms `, _getRoomsByUser(io, socket.id))
   })
 
   socket.on('unsubscribe', (jobId) => {
@@ -213,7 +146,7 @@ initiateTestRoutes({
   app,
   jobTraceStore,
   priceList,
-  tracer,
+  tracer: xRayTracer,
 })
 
 httpServer.listen(
