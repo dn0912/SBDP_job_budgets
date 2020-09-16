@@ -226,15 +226,13 @@ redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events'
 
 redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:*')
 redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
-  console.log('+++channel, message', { pattern, channel, message })
+  // console.log('+++channel, message', { pattern, channel, message })
   const command = channel.split(':')[1]
-
-  console.log('+++command', command)
 
   if (command === 'set' && message.startsWith('arn:aws:lambda')) {
     const redisTsValue = await redisClient.get(message)
     const passedTime = moment.utc().valueOf() - redisTsValue
-    console.log('+++passedTimeSinceTrace', redisTsValue, passedTime)
+    console.log('+++passedTimeSinceTraceInRedis', redisTsValue, passedTime)
   }
 })
 
@@ -360,6 +358,21 @@ export const getJobStatus = async ({
   }
 }
 
+const subscribeToBudgetAlarm = async (req, res) => {
+  console.log('+++data', req.body)
+  const requestBody = JSON.parse(req.body)
+  const { mail } = requestBody
+  const notifier = new Notifier()
+
+  await notifier.subscribe(mail)
+
+  console.log('++++ YOU NEED TO CONFIRM EMAIL')
+
+  res.status(HttpStatus.CREATED).json({
+    Note: 'YOU NEED TO CONFIRM EMAIL SUBSCRIPTION.'
+  })
+}
+
 const getJobStatusRouteHandler = (eventBus) => async (req, res) => {
   const { jobId, appId = '' } = req.params
 
@@ -394,4 +407,5 @@ export default {
   getJobStatusRouteHandler,
   getRegisteredApp,
   getJobRecord,
+  subscribeToBudgetAlarm,
 }
