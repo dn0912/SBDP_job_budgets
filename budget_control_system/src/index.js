@@ -84,9 +84,9 @@ io.on('connect', (socket) => {
   })
 })
 
-eventEmitter.addListener('job-costs-calculated', (jobId, jobCost) => {
+eventEmitter.addListener('job-costs-calculated', (jobId, jobCostResult) => {
   // console.log('+++eventEmitter.addListener', jobId, jobCost)
-  io.emit('stream-job-costs', { ...jobCost, jobId })
+  io.emit('stream-job-costs', { ...jobCostResult, jobId })
 })
 
 eventEmitter.addListener('start-job', (jobId) => {
@@ -119,6 +119,7 @@ curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/j
  * @param {string} jobUrl - start endpoint of the serverless big data processing job
  * @param {string} appId - to read app configuration from store for pricing calculation
  * @param {string} budgetLimit - max budget of big data processing app
+ * @param {number} periodInSec - how long the system should should poll for trace and calculate the job price - in seconds
  *
  * @returns {object}
 */

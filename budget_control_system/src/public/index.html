@@ -68,6 +68,17 @@
       z-index: 1;
       box-shadow: 0 0 5px 5px #c3c3c3;
     }
+
+    table {
+      border-spacing: 5px 10px;
+    }
+
+    #messages-table tr {
+      padding: 5px;
+    }
+    #messages-table tr:nth-child(odd) {
+      background: #eee;
+    }
   </style>
 </head>
 
@@ -81,6 +92,24 @@
     <button id="clear-button">Clear page</button>
   </div>
   <ul id="messages"></ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Lambda n$</th>
+        <th>SQS n$</th>
+        <th>S3 n$</th>
+        <th>Total job price (in nano $)</th>
+        <th>Total job price in $</th>
+        <th>Job budget</th>
+        <th>Time passed</th>
+        <th>Job ID</th>
+        <th>Meta data</th>
+      </tr>
+    </thead>
+    <tbody id="messages-table">
+    </tbody>
+  </table>
+
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -113,7 +142,10 @@
         totalJobPriceInUSD,
         formatedTimePassedSinceJobStart,
         budgetLimit,
+        metaData = {},
       } = jobCostsDetails
+
+      const { awsService = '', additionalData = '' } = metaData
 
       const lambdaPricesListItem = `<strong>Lambda n$:</strong> ${lambdaPrices}  `
       const sqsPricesListItem = `<strong>SQS n$:</strong> ${sqsPrices}  `
@@ -124,17 +156,31 @@
       const timepassedListItem = `<strong>Time passed:</strong> ${formatedTimePassedSinceJobStart}   `
       const budgetLimitListItem = `<strong>Job budget:</strong> ${budgetLimit}$   `
 
-      $('#messages').append('<li>'
-        + `${iterationNumber >= 0 ? iterationNumber + ' - ' : ''}`
-        + lambdaPricesListItem
-        + sqsPricesListItem
-        + s3PricesListItem
-        + totalJobPriceListItem
-        + totalJobPriceInUSDListItem
-        + budgetLimitListItem
-        + timepassedListItem
-        + jobIdListItem
-        + '</li>');
+      // $('#messages').append('<li>'
+      //   + `${iterationNumber >= 0 ? iterationNumber + ' - ' : ''}`
+      //   + lambdaPricesListItem
+      //   + sqsPricesListItem
+      //   + s3PricesListItem
+      //   + totalJobPriceListItem
+      //   + totalJobPriceInUSDListItem
+      //   + budgetLimitListItem
+      //   + timepassedListItem
+      //   + jobIdListItem
+      //   + '</li>');
+
+      const metaDataText = typeof iterationNumber === 'number' ? `Iteration: ${iterationNumber}` : `${awsService} - ${additionalData}`
+
+      $('#messages-table').append('<tr>'
+        + '<td>' + lambdaPrices + '</td>'
+        + '<td>' + sqsPrices + '</td>'
+        + '<td>' + s3Prices + '</td>'
+        + '<td>' + totalJobPrice + '</td>'
+        + '<td>' + totalJobPriceInUSD + '</td>'
+        + '<td>' + budgetLimit + '</td>'
+        + '<td>' + formatedTimePassedSinceJobStart + '</td>'
+        + '<td>' + jobId + '</td>'
+        + '<td>' + metaDataText + '</td>'
+      )
     };
 
     const socket = io();

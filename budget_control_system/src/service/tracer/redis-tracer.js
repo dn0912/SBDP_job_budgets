@@ -2,7 +2,7 @@ import Redis from 'ioredis'
 import { get, set } from 'lodash'
 
 // Key format: tracer_{jobId}#{serviceType}#{serviceMethod}
-const REDIS_CACHE_KEY_PREFIX = 'tracer_'
+export const REDIS_CACHE_KEY_PREFIX = 'tracer_'
 export default class RedisTracer extends Redis {
   constructor(redisConfig) {
     const {

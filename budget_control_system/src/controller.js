@@ -10,7 +10,7 @@ import AppRegisterStore from './service/app-register-store/dynamo'
 import JobTraceStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import XRayTracer from './service/tracer/xray-tracer'
-import RedisTracer from './service/tracer/redis-tracer'
+import RedisTracer, { REDIS_CACHE_KEY_PREFIX } from './service/tracer/redis-tracer'
 import PriceCalculator from './service/cost-control/price-calculator'
 import FlagPoleService from './service/cost-control/flag-pole'
 import Notifier from './service/notification/notifier'
@@ -32,8 +32,8 @@ const appRegisterStore = new AppRegisterStore()
 const jobTraceStore = new JobTraceStore()
 const xrayTracer = new XRayTracer()
 const redisTracer = new RedisTracer(redisParams)
-
 const notifier = new Notifier()
+const flagPole = new FlagPoleService(redisParams, notifier)
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
@@ -67,8 +67,8 @@ const calculateJobCostsWithXRay = async ({
   jobStartTime,
   jobId,
   priceCalculator,
-  flagPole,
   iterationNumber,
+  budgetLimit,
 }) => {
   const startTime = parseInt(jobStartTime, 10) / 1000
   const allTraceSegments = await xrayTracer.getFullTrace(jobId, startTime)
@@ -85,12 +85,12 @@ const calculateJobCostsWithXRay = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
-  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD)
+  const isInBudgetLimit = await flagPole.isInBudgetLimit(jobId, budgetLimit, totalJobPriceInUSD)
 
   console.log('+++totalJobPrice in Nano USD', {
     iteration: iterationNumber,
     isInBudgetLimit,
-    'Budget limit': flagPole.getBudgetLimit(),
+    'Budget limit': budgetLimit,
     'Time passed since job start': (Date.now() / 1000) - startTime,
     'Lambda total price': lambdaPrices,
     'SQS total price': sqsPrices,
@@ -103,14 +103,15 @@ const calculateJobCostsWithXRay = async ({
 const calculateJobCostsFromRedis = async ({
   jobId,
   priceCalculator,
-  flagPole,
-  iterationNumber = 0,
+  iterationNumber,
   queueMap,
   jobStartTime,
   budgetLimit = 0,
   eventBus,
   skipNotifying,
+  metaData,
 }) => {
+  console.log('+++calculateJobCostsFromRedis iterationNumber', iterationNumber)
   const lambdaTrace = await redisTracer.getLambdaTrace(jobId)
   const lambdaPrices = priceCalculator.calculateLambdaPrice(lambdaTrace, true)
 
@@ -130,7 +131,12 @@ const calculateJobCostsFromRedis = async ({
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
 
-  const isInBudgetLimit = await flagPole.isInBudgetLimit(totalJobPriceInUSD, skipNotifying)
+  const isInBudgetLimit = await flagPole.isInBudgetLimit(
+    jobId,
+    budgetLimit,
+    totalJobPriceInUSD,
+    skipNotifying,
+  )
 
   const startTime = parseInt(jobStartTime, 10) / 1000
   const timePassedSinceJobStartInSec = parseFloat((Date.now() / 1000) - startTime).toFixed(2)
@@ -144,6 +150,7 @@ const calculateJobCostsFromRedis = async ({
     totalJobPriceInUSD,
     formatedTimePassedSinceJobStart: moment.utc(timePassedSinceJobStartInSec * 1000).format('HH:mm:ss.SSS'),
     budgetLimit,
+    metaData,
   }
 
   console.log('+++totalJobPriceFromRedis in Nano USD', {
@@ -170,7 +177,8 @@ const calculateJobCostsFromRedis = async ({
   return result
 }
 
-async function calculateJobCostsPeriodically(passedArgs) {
+async function calculateJobCostsPeriodically(passedArgs, periodInSecCalculation) {
+  const counterThreshold = (periodInSecCalculation * 1000) / 500
   const pollPeriodinMs = 500
   const counter = { value: 0 }
 
@@ -180,7 +188,7 @@ async function calculateJobCostsPeriodically(passedArgs) {
   //   resolve()
   // }, 1000))
 
-  while (counter.value < 30) {
+  while (counter.value < counterThreshold) {
     // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
 
@@ -196,6 +204,15 @@ async function calculateJobCostsPeriodically(passedArgs) {
 }
 
 // TODO: *** Redis Keyspace notification
+const redisClient = REDIS_CONNECTION
+  ? new Redis(REDIS_CONNECTION)
+  : new Redis({
+    port: REDIS_PORT,
+    host: REDIS_HOST,
+    family: 4,
+    password: REDIS_PASSWORD,
+    db: 0,
+  })
 const redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
   ? new Redis(REDIS_CONNECTION)
   : new Redis({
@@ -206,35 +223,15 @@ const redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
     db: 0,
   })
 
-const redisClient = REDIS_CONNECTION
-  ? new Redis(REDIS_CONNECTION)
-  : new Redis({
-    port: REDIS_PORT,
-    host: REDIS_HOST,
-    family: 4,
-    password: REDIS_PASSWORD,
-    db: 0,
-  })
-
-// redisKeyspaceNotificationSubscriberClient.on('ready', () => {
-// redisKeyspaceNotificationSubscriberClient.config(
-//   'set', 'notify-keyspace-events', 'KEA',
-// )
-// })
+// // redisKeyspaceNotificationSubscriberClient.on('ready', () => {
+// // redisKeyspaceNotificationSubscriberClient.config(
+// //   'set', 'notify-keyspace-events', 'KEA',
+// // )
+// // })
 
 redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
 
 redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:*')
-redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
-  // console.log('+++channel, message', { pattern, channel, message })
-  const command = channel.split(':')[1]
-
-  if (command === 'set' && message.startsWith('arn:aws:lambda')) {
-    const redisTsValue = await redisClient.get(message)
-    const passedTime = moment.utc().valueOf() - redisTsValue
-    console.log('+++passedTimeSinceTraceInRedis', redisTsValue, passedTime)
-  }
-})
 
 const initPriceCalculator = async () => {
   const priceList = new PriceList()
@@ -256,19 +253,19 @@ const startTracing = (eventBus) => async (req, res) => {
   let jobUrl = process.env.TEMP_JOB_URL
   let budgetLimit = 0.025
   let appId
+  let periodInSecCalculation
 
   if (!isEmpty(req.body)) {
     const requestBody = JSON.parse(req.body)
     jobUrl = get(requestBody, 'jobUrl', jobUrl)
     budgetLimit = Number(get(requestBody, 'budgetLimit', budgetLimit))
     appId = get(requestBody, 'appId')
+    periodInSecCalculation = get(requestBody, 'periodInSec')
+    console.log('+++requestBody', requestBody, periodInSecCalculation)
   }
 
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
-
-  // TODO: set budget limit beforehand
-  const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
 
   // store job details
   const dateNow = Date.now()
@@ -279,6 +276,44 @@ const startTracing = (eventBus) => async (req, res) => {
     appId,
     jobStartTime: dateNow,
   })
+
+  if (!periodInSecCalculation) {
+    redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
+      console.log('+++channel, message', { pattern, channel, message })
+      const redisCommand = channel.split(':')[1]
+
+      // TODO: only for speed evaluation
+      if (redisCommand === 'set' && message.startsWith('arn:aws:lambda')) {
+        const redisTsValue = await redisClient.get(message)
+        const passedTime = moment.utc().valueOf() - redisTsValue
+        console.log('+++passedTimeSinceTraceInRedis', redisTsValue, passedTime)
+      }
+
+      // every operation on the trace store
+      if (message.startsWith(`${REDIS_CACHE_KEY_PREFIX}${jobId}`)) {
+        console.log('+++every operation on the trace store', { pattern, channel, message })
+
+        // message format e.g.
+        // tracer_356fe48b-d3c1-4be1-ac10-1d764a7612e3#s3#putObject
+        const [
+          cacheKeyPrefix,
+          jobId,
+          awsService,
+          additionalData,
+        ] = message.split(/[_|#]+/)
+
+        calculateJobCostsFromRedis({
+          jobStartTime: dateNow,
+          jobId,
+          priceCalculator,
+          queueMap: registeredSqsQueuesMap,
+          budgetLimit,
+          eventBus,
+          metaData: { awsService, additionalData },
+        })
+      }
+    })
+  }
 
   // TRIGGER THE JOB
   const response = await superagent
@@ -297,16 +332,18 @@ const startTracing = (eventBus) => async (req, res) => {
 
   console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
 
-  // fetchTracePeriodically(xRayTracer, dateNow, jobId)
-  calculateJobCostsPeriodically({
-    jobStartTime: dateNow,
-    jobId,
-    priceCalculator,
-    flagPole,
-    queueMap: registeredSqsQueuesMap,
-    budgetLimit,
-    eventBus,
-  })
+  console.log('+++periodInSecCalculation', typeof periodInSecCalculation)
+  if (typeof periodInSecCalculation === 'number') {
+    // fetchTracePeriodically(xRayTracer, dateNow, jobId)
+    calculateJobCostsPeriodically({
+      jobStartTime: dateNow,
+      jobId,
+      priceCalculator,
+      queueMap: registeredSqsQueuesMap,
+      budgetLimit,
+      eventBus,
+    }, periodInSecCalculation)
+  }
 
   res.status(HttpStatus.OK).json({
     jobUrl,
@@ -329,8 +366,6 @@ export const getJobStatus = async ({
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
   console.log('+++jobRecord', jobRecord)
 
-  const flagPole = new FlagPoleService(jobId, budgetLimit, redisParams, notifier)
-
   const {
     lambdaPrices,
     sqsPrices,
@@ -340,7 +375,6 @@ export const getJobStatus = async ({
   } = await calculateJobCostsFromRedis({
     jobId,
     priceCalculator,
-    flagPole,
     queueMap: registeredSqsQueuesMap,
     eventBus,
     skipNotifying: true,

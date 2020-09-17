@@ -3,7 +3,7 @@ import Redis from 'ioredis'
 const createFlagPoleCacheKey = (jobId) => `flag_${jobId}`
 
 export default class FlagPoleService extends Redis {
-  constructor(jobId, budgetLimit, {
+  constructor({
     REDIS_HOST,
     REDIS_PORT,
     REDIS_PASSWORD,
@@ -21,27 +21,25 @@ export default class FlagPoleService extends Redis {
       })
     }
 
-    this.budgetLimit = budgetLimit
-    this.jobId = jobId
     this.isFlagSwitched = false
     this.notifier = notifier
   }
 
-  async isInBudgetLimit(currentCost = 0, skipNotifying = false) {
-    if (this.budgetLimit === 0) {
+  async isInBudgetLimit(jobId, budgetLimit, currentCost = 0, skipNotifying = false) {
+    if (budgetLimit === 0) {
       return true
     }
 
-    if (currentCost > this.budgetLimit) {
+    if (currentCost > budgetLimit) {
       console.log('+++currentCost', currentCost)
-      console.log('+++isInBudgetLimit', await this.get(this.jobId))
+      console.log('+++isInBudgetLimit', await this.get(jobId))
 
       if (!this.isFlagSwitched) {
-        this.set(createFlagPoleCacheKey(this.jobId), this.budgetLimit)
+        this.set(createFlagPoleCacheKey(jobId), budgetLimit)
         this.isFlagSwitched = true
 
-        const msgSubject = `Job ${this.jobId} reached budget limit`
-        const msgContent = `Job with ID: ${this.jobId} reached budget limit of ${this.budgetLimit}$`
+        const msgSubject = `Job ${jobId} reached budget limit`
+        const msgContent = `Job with ID: ${jobId} reached budget limit of ${budgetLimit}$`
         if (!skipNotifying) {
           console.log('+++send sns notification')
           this.notifier.publish(msgSubject, msgContent)
@@ -52,9 +50,5 @@ export default class FlagPoleService extends Redis {
     }
 
     return true
-  }
-
-  getBudgetLimit() {
-    return this.budgetLimit
   }
 }
