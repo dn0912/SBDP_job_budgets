@@ -107,7 +107,7 @@ app.use(bodyParser.text({
 }))
 
 // for parsing multipart/form-data
-// app.use(express.static('public'))
+app.use(express.static(__dirname + '/public'))
 
 app.get('/ping', (req, res) => res.status(200).json({
   pong: 'Hello world!',
