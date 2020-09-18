@@ -29,9 +29,10 @@
     form input {
       border: 0;
       padding: 10px;
-      width: 90%;
       margin-right: 0.5%;
       border-radius: 5px;
+      width: 100%;
+      font-size: 11px;
     }
   
     form button {
@@ -43,7 +44,7 @@
       color: white;
     }
     .submit-buttons {
-      width: 100px;
+      width: 20%
     }
   
     #messages {
@@ -62,7 +63,7 @@
     #clear-button {
       border-radius: 5px;
       color: #d24336;
-      height: 30px;
+      height: 40px;
     }
 
     .header {
@@ -96,15 +97,18 @@
         placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
       <button class="submit-buttons">Get job costs</button>
     </form>
-    <form name="start-job-and-trace-form" id="start-job-and-trace-form" action="">
-      <input id="start-job-and-trace-jobUrl-input" autocomplete="off"
-        placeholder="Entry point URL of instrumented app" />
+    <form
+      name="start-job-and-trace-form"
+      id="start-job-and-trace-form"
+      action=""
+    >
+      <input id="start-job-and-trace-jobUrl-input" autocomplete="off" placeholder="Entry point URL of instrumented app" />
       <input id="start-job-and-trace-budgetLimit-input" autocomplete="off"
         placeholder="Budget limit of app ($) e.g. 0.0245; Default: 0" />
       <input id="start-job-and-trace-appId-input" autocomplete="off"
-        placeholder="(Opt) - App ID of your uploaded Cloudformation stack" />
+        placeholder="(Opt) - App ID of uploaded Cloudformation stack" />
       <input id="start-job-and-trace-tracePeriod-input" autocomplete="off"
-        placeholder="(Opt) Duration of tracing (in seconds) - fetching trace in 500ms period" />
+        placeholder="(Opt) Tracing duration (in sec) - fetching trace in 500ms period" />
       <button class="submit-buttons">Start job</button>
     </form>
     <button id="clear-button">Clear page</button>
@@ -150,14 +154,14 @@
         $('#start-job-and-trace-form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
           const inputJobUrl = $('#start-job-and-trace-jobUrl-input').val() // TODO:
-          const inputBudgetLimit = $('#start-job-and-trace-budgetLimit-input').val() || 0 // TODO:
+          const inputBudgetLimit = $('#start-job-and-trace-budgetLimit-input').val() || 0
           const inputAppId = $('#start-job-and-trace-appId-input').val()
-          const inputTracePeriod = $('#start-job-and-trace-tracePeriod-input').val() // TODO:
+          const inputTracePeriod = $('#start-job-and-trace-tracePeriod-input').val() || 0
           const additionalData = {
             jobUrl: inputJobUrl,
-            budgetLimit: inputBudgetLimit,
+            budgetLimit: Number(inputBudgetLimit),
             appId: inputAppId,
-            periodInSecCalculation: inputTracePeriod,
+            periodInSec: Number(inputTracePeriod),
           };
 
           console.log('+++additionalData', additionalData)
@@ -241,6 +245,7 @@
 
     socket.on('connect', () => {
       $('#messages').append($('<li>').text('Ready'));
+      $('#messages').append($('<li>').text('To start instrumented sample app use entry point URL: https://3bzyiuknib.execute-api.eu-central-1.amazonaws.com/dev/start-job-with-redis'));
     });
 
     socket.on('disconnect', () => {

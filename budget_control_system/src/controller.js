@@ -154,6 +154,7 @@ const calculateJobCostsFromRedis = async ({
   }
 
   console.log('+++totalJobPriceFromRedis in Nano USD', {
+    jobId,
     iteration: iterationNumber,
     isInBudgetLimit,
     'Time passed since job start': timePassedSinceJobStartInSec,
@@ -332,7 +333,7 @@ export const startTracing = async (eventBus, additionalData) => {
   console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
 
   console.log('+++periodInSecCalculation', typeof periodInSecCalculation)
-  if (typeof periodInSecCalculation === 'number') {
+  if (typeof periodInSecCalculation === 'number' && periodInSecCalculation > 0) {
     // fetchTracePeriodically(xRayTracer, dateNow, jobId)
     calculateJobCostsPeriodically({
       jobStartTime: dateNow,
