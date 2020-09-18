@@ -9,7 +9,7 @@ import JobTraceStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import XRayTracer from './service/tracer/xray-tracer'
 
-import controller, { getJobStatus } from './controller'
+import controller, { getJobStatus, startTracing } from './controller'
 import initiateTestRoutes from './test-routes'
 
 // import { _getRoomsByUser } from './utils'
@@ -63,6 +63,11 @@ io.on('connect', (socket) => {
     } else {
       io.emit('no-job-found', jobId)
     }
+  })
+
+  socket.on('start-job-and-trace', async (data) => {
+    console.log('Socket event: start-job-and-trace', { data })
+    await startTracing(eventEmitter, data)
   })
 
   socket.on('subscribe', (jobId) => {
@@ -123,7 +128,7 @@ curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/j
  *
  * @returns {object}
 */
-app.post('/start-tracing', controller.startTracing(eventEmitter))
+app.post('/start-tracing', controller.startTracingRouteHandler(eventEmitter))
 
 /**
  * stop serverless big data processing tracing endpoint

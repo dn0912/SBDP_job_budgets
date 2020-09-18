@@ -18,10 +18,12 @@
     }
   
     form {
+      display: flex;
       background: #5E6772;
       padding: 3px;
       width: 100%;
       border-radius: 5px;
+      height: 40px;
     }
   
     form input {
@@ -40,10 +42,13 @@
       border-radius: 5px;
       color: white;
     }
+    .submit-buttons {
+      width: 100px;
+    }
   
     #messages {
       list-style-type: none;
-      margin: 60px 0 0 0;
+      margin: 130px 0 0 0;
     }
   
     #messages li {
@@ -57,6 +62,7 @@
     #clear-button {
       border-radius: 5px;
       color: #d24336;
+      height: 30px;
     }
 
     .header {
@@ -67,6 +73,7 @@
       right: 0;
       z-index: 1;
       box-shadow: 0 0 5px 5px #c3c3c3;
+      flex-direction: column;
     }
 
     table {
@@ -84,10 +91,21 @@
 
 <body>
   <div class="header">
-    <form action="">
-      <input id="get-job-costs-button" autocomplete="off"
+    <form name="get-job-status-form" id="get-job-status-form" action="">
+      <input id="get-job-costs-input" autocomplete="off"
         placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
-      <button>Get job costs</button>
+      <button class="submit-buttons">Get job costs</button>
+    </form>
+    <form name="start-job-and-trace-form" id="start-job-and-trace-form" action="">
+      <input id="start-job-and-trace-jobUrl-input" autocomplete="off"
+        placeholder="Entry point URL of instrumented app" />
+      <input id="start-job-and-trace-budgetLimit-input" autocomplete="off"
+        placeholder="Budget limit of app ($) e.g. 0.0245; Default: 0" />
+      <input id="start-job-and-trace-appId-input" autocomplete="off"
+        placeholder="(Opt) - App ID of your uploaded Cloudformation stack" />
+      <input id="start-job-and-trace-tracePeriod-input" autocomplete="off"
+        placeholder="(Opt) Duration of tracing (in seconds) - fetching trace in 500ms period" />
+      <button class="submit-buttons">Start job</button>
     </form>
     <button id="clear-button">Clear page</button>
   </div>
@@ -116,16 +134,47 @@
   <script>
     $(function () {
         var socket = io();
-        $('form').submit(function (e) {
+        $('#get-job-status-form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
-          const inputJobId = $('#get-job-costs-button').val()
+          const inputJobId = $('#get-job-costs-input').val()
           socket.emit('get-job-trace-data', inputJobId);
           socket.emit('subscribe', inputJobId)
 
           // clear input
-          $('#get-job-costs-button').val('');
+          $('#get-job-costs-input').val('');
 
           $('#messages').append($('<li>').text(`Fetching data from job ID ${inputJobId} ...`));
+          return false;
+        });
+
+        $('#start-job-and-trace-form').submit(function (e) {
+          e.preventDefault(); // prevents page reloading
+          const inputJobUrl = $('#start-job-and-trace-jobUrl-input').val() // TODO:
+          const inputBudgetLimit = $('#start-job-and-trace-budgetLimit-input').val() || 0 // TODO:
+          const inputAppId = $('#start-job-and-trace-appId-input').val()
+          const inputTracePeriod = $('#start-job-and-trace-tracePeriod-input').val() // TODO:
+          const additionalData = {
+            jobUrl: inputJobUrl,
+            budgetLimit: inputBudgetLimit,
+            appId: inputAppId,
+            periodInSecCalculation: inputTracePeriod,
+          };
+
+          console.log('+++additionalData', additionalData)
+
+          
+
+          // clear input
+          $('#start-job-and-trace-input').val('');
+
+          if(inputJobUrl) {
+            $('#messages').append($('<li>').text('Starting job...'));
+            $('#messages').append($('<li>').text(`jobUrl: ${inputJobUrl} - budgetLimit: ${inputBudgetLimit} - appId: ${inputAppId} - tracePeriod: ${inputTracePeriod}`));
+            socket.emit('start-job-and-trace', additionalData);
+          } else {
+            $('#messages').append($('<li>').text('Error: Provide job url'));
+          }
+
           return false;
         });
       });

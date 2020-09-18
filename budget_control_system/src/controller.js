@@ -247,22 +247,22 @@ const initPriceCalculator = async () => {
 
 const getRegisteredSqsQueuesMap = async (appId) => (appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {})
 
-const startTracing = (eventBus) => async (req, res) => {
-  console.log('+++req.body', req.body)
+export const startTracing = async (eventBus, additionalData) => {
   const jobId = uuid.v4()
   let jobUrl = process.env.TEMP_JOB_URL
-  let budgetLimit = 0.025
+  let budgetLimit = 0
   let appId
   let periodInSecCalculation
 
-  if (!isEmpty(req.body)) {
-    const requestBody = JSON.parse(req.body)
-    jobUrl = get(requestBody, 'jobUrl', jobUrl)
-    budgetLimit = Number(get(requestBody, 'budgetLimit', budgetLimit))
-    appId = get(requestBody, 'appId')
-    periodInSecCalculation = get(requestBody, 'periodInSec')
-    console.log('+++requestBody', requestBody, periodInSecCalculation)
+  if (!isEmpty(additionalData)) {
+    jobUrl = get(additionalData, 'jobUrl', jobUrl)
+    budgetLimit = Number(get(additionalData, 'budgetLimit', budgetLimit))
+    appId = get(additionalData, 'appId')
+    periodInSecCalculation = get(additionalData, 'periodInSec')
+    console.log('+++additionalData', additionalData, { periodInSecCalculation })
   }
+
+  console.log('+++additionalData', additionalData)
 
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
@@ -324,7 +324,6 @@ const startTracing = (eventBus) => async (req, res) => {
       jobId
     })
 
-  console.log('+++data', req.body)
   console.log('+++dateNow', dateNow)
   console.log('+++jobId', jobId)
   console.log('+++response.statusCode', response.statusCode)
@@ -345,12 +344,25 @@ const startTracing = (eventBus) => async (req, res) => {
     }, periodInSecCalculation)
   }
 
-  res.status(HttpStatus.OK).json({
+  return {
     jobUrl,
     jobId,
     dateNow,
     tracingUrl: `http://localhost:8080/test-job-tracing-summary/${dateNow}/${jobId}`
-  })
+  }
+}
+
+const startTracingRouteHandler = (eventBus) => async (req, res) => {
+  console.log('+++req.body', req.body)
+  let additionalData = {}
+
+  if (!isEmpty(req.body)) {
+    additionalData = JSON.parse(req.body)
+  }
+
+  const result = await startTracing(eventBus, additionalData)
+
+  res.status(HttpStatus.OK).json(result)
 }
 
 export const getJobStatus = async ({
@@ -437,7 +449,7 @@ const getJobRecord = async (req, res) => {
 
 export default {
   registerApp,
-  startTracing,
+  startTracingRouteHandler,
   getJobStatusRouteHandler,
   getRegisteredApp,
   getJobRecord,
