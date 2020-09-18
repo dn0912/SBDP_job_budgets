@@ -1,4 +1,4 @@
-service: lambda-gsd-index-calculator
+service: gsd-index-calculator
 
 custom:
   REGION: eu-central-1

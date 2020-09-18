@@ -64,7 +64,7 @@ module.exports.startJob = async (event, context) => {
       jobId,
     }
     return invokeLambda({
-      FunctionName: 'lambda-gsd-index-calculator-dev-preprocess1k',
+      FunctionName: 'gsd-index-calculator-dev-preprocess1k',
       InvocationType: 'Event',
       Payload: JSON.stringify(payload),
     })
