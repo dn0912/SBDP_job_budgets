@@ -37,7 +37,7 @@ module.exports = class AWSTracer {
 
     console.log('+++process.env+++', process.env)
 
-    this.tracerStore = REDIS_CONNECTION
+    this.tracerStoreClient = REDIS_CONNECTION
       ? new Redis(REDIS_CONNECTION)
       : new Redis({
         port: REDIS_PORT, // Redis port
@@ -55,15 +55,37 @@ module.exports = class AWSTracer {
       lambdaFunctionName: null,
       lambdaInvokedFunctionArn: null,
     }
+
+    // TODO: *** Redis Keyspace notification
+    this.redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
+      ? new Redis(REDIS_CONNECTION)
+      : new Redis({
+        port: REDIS_PORT, // Redis port
+        host: REDIS_HOST, // Redis host
+        family: 4, // 4 (IPv4) or 6 (IPv6)
+        password: REDIS_PASSWORD,
+        db: 0,
+      })
+
+    this.redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
+
+    this.redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:set')
+
+    this.redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
+      console.log('+++channel, message', { pattern, channel, message })
+      this.checkFlagPerSubscription({ pattern, channel, message })
+    })
   }
 
-  // myWrapper(fn) {
-  //   return async (...args) => {
-  //     await fn(...args)
-  //     this.putS3ObjectIsCalled(...args)
-  //     console.log('+++myWrapper called', args)
-  //   }
-  // }
+  async checkFlagPerSubscription({ pattern, channel, message }) {
+    console.log('+++inside checkFlagPerSubscription', { pattern, channel, message })
+
+    // Flag format: flag_jobId
+
+    if (message === createFlagPoleCacheKey(this.jobId)) {
+      await this.checkFlag()
+    }
+  }
 
   traceS3GetObject(fn) {
     return async (...args) => {
@@ -90,14 +112,14 @@ module.exports = class AWSTracer {
   }
 
   async checkFlag() {
-    const flagStatus = await this.tracerStore.get(createFlagPoleCacheKey(this.jobId))
+    const flagStatus = await this.tracerStoreClient.get(createFlagPoleCacheKey(this.jobId))
     if (flagStatus) {
       // process.exit(0)
       throw new BudgetError(`Job budget of ${flagStatus}$ exceeded`)
     }
 
     // TODO: for testing purpose only
-    await this.tracerStore.incr(`TEST_FLAG#####${this.jobId}`)
+    await this.tracerStoreClient.incr(`TEST_FLAG#####${this.jobId}`)
   }
 
   // **********
@@ -144,10 +166,10 @@ module.exports = class AWSTracer {
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
 
-    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
+    await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
 
     // TODO: for evaluation of redis speed
-    await this.tracerStore.set(`${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
+    await this.tracerStoreClient.set(`${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
     await this.checkFlag()
   }
 
@@ -163,7 +185,7 @@ module.exports = class AWSTracer {
     this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
-    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
+    await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
 
     await this.checkFlag()
   }
@@ -173,7 +195,7 @@ module.exports = class AWSTracer {
   // S3
   async getS3ObjectIsCalled() {
     console.log('+++redis getS3ObjectIsCalled+++')
-    await this.tracerStore.incr(`${CACHE_KEY_PREFIX}${this.jobId}#s3#getObject`)
+    await this.tracerStoreClient.incr(`${CACHE_KEY_PREFIX}${this.jobId}#s3#getObject`)
 
     await this.checkFlag()
   }
@@ -182,7 +204,7 @@ module.exports = class AWSTracer {
     console.log('+++redis putS3ObjectIsCalled+++')
     const fileContent = params.Body
     const fileSize = _s3FileSizeTracer(fileContent)
-    await this.tracerStore.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#s3#putObject`, fileSize)
+    await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#s3#putObject`, fileSize)
 
     await this.checkFlag()
   }
@@ -201,9 +223,9 @@ module.exports = class AWSTracer {
     console.log('+++queueName+++', queueName)
 
     const sqs64KiloByteChunkAmounts = _sqsPayloadSizeTracer(sqsPayload)
-    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
+    await this.tracerStoreClient.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
     // in case queue names are not known from trace start bc no app is registered
-    await this.tracerStore.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
+    await this.tracerStoreClient.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
 
     await this.checkFlag()
   }
