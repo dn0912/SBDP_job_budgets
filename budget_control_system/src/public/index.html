@@ -14,6 +14,10 @@
         placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
       <button class="submit-buttons">Get job costs</button>
     </form>
+    <form class="register-app-form" method="POST" enctype="multipart/form-data" id="register-app-form">
+      <input type="file" id="uploadfile" placeholder="Upload Cloudformation file" name="data" class="file-input"></input>
+      <button type="submit" class="submit-buttons" id="register-app-submit-button">Upload</button>
+    </form>
     <form
       name="start-job-and-trace-form"
       id="start-job-and-trace-form"
@@ -54,7 +58,7 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
     $(function () {
-        var socket = io();
+        const socket = io();
         $('#get-job-status-form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
           const inputJobId = $('#get-job-costs-input').val()
@@ -83,8 +87,6 @@
 
           console.log('+++additionalData', additionalData)
 
-          
-
           // clear input
           $('#start-job-and-trace-input').val('');
 
@@ -97,6 +99,22 @@
           }
 
           return false;
+        });
+
+        $("#register-app-form").submit((event) => {
+          event.preventDefault(); //stop submit the form, will post manually.
+          $.ajax({
+            url: '/register-app',
+            data: new FormData($('#register-app-form')[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: (data) => {
+              console.log('+++data', data)
+              $('#messages').append($('<li>').text('App registered successfully: ' + JSON.stringify(data)));
+            },
+          });
         });
       });
 

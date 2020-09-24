@@ -94,10 +94,6 @@ eventEmitter.addListener('job-costs-calculated', (jobId, jobCostResult) => {
   io.emit('stream-job-costs', { ...jobCostResult, jobId })
 })
 
-eventEmitter.addListener('start-job', (jobId) => {
-
-})
-
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -133,9 +129,7 @@ app.post('/start-tracing', controller.startTracingRouteHandler(eventEmitter))
 /**
  * stop serverless big data processing tracing endpoint
 */
-app.post('/stop', () => {
-
-})
+app.post('/stop', () => {})
 
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)

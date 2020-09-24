@@ -58,6 +58,7 @@ const registerApp = async (req, res) => {
   })
 
   const createdItem = await appRegisterStore.put(cloudFormationData)
+  console.log('+++cloudFormationData', cloudFormationData)
   console.log('+++createdItem', createdItem)
 
   res.status(HttpStatus.CREATED).json(createdItem)
