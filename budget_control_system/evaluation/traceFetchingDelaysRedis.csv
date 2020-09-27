@@ -1,0 +1,4 @@
+arn, redisTsValue, currentSystemTs, passedTime
+arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#1e59349c-e41e-44a7-adf4-89bfbb41bad6, 1601243289013, 1601243289062, 49
+arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#1e59349c-e41e-44a7-adf4-89bfbb41bad6, 1601243297150, 1601243297197, 47
+arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#1e59349c-e41e-44a7-adf4-89bfbb41bad6, 1601243310076, 1601243310176, 100

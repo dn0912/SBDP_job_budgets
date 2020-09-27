@@ -281,8 +281,13 @@ const startJobAndTrace = async (eventBus, additionalData) => {
       // TODO: only for speed evaluation
       if (redisCommand === 'set' && message.startsWith('arn:aws:lambda')) {
         const redisTsValue = await redisClient.get(message)
-        const passedTime = moment.utc().valueOf() - redisTsValue
-        console.log('+++passedTimeSinceTraceInRedis', redisTsValue, passedTime)
+        const currentSystemTs = Date.now()
+        const passedTime = currentSystemTs - redisTsValue
+        console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
+        fs.appendFileSync(
+          'evaluation/traceFetchingDelaysRedis.csv',
+          `\n${message}, ${redisTsValue}, ${currentSystemTs}, ${passedTime}`,
+        )
       }
 
       // every operation on the trace store

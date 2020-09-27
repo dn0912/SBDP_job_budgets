@@ -44,7 +44,7 @@ async function fetchTracePeriodically(xRayTracer, dateNow, jobId) {
     if (traceSummary.TraceSummaries.length > 0) {
       console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
       fs.appendFileSync(
-        'traceFetchingDelays.csv',
+        'evaluation/traceFetchingDelays.csv',
         `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
       )
       break
