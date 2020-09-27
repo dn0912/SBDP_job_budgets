@@ -49,22 +49,27 @@ module.exports.startJob = async (event, context) => {
   console.log(`## eventbody: ${event.body}`)
 
   // TODO: batch files based on batch size coming from request
-  const inputArray = [
-    // 'test_with_description_title_change_500_single.json',
+
+  const fileNames = [
+    'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
-    // 'test_with_description_title_change_1500_single.json',
-    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    'test_with_description_title_change_1500_single.json',
+    'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    // 'test_with_description_title_change_10000_single.json', // TODO: throws some timeout errors
+    // 'test_with_description_title_change_15000_single.json', // TODO: throws some timeout errors
   ]
 
   await slowDown(2000)
 
-  const promises = inputArray.map((fileName) => {
+  const numberOfLambdaInvocations = Array.from(Array(1).keys())
+
+  const promises = numberOfLambdaInvocations.map(() => {
     const payload = {
-      fileName,
+      fileNames,
       jobId,
     }
     return invokeLambda({
-      FunctionName: 'gsd-index-calculator-dev-preprocess1k',
+      FunctionName: 'gsd-index-calculator-dev-preprocess',
       InvocationType: 'Event',
       Payload: JSON.stringify(payload),
     })

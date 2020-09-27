@@ -176,7 +176,7 @@ module.exports = class AWSTracer {
    * For intermediate budget checking in lambda code.
    */
   async checkForBudget() {
-    console.log('+++redis stopLambdaTracer+++')
+    console.log('+++redis checkForBudget+++')
 
     const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
     const processingTime = (Date.now() - this.lambdaTraceInfo.lambdaStartTime) / 1000

@@ -11,6 +11,7 @@ const TracedAWS = require('service-cost-tracer')
 // })
 
 const moment = require('moment')
+const _ = require('lodash')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
 const awsTracerWithRedis = new AWSTracerWithRedis()
@@ -88,10 +89,16 @@ module.exports.readAndFilterFile = async (event, context) => {
   // with Redis
   await awsTracerWithRedis.startLambdaTracer(event, context)
 
-  const inputFileName = (event && event.fileName) || FILE
-  const s3FileContentAsString = await _readFile(inputFileName)
-  const s3FileContent = JSON.parse(s3FileContentAsString)
-  const cleanTaskUpdates = _filterUnnecessaryUpdates(s3FileContent)
+  // Read batched filenames
+  const inputFileNameBatches = (event && event.fileNames)
+  const promises = inputFileNameBatches.map((inputFileName) => _readFile(inputFileName))
+  const readFileResults = await Promise.all(promises)
+
+  // structure: [[events], [events], ...]
+  const parsedEventArrays = readFileResults.map((fileString) => JSON.parse(fileString))
+
+  const eventArray = _.flattenDeep(parsedEventArrays)
+  const cleanTaskUpdates = _filterUnnecessaryUpdates(eventArray)
 
   await _slowDown(4000)
 

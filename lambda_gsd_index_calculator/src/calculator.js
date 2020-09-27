@@ -31,6 +31,8 @@ const readFile = async (fileName) => {
     Key: `${SUBRESULT_FOLDER}/${fileName}`,
   }
 
+  console.log('+++params', params)
+
   const data = await getS3Object(params)
 
   return data.Body.toString('utf-8')

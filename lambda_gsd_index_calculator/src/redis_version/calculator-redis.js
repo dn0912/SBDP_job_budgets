@@ -98,49 +98,53 @@ const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
 }
 
 module.exports.handler = async (event, context) => {
-  console.log('+++event2', JSON.stringify(event, undefined, 2))
-  console.log('+++context', context)
+  try {
+    console.log('+++event2', JSON.stringify(event, undefined, 2))
+    console.log('+++context', context)
 
-  const eventBody = JSON.parse(event.Records[0].body)
-  const { fileName } = eventBody
+    const eventBody = JSON.parse(event.Records[0].body)
+    const { fileName } = eventBody
 
-  // *******
-  // Tracing with Redis
-  await awsTracerWithRedis.startLambdaTracer(event, context)
-  // *******
+    // *******
+    // Tracing with Redis
+    await awsTracerWithRedis.startLambdaTracer(event, context)
+    // *******
 
-  const s3FileContentAsString = await readFile(fileName)
-  const s3FileContent = JSON.parse(s3FileContentAsString)
+    const s3FileContentAsString = await readFile(fileName)
+    const s3FileContent = JSON.parse(s3FileContentAsString)
 
-  const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)
+    const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)
 
-  await slowDown(2000)
+    await slowDown(2000)
 
-  const fileContent = {
-    preprocessedDataFileName: fileName,
-    averageTimeToCompleteTask,
-  }
-
-  const resultFileName = await putFile(fileContent)
-
-  // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'SQS event processed.',
-      input: event,
+    const fileContent = {
+      preprocessedDataFileName: fileName,
       averageTimeToCompleteTask,
-      resultFileName,
-    }),
+    }
+
+    const resultFileName = await putFile(fileContent)
+
+    // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
+
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: 'SQS event processed.',
+        input: event,
+        averageTimeToCompleteTask,
+        resultFileName,
+      }),
+    }
+
+    await slowDown(2000)
+
+    console.log('+++response', response)
+
+    // TRACING with redis
+    await awsTracerWithRedis.stopLambdaTracer()
+
+    return response
+  } catch (err) {
+    console.log('+++err', err)
   }
-
-  await slowDown(2000)
-
-  console.log('+++response', response)
-
-  // TRACING with redis
-  await awsTracerWithRedis.stopLambdaTracer()
-
-  return response
 }
