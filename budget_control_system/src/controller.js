@@ -361,6 +361,20 @@ const startTracingRouteHandler = (eventBus) => async (req, res) => {
   res.status(HttpStatus.OK).json(result)
 }
 
+const stopJobRouteHandler = async (req, res) => {
+  console.log('+++req.body', req.body)
+  if (!isEmpty(req.body)) {
+    const requestBody = JSON.parse(req.body)
+    const { jobId } = requestBody
+    await flagPole.switchFlagAndStopJob(jobId)
+    res.status(HttpStatus.OK).json({
+      jobId,
+    })
+  } else {
+    res.status(HttpStatus.OK)
+  }
+}
+
 const getJobStatus = async ({
   eventBus,
   jobId,
@@ -447,6 +461,7 @@ export default {
   registerApp,
   startTracingRouteHandler,
   getJobStatusRouteHandler,
+  stopJobRouteHandler,
   getRegisteredApp,
   getJobRecord,
   subscribeToBudgetAlarm,

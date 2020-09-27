@@ -126,10 +126,11 @@ curl -X POST http://localhost:8080/start-tracing -H "Content-Type: application/j
 */
 app.post('/start-tracing', controller.startTracingRouteHandler(eventEmitter))
 
+// curl -X POST http://localhost:8080/stop -H "Content-Type: application/json" -d '{"jobId": ""}'
 /**
  * stop serverless big data processing tracing endpoint
 */
-app.post('/stop', () => {})
+app.post('/stop', controller.stopJobRouteHandler)
 
 // example curl: curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@./lambda_gsd_index_calculator/.serverless/cloudformation-template-update-stack.json" -F "userid=1234" http://localhost:8080/register-app
 app.post('/register-app', upload.single('data'), controller.registerApp)

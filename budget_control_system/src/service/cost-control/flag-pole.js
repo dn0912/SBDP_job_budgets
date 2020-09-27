@@ -52,4 +52,9 @@ export default class FlagPoleService extends Redis {
 
     return true
   }
+
+  async switchFlagAndStopJob(jobId) {
+    console.log('+++FlagPoleService switchFlagAndStopJob')
+    this.set(createFlagPoleCacheKey(jobId), 1)
+  }
 }
