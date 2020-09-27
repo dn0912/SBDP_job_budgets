@@ -205,6 +205,20 @@ async function calculateJobCostsPeriodically(passedArgs, periodInSecCalculation)
   }
 }
 
+const initPriceCalculator = async () => {
+  const priceList = new PriceList()
+  const lambdaPricing = await priceList.getLambdaPricing()
+  const sqsPricing = await priceList.getSQSPricing()
+  const s3Pricing = await priceList.getS3Pricing()
+  const priceCalculator = new PriceCalculator(
+    lambdaPricing, sqsPricing, s3Pricing
+  )
+
+  return priceCalculator
+}
+
+const getRegisteredSqsQueuesMap = async (appId) => (appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {})
+
 // TODO: *** Redis Keyspace notification
 const redisClient = REDIS_CONNECTION
   ? new Redis(REDIS_CONNECTION)
@@ -225,31 +239,11 @@ const redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
     db: 0,
   })
 
-// // redisKeyspaceNotificationSubscriberClient.on('ready', () => {
-// // redisKeyspaceNotificationSubscriberClient.config(
-// //   'set', 'notify-keyspace-events', 'KEA',
-// // )
-// // })
-
 redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events', 'KEA')
 
 redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:*')
 
-const initPriceCalculator = async () => {
-  const priceList = new PriceList()
-  const lambdaPricing = await priceList.getLambdaPricing()
-  const sqsPricing = await priceList.getSQSPricing()
-  const s3Pricing = await priceList.getS3Pricing()
-  const priceCalculator = new PriceCalculator(
-    lambdaPricing, sqsPricing, s3Pricing
-  )
-
-  return priceCalculator
-}
-
-const getRegisteredSqsQueuesMap = async (appId) => (appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {})
-
-export const startTracing = async (eventBus, additionalData) => {
+const startJobAndTrace = async (eventBus, additionalData) => {
   const jobId = uuid.v4()
   let jobUrl = process.env.TEMP_JOB_URL
   let budgetLimit = 0
@@ -362,12 +356,12 @@ const startTracingRouteHandler = (eventBus) => async (req, res) => {
     additionalData = JSON.parse(req.body)
   }
 
-  const result = await startTracing(eventBus, additionalData)
+  const result = await startJobAndTrace(eventBus, additionalData)
 
   res.status(HttpStatus.OK).json(result)
 }
 
-export const getJobStatus = async ({
+const getJobStatus = async ({
   eventBus,
   jobId,
 }) => {
@@ -456,4 +450,9 @@ export default {
   getRegisteredApp,
   getJobRecord,
   subscribeToBudgetAlarm,
+}
+
+export {
+  startJobAndTrace,
+  getJobStatus,
 }

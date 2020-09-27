@@ -9,7 +9,7 @@ import JobTraceStore from './service/job-trace-store/dynamo'
 import PriceList from './service/cost-control/price-list'
 import XRayTracer from './service/tracer/xray-tracer'
 
-import controller, { getJobStatus, startTracing } from './controller'
+import controller, { getJobStatus, startJobAndTrace } from './controller'
 import initiateTestRoutes from './test-routes'
 
 // import { _getRoomsByUser } from './utils'
@@ -67,7 +67,7 @@ io.on('connect', (socket) => {
 
   socket.on('start-job-and-trace', async (data) => {
     console.log('Socket event: start-job-and-trace', { data })
-    await startTracing(eventEmitter, data)
+    await startJobAndTrace(eventEmitter, data)
   })
 
   socket.on('subscribe', (jobId) => {
