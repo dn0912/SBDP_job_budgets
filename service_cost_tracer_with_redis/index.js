@@ -1,4 +1,3 @@
-const moment = require('moment')
 const Redis = require('ioredis')
 
 const BudgetError = require('./budget-error')
@@ -127,7 +126,7 @@ module.exports = class AWSTracer {
 
   // use in Lambda as early as possible
   async startLambdaTracer(event, context) {
-    this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
+    this.lambdaTraceInfo.lambdaStartTime = Date.now()
     this.lambdaTraceInfo.lambdaMemoryAllocationInMB = context.memoryLimitInMB
     this.lambdaTraceInfo.lambdaFunctionName = context.functionName
     this.lambdaTraceInfo.lambdaInvokedFunctionArn = context.invokedFunctionArn
@@ -161,7 +160,7 @@ module.exports = class AWSTracer {
     console.log('+++redis stopLambdaTracer+++')
 
     const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
-    const stopLambdaTs = moment.utc().valueOf()
+    const stopLambdaTs = Date.now()
     const processingTime = (stopLambdaTs - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
@@ -180,9 +179,9 @@ module.exports = class AWSTracer {
     console.log('+++redis stopLambdaTracer+++')
 
     const memoryAllocationInMB = this.lambdaTraceInfo.lambdaMemoryAllocationInMB
-    const processingTime = (moment.utc().valueOf() - this.lambdaTraceInfo.lambdaStartTime) / 1000
+    const processingTime = (Date.now() - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
-    this.lambdaTraceInfo.lambdaStartTime = moment.utc().valueOf()
+    this.lambdaTraceInfo.lambdaStartTime = Date.now()
 
     const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
     await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
