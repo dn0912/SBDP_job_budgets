@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "_mocha --recursive test/unit --require @babel/register",
-    "start": "./node_modules/.bin/nodemon --require dotenv/config --exec babel-node --inspect src/index.js",
+    "start": "./node_modules/.bin/nodemon --ignore 'evaluation/' --require dotenv/config --exec babel-node --inspect src/index.js",
     "lint": "eslint \"**/*.js\"",
     "e2e": "_mocha --recursive test/e2e --require @babel/register --exit"
   },
