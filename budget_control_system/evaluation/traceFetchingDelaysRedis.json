@@ -1,1 +1,758 @@
 [
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322854856,
+    "currentSystemTs": 1601322854861,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322864833,
+    "currentSystemTs": 1601322864840,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322865314,
+    "currentSystemTs": 1601322865319,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322865860,
+    "currentSystemTs": 1601322865866,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322866286,
+    "currentSystemTs": 1601322866290,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322866331,
+    "currentSystemTs": 1601322866336,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322875509,
+    "currentSystemTs": 1601322875513,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322875969,
+    "currentSystemTs": 1601322875974,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322876863,
+    "currentSystemTs": 1601322876870,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322876994,
+    "currentSystemTs": 1601322876999,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#ddd9c7fa-3499-4f58-9892-e937e38bcf47",
+    "redisTsValue": 1601322877000,
+    "currentSystemTs": 1601322877007,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322906212,
+    "currentSystemTs": 1601322906217,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322915919,
+    "currentSystemTs": 1601322915923,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322916245,
+    "currentSystemTs": 1601322916250,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322916928,
+    "currentSystemTs": 1601322916932,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322917128,
+    "currentSystemTs": 1601322917132,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322917459,
+    "currentSystemTs": 1601322917464,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322927079,
+    "currentSystemTs": 1601322927086,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322927546,
+    "currentSystemTs": 1601322927551,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322928279,
+    "currentSystemTs": 1601322928285,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#493b6250-1481-4343-91a5-accc405345ca",
+    "redisTsValue": 1601322928300,
+    "currentSystemTs": 1601322928305,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322968735,
+    "currentSystemTs": 1601322968744,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322978401,
+    "currentSystemTs": 1601322978408,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322978692,
+    "currentSystemTs": 1601322978696,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322979167,
+    "currentSystemTs": 1601322979172,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322979664,
+    "currentSystemTs": 1601322979669,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322980001,
+    "currentSystemTs": 1601322980006,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322989676,
+    "currentSystemTs": 1601322989681,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322990378,
+    "currentSystemTs": 1601322990384,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322990395,
+    "currentSystemTs": 1601322990400,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#5fb0f6d6-51a3-4cb8-8ba4-ce72a18356ee",
+    "redisTsValue": 1601322990677,
+    "currentSystemTs": 1601322990683,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323297371,
+    "currentSystemTs": 1601323297377,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323297371,
+    "currentSystemTs": 1601323297378,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308700,
+    "currentSystemTs": 1601323308705,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308700,
+    "currentSystemTs": 1601323308706,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308723,
+    "currentSystemTs": 1601323308727,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308723,
+    "currentSystemTs": 1601323308728,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308803,
+    "currentSystemTs": 1601323308807,
+    "passedTime": 4
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308803,
+    "currentSystemTs": 1601323308808,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308867,
+    "currentSystemTs": 1601323308872,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323308867,
+    "currentSystemTs": 1601323308873,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323309079,
+    "currentSystemTs": 1601323309085,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323309079,
+    "currentSystemTs": 1601323309086,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323309436,
+    "currentSystemTs": 1601323309442,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323309436,
+    "currentSystemTs": 1601323309443,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310028,
+    "currentSystemTs": 1601323310034,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310028,
+    "currentSystemTs": 1601323310035,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310346,
+    "currentSystemTs": 1601323310360,
+    "passedTime": 14
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310346,
+    "currentSystemTs": 1601323310361,
+    "passedTime": 15
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310400,
+    "currentSystemTs": 1601323310405,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310400,
+    "currentSystemTs": 1601323310406,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310745,
+    "currentSystemTs": 1601323310750,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323310745,
+    "currentSystemTs": 1601323310751,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320524,
+    "currentSystemTs": 1601323320529,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320524,
+    "currentSystemTs": 1601323320530,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320535,
+    "currentSystemTs": 1601323320540,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320535,
+    "currentSystemTs": 1601323320541,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320565,
+    "currentSystemTs": 1601323320570,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320565,
+    "currentSystemTs": 1601323320571,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320743,
+    "currentSystemTs": 1601323320749,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320743,
+    "currentSystemTs": 1601323320750,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320787,
+    "currentSystemTs": 1601323320798,
+    "passedTime": 11
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323320787,
+    "currentSystemTs": 1601323320800,
+    "passedTime": 13
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323321841,
+    "currentSystemTs": 1601323321846,
+    "passedTime": 5
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323321841,
+    "currentSystemTs": 1601323321847,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323321975,
+    "currentSystemTs": 1601323321981,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323321975,
+    "currentSystemTs": 1601323321982,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323322186,
+    "currentSystemTs": 1601323322198,
+    "passedTime": 12
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#d7c8656f-26fb-4728-9f58-00e627400ac2",
+    "redisTsValue": 1601323322186,
+    "currentSystemTs": 1601323322198,
+    "passedTime": 12
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323388103,
+    "currentSystemTs": 1601323388109,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323388103,
+    "currentSystemTs": 1601323388110,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323388103,
+    "currentSystemTs": 1601323388111,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398018,
+    "currentSystemTs": 1601323398025,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398018,
+    "currentSystemTs": 1601323398025,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398018,
+    "currentSystemTs": 1601323398026,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398297,
+    "currentSystemTs": 1601323398308,
+    "passedTime": 11
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398297,
+    "currentSystemTs": 1601323398309,
+    "passedTime": 12
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398297,
+    "currentSystemTs": 1601323398309,
+    "passedTime": 12
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398301,
+    "currentSystemTs": 1601323398310,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398301,
+    "currentSystemTs": 1601323398311,
+    "passedTime": 10
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398301,
+    "currentSystemTs": 1601323398311,
+    "passedTime": 10
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398353,
+    "currentSystemTs": 1601323398359,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398353,
+    "currentSystemTs": 1601323398359,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398353,
+    "currentSystemTs": 1601323398361,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398453,
+    "currentSystemTs": 1601323398459,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398453,
+    "currentSystemTs": 1601323398460,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398453,
+    "currentSystemTs": 1601323398461,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398930,
+    "currentSystemTs": 1601323398936,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398930,
+    "currentSystemTs": 1601323398937,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323398930,
+    "currentSystemTs": 1601323398938,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399174,
+    "currentSystemTs": 1601323399181,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399174,
+    "currentSystemTs": 1601323399182,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399174,
+    "currentSystemTs": 1601323399183,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399187,
+    "currentSystemTs": 1601323399193,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399187,
+    "currentSystemTs": 1601323399194,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399187,
+    "currentSystemTs": 1601323399195,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399308,
+    "currentSystemTs": 1601323399315,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399308,
+    "currentSystemTs": 1601323399316,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399308,
+    "currentSystemTs": 1601323399316,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399545,
+    "currentSystemTs": 1601323399552,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399545,
+    "currentSystemTs": 1601323399553,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323399545,
+    "currentSystemTs": 1601323399553,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409170,
+    "currentSystemTs": 1601323409177,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409170,
+    "currentSystemTs": 1601323409178,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409170,
+    "currentSystemTs": 1601323409179,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409862,
+    "currentSystemTs": 1601323409868,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409862,
+    "currentSystemTs": 1601323409869,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323409862,
+    "currentSystemTs": 1601323409870,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410302,
+    "currentSystemTs": 1601323410309,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410302,
+    "currentSystemTs": 1601323410310,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410302,
+    "currentSystemTs": 1601323410311,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410318,
+    "currentSystemTs": 1601323410330,
+    "passedTime": 12
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410318,
+    "currentSystemTs": 1601323410331,
+    "passedTime": 13
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410318,
+    "currentSystemTs": 1601323410331,
+    "passedTime": 13
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410362,
+    "currentSystemTs": 1601323410369,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410362,
+    "currentSystemTs": 1601323410370,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410362,
+    "currentSystemTs": 1601323410370,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410439,
+    "currentSystemTs": 1601323410448,
+    "passedTime": 9
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410439,
+    "currentSystemTs": 1601323410449,
+    "passedTime": 10
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410439,
+    "currentSystemTs": 1601323410450,
+    "passedTime": 11
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410545,
+    "currentSystemTs": 1601323410551,
+    "passedTime": 6
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410545,
+    "currentSystemTs": 1601323410552,
+    "passedTime": 7
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323410545,
+    "currentSystemTs": 1601323410553,
+    "passedTime": 8
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323412217,
+    "currentSystemTs": 1601323412232,
+    "passedTime": 15
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323412217,
+    "currentSystemTs": 1601323412233,
+    "passedTime": 16
+  },
+  {
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#6d6f8556-2245-48fd-92ce-c7d860016931",
+    "redisTsValue": 1601323412217,
+    "currentSystemTs": 1601323412234,
+    "passedTime": 17
+  }
+]

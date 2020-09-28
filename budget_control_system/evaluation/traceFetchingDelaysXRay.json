@@ -1,0 +1,702 @@
+[
+  {
+    "jobStartTs": 1595255512307,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595255514559,
+    "currentTs": 1595255517329,
+    "passedTime": 2770
+  },
+  {
+    "jobStartTs": 1595255693655,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595255695914,
+    "currentTs": 1595255698241,
+    "passedTime": 2327
+  },
+  {
+    "jobStartTs": 1595255703072,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595255705255,
+    "currentTs": 1595255707508,
+    "passedTime": 2253
+  },
+  {
+    "jobStartTs": 1595264178991,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595264181199,
+    "currentTs": 1595264184298,
+    "passedTime": 3099
+  },
+  {
+    "jobStartTs": 1595268026600,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595268029913,
+    "currentTs": 1595268033615,
+    "passedTime": 3702
+  },
+  {
+    "jobStartTs": 1595277514296,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595277519291,
+    "currentTs": 1595277524420,
+    "passedTime": 5129
+  },
+  {
+    "jobStartTs": 1595277907084,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595277911189,
+    "currentTs": 1595277914258,
+    "passedTime": 3069
+  },
+  {
+    "jobStartTs": 1595278373386,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595278376483,
+    "currentTs": 1595278381799,
+    "passedTime": 5316
+  },
+  {
+    "jobStartTs": 1595278598714,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595278601669,
+    "currentTs": 1595278605310,
+    "passedTime": 3641
+  },
+  {
+    "jobStartTs": 1595279041626,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595279044588,
+    "currentTs": 1595279048408,
+    "passedTime": 3820
+  },
+  {
+    "jobStartTs": 1595280624883,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595280627794,
+    "currentTs": 1595280634478,
+    "passedTime": 6684
+  },
+  {
+    "jobStartTs": 1595320727281,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595320730422,
+    "currentTs": 1595320736408,
+    "passedTime": 5986
+  },
+  {
+    "jobStartTs": 1595322991674,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595322994674,
+    "currentTs": 1595323000165,
+    "passedTime": 5491
+  },
+  {
+    "jobStartTs": 1595326722067,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595326725044,
+    "currentTs": 1595326729737,
+    "passedTime": 4693
+  },
+  {
+    "jobStartTs": 1595326976029,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595326978932,
+    "currentTs": 1595326983462,
+    "passedTime": 4530
+  },
+  {
+    "jobStartTs": 1595327302429,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595327305259,
+    "currentTs": 1595327309361,
+    "passedTime": 4102
+  },
+  {
+    "jobStartTs": 1595327569678,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595327572520,
+    "currentTs": 1595327578284,
+    "passedTime": 5764
+  },
+  {
+    "jobStartTs": 1595329519698,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595329522804,
+    "currentTs": 1595329526591,
+    "passedTime": 3787
+  },
+  {
+    "jobStartTs": 1595333003326,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595333006330,
+    "currentTs": 1595333012309,
+    "passedTime": 5979
+  },
+  {
+    "jobStartTs": 1595336540026,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595336543019,
+    "currentTs": 1595336548533,
+    "passedTime": 5514
+  },
+  {
+    "jobStartTs": 1595412436022,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595412439055,
+    "currentTs": 1595412443461,
+    "passedTime": 4406
+  },
+  {
+    "jobStartTs": 1595417709501,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595417712483,
+    "currentTs": 1595417717332,
+    "passedTime": 4849
+  },
+  {
+    "jobStartTs": 1595420678253,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1595420681322,
+    "currentTs": 1595420686318,
+    "passedTime": 4996
+  },
+  {
+    "jobStartTs": 1596196296779,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596196299992,
+    "currentTs": 1596196304379,
+    "passedTime": 4387
+  },
+  {
+    "jobStartTs": 1596199239897,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596199242901,
+    "currentTs": 1596199249371,
+    "passedTime": 6470
+  },
+  {
+    "jobStartTs": 1596199919319,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596199922402,
+    "currentTs": 1596199927483,
+    "passedTime": 5081
+  },
+  {
+    "jobStartTs": 1596200242801,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596200245062,
+    "currentTs": 1596200248377,
+    "passedTime": 3315
+  },
+  {
+    "jobStartTs": 1596200536390,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596200538560,
+    "currentTs": 1596200542459,
+    "passedTime": 3899
+  },
+  {
+    "jobStartTs": 1596200833064,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596200835967,
+    "currentTs": 1596200840406,
+    "passedTime": 4439
+  },
+  {
+    "jobStartTs": 1596200985674,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596200988649,
+    "currentTs": 1596200993265,
+    "passedTime": 4616
+  },
+  {
+    "jobStartTs": 1596201271820,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596201274729,
+    "currentTs": 1596201278433,
+    "passedTime": 3704
+  },
+  {
+    "jobStartTs": 1596201426694,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596201429589,
+    "currentTs": 1596201433196,
+    "passedTime": 3607
+  },
+  {
+    "jobStartTs": 1596201689807,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596201692665,
+    "currentTs": 1596201697284,
+    "passedTime": 4619
+  },
+  {
+    "jobStartTs": 1596204677366,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596204680372,
+    "currentTs": 1596204685509,
+    "passedTime": 5137
+  },
+  {
+    "jobStartTs": 1596208853703,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596208856772,
+    "currentTs": 1596208860377,
+    "passedTime": 3605
+  },
+  {
+    "jobStartTs": 1596212528115,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596212531203,
+    "currentTs": 1596212535195,
+    "passedTime": 3992
+  },
+  {
+    "jobStartTs": 1596213487577,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596213490635,
+    "currentTs": 1596213495449,
+    "passedTime": 4814
+  },
+  {
+    "jobStartTs": 1596383219470,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596383222511,
+    "currentTs": 1596383227370,
+    "passedTime": 4859
+  },
+  {
+    "jobStartTs": 1596385085234,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596385088292,
+    "currentTs": 1596385092221,
+    "passedTime": 3929
+  },
+  {
+    "jobStartTs": 1596387841562,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596387844667,
+    "currentTs": 1596387848398,
+    "passedTime": 3731
+  },
+  {
+    "jobStartTs": 1596452840560,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596452843752,
+    "currentTs": 1596452847214,
+    "passedTime": 3462
+  },
+  {
+    "jobStartTs": 1596452975756,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596452978699,
+    "currentTs": 1596452982298,
+    "passedTime": 3599
+  },
+  {
+    "jobStartTs": 1596453291236,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596453294177,
+    "currentTs": 1596453298321,
+    "passedTime": 4144
+  },
+  {
+    "jobStartTs": 1596453488384,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596453491277,
+    "currentTs": 1596453497250,
+    "passedTime": 5973
+  },
+  {
+    "jobStartTs": 1596459873037,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596459875986,
+    "currentTs": 1596459880260,
+    "passedTime": 4274
+  },
+  {
+    "jobStartTs": 1596460270162,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596460273172,
+    "currentTs": 1596460277385,
+    "passedTime": 4213
+  },
+  {
+    "jobStartTs": 1596461419539,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596461422515,
+    "currentTs": 1596461426189,
+    "passedTime": 3674
+  },
+  {
+    "jobStartTs": 1596461621008,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596461623203,
+    "currentTs": 1596461627325,
+    "passedTime": 4122
+  },
+  {
+    "jobStartTs": 1596461728188,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596461730345,
+    "currentTs": 1596461734173,
+    "passedTime": 3828
+  },
+  {
+    "jobStartTs": 1596462234318,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596462236482,
+    "currentTs": 1596462239470,
+    "passedTime": 2988
+  },
+  {
+    "jobStartTs": 1596462744652,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596462747589,
+    "currentTs": 1596462753307,
+    "passedTime": 5718
+  },
+  {
+    "jobStartTs": 1596462908040,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596462911016,
+    "currentTs": 1596462915178,
+    "passedTime": 4162
+  },
+  {
+    "jobStartTs": 1596463187409,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596463190343,
+    "currentTs": 1596463194243,
+    "passedTime": 3900
+  },
+  {
+    "jobStartTs": 1596463480687,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596463483542,
+    "currentTs": 1596463488342,
+    "passedTime": 4800
+  },
+  {
+    "jobStartTs": 1596463799596,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596463802556,
+    "currentTs": 1596463807321,
+    "passedTime": 4765
+  },
+  {
+    "jobStartTs": 1596464261651,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596464264644,
+    "currentTs": 1596464269144,
+    "passedTime": 4500
+  },
+  {
+    "jobStartTs": 1596464738628,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596464741575,
+    "currentTs": 1596464746427,
+    "passedTime": 4852
+  },
+  {
+    "jobStartTs": 1596464874789,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596464877009,
+    "currentTs": 1596464878444,
+    "passedTime": 1435
+  },
+  {
+    "jobStartTs": 1596464909467,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596464911611,
+    "currentTs": 1596464914189,
+    "passedTime": 2578
+  },
+  {
+    "jobStartTs": 1596465048962,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465051942,
+    "currentTs": 1596465056519,
+    "passedTime": 4577
+  },
+  {
+    "jobStartTs": 1596465161064,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465163979,
+    "currentTs": 1596465168085,
+    "passedTime": 4106
+  },
+  {
+    "jobStartTs": 1596465174608,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465176756,
+    "currentTs": 1596465179296,
+    "passedTime": 2540
+  },
+  {
+    "jobStartTs": 1596465249930,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465252913,
+    "currentTs": 1596465259224,
+    "passedTime": 6311
+  },
+  {
+    "jobStartTs": 1596465588251,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465591249,
+    "currentTs": 1596465596411,
+    "passedTime": 5162
+  },
+  {
+    "jobStartTs": 1596465881639,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596465884625,
+    "currentTs": 1596465890346,
+    "passedTime": 5721
+  },
+  {
+    "jobStartTs": 1596466296780,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596466299703,
+    "currentTs": 1596466303598,
+    "passedTime": 3895
+  },
+  {
+    "jobStartTs": 1596466384501,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596466386700,
+    "currentTs": 1596466389051,
+    "passedTime": 2351
+  },
+  {
+    "jobStartTs": 1596466538855,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596466541891,
+    "currentTs": 1596466547296,
+    "passedTime": 5405
+  },
+  {
+    "jobStartTs": 1596467392012,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596467395058,
+    "currentTs": 1596467400175,
+    "passedTime": 5117
+  },
+  {
+    "jobStartTs": 1596467855169,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596467858211,
+    "currentTs": 1596467864502,
+    "passedTime": 6291
+  },
+  {
+    "jobStartTs": 1596469126651,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596469129658,
+    "currentTs": 1596469134392,
+    "passedTime": 4734
+  },
+  {
+    "jobStartTs": 1596469277721,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596469279952,
+    "currentTs": 1596469285346,
+    "passedTime": 5394
+  },
+  {
+    "jobStartTs": 1596470198558,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596470201489,
+    "currentTs": 1596470205248,
+    "passedTime": 3759
+  },
+  {
+    "jobStartTs": 1596531865034,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596531867982,
+    "currentTs": 1596531873192,
+    "passedTime": 5210
+  },
+  {
+    "jobStartTs": 1596531931839,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596531934005,
+    "currentTs": 1596531936191,
+    "passedTime": 2186
+  },
+  {
+    "jobStartTs": 1596532109429,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596532112529,
+    "currentTs": 1596532117529,
+    "passedTime": 5000
+  },
+  {
+    "jobStartTs": 1596532652588,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596532655566,
+    "currentTs": 1596532660316,
+    "passedTime": 4750
+  },
+  {
+    "jobStartTs": 1596533074561,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596533077484,
+    "currentTs": 1596533082384,
+    "passedTime": 4900
+  },
+  {
+    "jobStartTs": 1596538471319,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596538474287,
+    "currentTs": 1596538480538,
+    "passedTime": 6251
+  },
+  {
+    "jobStartTs": 1596567960103,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596567963239,
+    "currentTs": 1596567969354,
+    "passedTime": 6115
+  },
+  {
+    "jobStartTs": 1596568175110,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596568178076,
+    "currentTs": 1596568182202,
+    "passedTime": 4126
+  },
+  {
+    "jobStartTs": 1596568797112,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596568800082,
+    "currentTs": 1596568806442,
+    "passedTime": 6360
+  },
+  {
+    "jobStartTs": 1596569335101,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596569338432,
+    "currentTs": 1596569344610,
+    "passedTime": 6178
+  },
+  {
+    "jobStartTs": 1596569586165,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596569588390,
+    "currentTs": 1596569592449,
+    "passedTime": 4059
+  },
+  {
+    "jobStartTs": 1596569688388,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596569690560,
+    "currentTs": 1596569692370,
+    "passedTime": 1810
+  },
+  {
+    "jobStartTs": 1596569935133,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596569938122,
+    "currentTs": 1596569944253,
+    "passedTime": 6131
+  },
+  {
+    "jobStartTs": 1596570624194,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596570627275,
+    "currentTs": 1596570631237,
+    "passedTime": 3962
+  },
+  {
+    "jobStartTs": 1596570827873,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596570830896,
+    "currentTs": 1596570836041,
+    "passedTime": 5145
+  },
+  {
+    "jobStartTs": 1596570951189,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596570954110,
+    "currentTs": 1596570958303,
+    "passedTime": 4193
+  },
+  {
+    "jobStartTs": 1596571987512,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596571990601,
+    "currentTs": 1596571994376,
+    "passedTime": 3775
+  },
+  {
+    "jobStartTs": 1596572082348,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596572085299,
+    "currentTs": 1596572090343,
+    "passedTime": 5044
+  },
+  {
+    "jobStartTs": 1596572403655,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596572405875,
+    "currentTs": 1596572409460,
+    "passedTime": 3585
+  },
+  {
+    "jobStartTs": 1596572480408,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596572483384,
+    "currentTs": 1596572487399,
+    "passedTime": 4015
+  },
+  {
+    "jobStartTs": 1596572705464,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596572708407,
+    "currentTs": 1596572712376,
+    "passedTime": 3969
+  },
+  {
+    "jobStartTs": 1596574489396,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596574492372,
+    "currentTs": 1596574497199,
+    "passedTime": 4827
+  },
+  {
+    "jobStartTs": 1596574638713,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596574641891,
+    "currentTs": 1596574646360,
+    "passedTime": 4469
+  },
+  {
+    "jobStartTs": 1596575209252,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596575212168,
+    "currentTs": 1596575216235,
+    "passedTime": 4067
+  },
+  {
+    "jobStartTs": 1596618736943,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596618740180,
+    "currentTs": 1596618746222,
+    "passedTime": 6042
+  },
+  {
+    "jobStartTs": 1596619419193,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596619422238,
+    "currentTs": 1596619428257,
+    "passedTime": 6019
+  },
+  {
+    "jobStartTs": 1596620418299,
+    "arn": "arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job",
+    "traceCloseTs": 1596620421406,
+    "currentTs": 1596620426345,
+    "passedTime": 4939
+  }
+]
