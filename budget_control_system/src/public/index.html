@@ -91,7 +91,7 @@
           $('#start-job-and-trace-input').val('');
 
           if(inputJobUrl) {
-            $('#messages').append($('<li>').text('Starting job...'));
+            $('#messages').append($('<li>').text(`Starting job: ${Date()}`));
             $('#messages').append($('<li>').text(`jobUrl: ${inputJobUrl} - budgetLimit: ${inputBudgetLimit} - appId: ${inputAppId} - tracePeriod: ${inputTracePeriod}`));
             socket.emit('start-job-and-trace', additionalData);
           } else {

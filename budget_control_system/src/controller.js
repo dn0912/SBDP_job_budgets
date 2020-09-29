@@ -273,6 +273,7 @@ const startJobAndTrace = async (eventBus, additionalData) => {
     jobStartTime: dateNow,
   })
 
+  // calculate per keyspace notification
   if (!periodInSecCalculation) {
     redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
       console.log('+++channel, message', { pattern, channel, message })
@@ -283,10 +284,14 @@ const startJobAndTrace = async (eventBus, additionalData) => {
         const redisTsValue = await redisClient.get(message)
         const currentSystemTs = Date.now()
         const passedTime = currentSystemTs - redisTsValue
-        console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
+        // console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
         fs.appendFileSync(
           'evaluation/traceFetchingDelaysRedis.json',
           `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
+        )
+        fs.appendFileSync(
+          'evaluation/traceFetchingDelaysRedis.csv',
+          `\n${message}, ${redisTsValue}, ${currentSystemTs}, ${passedTime}`,
         )
       }
 
@@ -332,6 +337,7 @@ const startJobAndTrace = async (eventBus, additionalData) => {
 
   console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
 
+  // calculate based on periodical polling for tracec data in cache
   console.log('+++periodInSecCalculation', typeof periodInSecCalculation)
   if (typeof periodInSecCalculation === 'number' && periodInSecCalculation > 0) {
     // fetchTracePeriodically(xRayTracer, dateNow, jobId)

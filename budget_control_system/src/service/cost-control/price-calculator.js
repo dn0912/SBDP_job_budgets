@@ -34,6 +34,7 @@ class PriceCalculator {
 
       const lambdaPricePer100MS = (1024 / memoryAllocation) * lambdaPricingPer100MsWith1GBMemory
 
+      console.log('+++roundedLambdaProcTime billed lambda 100ms', roundedLambdaProcTime)
       return lambdaPricePer100MS * roundedLambdaProcTime // Nano USD
     })
 
@@ -148,7 +149,9 @@ class PriceCalculator {
             || s3Pricings.requestAndDataRetrievalsPrices.Others
 
           // every 1000 request
-          return acc + priceForRequest * Math.ceil(requestAmount / 1000)
+          // return acc + priceForRequest * Math.ceil(requestAmount / 1000) * 1000
+          // every request
+          return acc + priceForRequest * requestAmount
         }, 0)
 
       return price

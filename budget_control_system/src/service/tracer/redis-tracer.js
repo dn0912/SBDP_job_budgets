@@ -28,10 +28,11 @@ export default class RedisTracer extends Redis {
     )
 
     const tracedLambdaSegments = tracedLambdaCacheEntry.map((delimitedString) => {
-      const [memoryAllocationInMB, processingTimeString] = delimitedString.split('::')
+      const [memoryAllocationInMB, processingTimeString, awsRequestId] = delimitedString.split('::')
       return {
         memoryAllocationInMB: Number(memoryAllocationInMB),
         processingTime: Number(processingTimeString),
+        awsRequestId,
       }
     })
 
