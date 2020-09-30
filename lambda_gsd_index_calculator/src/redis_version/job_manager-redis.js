@@ -54,14 +54,17 @@ module.exports.startJob = async (event, context) => {
   // ]
   const fileNames = [
     'test_with_description_title_change_500_single.json',
-    'test_with_description_title_change_1000_single.json',
-    'test_with_description_title_change_1500_single.json',
+    // 'test_with_description_title_change_1000_single.json',
+    // 'test_with_description_title_change_1500_single.json',
+    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    // 'test_with_description_title_change_500_single.json',
+    // 'test_with_description_title_change_1000_single.json',
+    // 'test_with_description_title_change_1500_single.json',
     // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
     // 'test_with_description_title_change_10000_single.json', // TODO: throws some timeout errors
-    // 'test_with_description_title_change_15000_single.json', // TODO: throws some timeout errors
   ]
 
-  await slowDown(2000)
+  // await slowDown(2000)
 
   const numberOfLambdaInvocations = Array.from(Array(1).keys())
 
@@ -81,7 +84,7 @@ module.exports.startJob = async (event, context) => {
   console.log('+++result', result)
 
   // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
-  await slowDown(3000)
+  // await slowDown(3000)
 
   // TRACING with redis
   await awsTracerWithRedis.stopLambdaTracer()

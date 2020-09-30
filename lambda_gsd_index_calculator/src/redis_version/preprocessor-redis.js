@@ -72,78 +72,82 @@ const _filterUnnecessaryUpdates = (tasksUpdateArray) => {
 }
 
 module.exports.readAndFilterFile = async (event, context) => {
-  console.log('+++event', JSON.stringify(event, undefined, 2))
-  console.log('+++context', context)
-  console.log('+++event+++', event)
-  // DO NOT USE object destructuring --
-  // somehow does not work and exits lambda: const { jobId } = event
-  const { jobId } = event
-  // Tracing with Redis
-  await awsTracerWithRedis.startLambdaTracer(event, context)
+  try {
+    console.log('+++event', JSON.stringify(event, undefined, 2))
+    console.log('+++context', context)
+    console.log('+++event+++', event)
+    // DO NOT USE object destructuring --
+    // somehow does not work and exits lambda: const { jobId } = event
+    const { jobId } = event
+    // Tracing with Redis
+    await awsTracerWithRedis.startLambdaTracer(event, context)
 
-  // Read batched filenames
-  const inputFileNameBatches = (event && event.fileNames)
-  const promises = inputFileNameBatches.map((inputFileName) => _readFile(inputFileName))
-  const readFileResults = await Promise.all(promises)
+    // Read batched filenames
+    const inputFileNameBatches = (event && event.fileNames)
+    const promises = inputFileNameBatches.map((inputFileName) => _readFile(inputFileName))
+    const readFileResults = await Promise.all(promises)
 
-  // structure: [[events], [events], ...]
-  const parsedEventArrays = readFileResults.map((fileString) => JSON.parse(fileString))
+    // structure: [[events], [events], ...]
+    const parsedEventArrays = readFileResults.map((fileString) => JSON.parse(fileString))
 
-  const eventArray = _.flattenDeep(parsedEventArrays)
-  const cleanTaskUpdates = _filterUnnecessaryUpdates(eventArray)
+    const eventArray = _.flattenDeep(parsedEventArrays)
+    const cleanTaskUpdates = _filterUnnecessaryUpdates(eventArray)
 
-  await _slowDown(4000)
+    // await _slowDown(4000)
 
-  const fileName = await _putFile(cleanTaskUpdates)
+    const fileName = await _putFile(cleanTaskUpdates)
 
-  console.log('+++fileName', fileName)
+    console.log('+++fileName', fileName)
 
-  const accountId = context.invokedFunctionArn.split(':')[4]
-  const queueUrl = `https://sqs.${REGION}.amazonaws.com/${accountId}/${QUEUE_NAME}`
+    const accountId = context.invokedFunctionArn.split(':')[4]
+    const queueUrl = `https://sqs.${REGION}.amazonaws.com/${accountId}/${QUEUE_NAME}`
 
-  const messageBody = {
-    fileName,
-    jobId,
-    // junk: ('x').repeat(1024*240)
+    const messageBody = {
+      fileName,
+      jobId,
+      // junk: ('x').repeat(1024*240)
+    }
+
+    const isFifoQueue = queueUrl.includes('.fifo')
+    const necessaryFiFoParams = isFifoQueue ? {
+      MessageGroupId: 'test-fifo-message-group-id',
+      MessageDeduplicationId: `msg-dedup-id-${moment().valueOf()}`
+    } : {}
+
+    console.log('+++isFifoQueue', { isFifoQueue, necessaryFiFoParams })
+
+    const sqsPayload = {
+      MessageBody: JSON.stringify(messageBody),
+      QueueUrl: queueUrl,
+      ...necessaryFiFoParams,
+    }
+
+    // await _slowDown(2000)
+
+    // Sends single message to SQS for further process
+    const test = await sendMessage(sqsPayload)
+
+    // await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
+
+    console.log('+++sqsPayload', sqsPayload)
+    console.log('+++test', test)
+
+    const responseBody = {
+      fileName,
+      queueUrl,
+    }
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify(responseBody),
+    }
+
+    // await _slowDown(2000)
+
+    // TRACING with redis
+    await awsTracerWithRedis.stopLambdaTracer()
+
+    return response
+  } catch (err) {
+    console.log('err', err)
   }
-
-  const isFifoQueue = queueUrl.includes('.fifo')
-  const necessaryFiFoParams = isFifoQueue ? {
-    MessageGroupId: 'test-fifo-message-group-id',
-    MessageDeduplicationId: `msg-dedup-id-${moment().valueOf()}`
-  } : {}
-
-  console.log('+++isFifoQueue', { isFifoQueue, necessaryFiFoParams })
-
-  const sqsPayload = {
-    MessageBody: JSON.stringify(messageBody),
-    QueueUrl: queueUrl,
-    ...necessaryFiFoParams,
-  }
-
-  await _slowDown(2000)
-
-  // Sends single message to SQS for further process
-  const test = await sendMessage(sqsPayload)
-
-  // await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
-
-  console.log('+++sqsPayload', sqsPayload)
-  console.log('+++test', test)
-
-  const responseBody = {
-    fileName,
-    queueUrl,
-  }
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify(responseBody),
-  }
-
-  await _slowDown(2000)
-
-  // TRACING with redis
-  await awsTracerWithRedis.stopLambdaTracer()
-
-  return response
 }

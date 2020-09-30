@@ -232,6 +232,8 @@ functions:
       SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
       PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
       REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_REDIS}
 
 resources:
   Resources:

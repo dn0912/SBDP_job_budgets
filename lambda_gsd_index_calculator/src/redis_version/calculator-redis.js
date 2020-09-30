@@ -1,4 +1,6 @@
-const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
+const {
+  BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER, REGION, QUEUE_NAME,
+} = process.env
 
 const AWS = require('aws-sdk')
 
@@ -10,12 +12,19 @@ const moment = require('moment')
 const { promisify } = require('util')
 
 const s3 = new AWS.S3()
+const sqs = new AWS.SQS({
+  region: REGION,
+})
 
 const getS3Object = awsTracerWithRedis.traceS3GetObject(
   promisify(s3.getObject).bind(s3),
 )
 const putS3Object = awsTracerWithRedis.traceS3PutObject(
   promisify(s3.putObject).bind(s3),
+)
+
+const deleteMessage = awsTracerWithRedis.traceSQSDeleteMessage(
+  promisify(sqs.deleteMessage).bind(sqs),
 )
 
 // TODO: remove later
@@ -47,6 +56,18 @@ const putFile = async (fileContent) => {
   await putS3Object(params)
 
   return fileName
+}
+
+const deleteSqsMessage = async (receiptHandle, context) => {
+  const accountId = context.invokedFunctionArn.split(':')[4]
+  const queueUrl = `https://sqs.${REGION}.amazonaws.com/${accountId}/${QUEUE_NAME}`
+  const params = {
+    QueueUrl: queueUrl,
+    ReceiptHandle: receiptHandle,
+  }
+
+  console.log('+++deleteSqsMessage', params)
+  await deleteMessage(params)
 }
 
 const calculateAverageTimeToCompleteTask = (tasksUpdateArray) => {
@@ -102,7 +123,8 @@ module.exports.handler = async (event, context) => {
     console.log('+++event2', JSON.stringify(event, undefined, 2))
     console.log('+++context', context)
 
-    const eventBody = JSON.parse(event.Records[0].body)
+    const { body, receiptHandle } = event.Records[0]
+    const eventBody = JSON.parse(body)
     const { fileName } = eventBody
 
     // *******
@@ -110,19 +132,25 @@ module.exports.handler = async (event, context) => {
     await awsTracerWithRedis.startLambdaTracer(event, context)
     // *******
 
+    await deleteSqsMessage(receiptHandle, context)
+
     const s3FileContentAsString = await readFile(fileName)
     const s3FileContent = JSON.parse(s3FileContentAsString)
 
+    console.log('+++before calculation')
+
     const averageTimeToCompleteTask = calculateAverageTimeToCompleteTask(s3FileContent)
 
-    await slowDown(2000)
+    console.log('+++after calculation')
+
+    // await slowDown(2000)
 
     const fileContent = {
       preprocessedDataFileName: fileName,
       averageTimeToCompleteTask,
     }
 
-    const resultFileName = await putFile(fileContent)
+    // const resultFileName = await putFile(fileContent)
 
     // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
 
@@ -132,11 +160,11 @@ module.exports.handler = async (event, context) => {
         message: 'SQS event processed.',
         input: event,
         averageTimeToCompleteTask,
-        resultFileName,
+        // resultFileName,
       }),
     }
 
-    await slowDown(2000)
+    // await slowDown(2000)
 
     console.log('+++response', response)
 
