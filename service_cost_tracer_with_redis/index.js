@@ -16,6 +16,13 @@ const _s3FileSizeTracer = (fileContent) => {
   return s3ContentKiloByteSize
 }
 
+const _getSqsQueueNameFromPayload = (sqsPayload) => {
+  const { QueueUrl } = sqsPayload
+  const _queueUrlSplitted = QueueUrl.split('/')
+  const queueName = _queueUrlSplitted[_queueUrlSplitted.length - 1]
+  return queueName
+}
+
 const _sqsPayloadSizeTracer = (sqsPayload) => {
   const payloadByteSize = Buffer.byteLength(JSON.stringify(sqsPayload), 'utf8')
   const sqs64KiloByteChunkAmounts = Math.ceil(payloadByteSize / 1024 / 64)
@@ -54,6 +61,9 @@ module.exports = class AWSTracer {
       lambdaFunctionName: null,
       lambdaInvokedFunctionArn: null,
     }
+
+    // TODO: only for evaluation purpose
+    this.awsRequestId = null
 
     // TODO: *** Redis Keyspace notification
     this.redisKeyspaceNotificationSubscriberClient = REDIS_CONNECTION
@@ -110,6 +120,14 @@ module.exports = class AWSTracer {
     }
   }
 
+  traceSQSDeleteMessage(fn) {
+    return async (...args) => {
+      const result = await fn(...args)
+      await this.deleteSqsMessageIsCalled(...args)
+      return result
+    }
+  }
+
   async checkFlag() {
     const flagStatus = await this.tracerStoreClient.get(createFlagPoleCacheKey(this.jobId))
     if (flagStatus) {
@@ -130,6 +148,7 @@ module.exports = class AWSTracer {
     this.lambdaTraceInfo.lambdaMemoryAllocationInMB = context.memoryLimitInMB
     this.lambdaTraceInfo.lambdaFunctionName = context.functionName
     this.lambdaTraceInfo.lambdaInvokedFunctionArn = context.invokedFunctionArn
+    this.awsRequestId = context.awsRequestId
 
     console.log('+++redis lambdaStartTime+++', this.lambdaTraceInfo.lambdaStartTime)
 
@@ -163,13 +182,14 @@ module.exports = class AWSTracer {
     const stopLambdaTs = Date.now()
     const processingTime = (stopLambdaTs - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
-    const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
+    const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}::${this.awsRequestId}`
 
     await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
 
     // TODO: for evaluation of redis speed
     await this.tracerStoreClient.set(`${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
     await this.checkFlag()
+    this.redisKeyspaceNotificationSubscriberClient.punsubscribe()
   }
 
   /**
@@ -214,10 +234,7 @@ module.exports = class AWSTracer {
   async sendSqsMessageIsCalled(sqsPayload) {
     console.log('+++redis sendSqsMessageIsCalled+++')
     // TODO: for queueType
-    const { QueueUrl } = sqsPayload
-
-    const _queueUrlSplitted = QueueUrl.split('/')
-    const queueName = _queueUrlSplitted[_queueUrlSplitted.length - 1]
+    const queueName = _getSqsQueueNameFromPayload(sqsPayload)
 
     console.log('+++queueName+++', queueName)
 
@@ -225,6 +242,16 @@ module.exports = class AWSTracer {
     await this.tracerStoreClient.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`, sqs64KiloByteChunkAmounts)
     // in case queue names are not known from trace start bc no app is registered
     await this.tracerStoreClient.incrby(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`, sqs64KiloByteChunkAmounts)
+
+    await this.checkFlag()
+  }
+
+  async deleteSqsMessageIsCalled(sqsPayload) {
+    console.log('+++redis deleteSqsMessageIsCalled+++')
+    const queueName = _getSqsQueueNameFromPayload(sqsPayload)
+    console.log('+++queueName+++', queueName)
+    await this.tracerStoreClient.incr(`${CACHE_KEY_PREFIX}${this.jobId}#sqs#${queueName}`)
+    await this.tracerStoreClient.incr(`${CACHE_KEY_PREFIX}${this.jobId}#sqs`)
 
     await this.checkFlag()
   }
