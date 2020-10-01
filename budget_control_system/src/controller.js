@@ -280,17 +280,17 @@ const startJobAndTrace = async (eventBus, additionalData) => {
       const redisCommand = channel.split(':')[1]
 
       // TODO: only for speed evaluation
-      if (redisCommand === 'set' && message.startsWith('arn:aws:lambda')) {
+      if (redisCommand === 'set' && message.startsWith('evaluation_arn:aws:lambda')) {
         const redisTsValue = await redisClient.get(message)
         const currentSystemTs = Date.now()
         const passedTime = currentSystemTs - redisTsValue
         // console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
+        // fs.appendFileSync(
+        //   'evaluation/traceFetchingDelaysRedis_log.json',
+        //   `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
+        // )
         fs.appendFileSync(
-          'evaluation/traceFetchingDelaysRedis_log.json',
-          `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
-        )
-        fs.appendFileSync(
-          'evaluation/traceFetchingDelaysRedis.csv',
+          'evaluation/traceFetchingDelaysRedis_log.csv',
           `\n${message}, ${redisTsValue}, ${currentSystemTs}, ${passedTime}`,
         )
       }

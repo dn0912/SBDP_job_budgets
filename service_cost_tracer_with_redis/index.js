@@ -187,9 +187,8 @@ module.exports = class AWSTracer {
     await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
 
     // TODO: for evaluation of redis speed
-    await this.tracerStoreClient.set(`${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
+    await this.tracerStoreClient.set(`evaluation_${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}`, stopLambdaTs)
     await this.checkFlag()
-    this.redisKeyspaceNotificationSubscriberClient.punsubscribe()
   }
 
   /**
