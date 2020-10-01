@@ -289,9 +289,15 @@ const startJobAndTrace = async (eventBus, additionalData) => {
         //   'evaluation/traceFetchingDelaysRedis_log.json',
         //   `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
         // )
-        fs.appendFileSync(
+        fs.appendFile(
           'evaluation/traceFetchingDelaysRedis_log.csv',
           `\n${message}, ${redisTsValue}, ${currentSystemTs}, ${passedTime}`,
+          (err) => {
+            if (err) {
+              throw err
+            }
+            console.log('The new_content was appended successfully')
+          }
         )
       }
 
