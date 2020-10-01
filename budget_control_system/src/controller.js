@@ -286,7 +286,7 @@ const startJobAndTrace = async (eventBus, additionalData) => {
         const passedTime = currentSystemTs - redisTsValue
         // console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
         fs.appendFileSync(
-          'evaluation/traceFetchingDelaysRedis.json',
+          'evaluation/traceFetchingDelaysRedis_log.json',
           `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
         )
         fs.appendFileSync(

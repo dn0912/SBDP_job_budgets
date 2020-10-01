@@ -54,19 +54,19 @@ module.exports.startJob = async (event, context) => {
   // ]
   const fileNames = [
     'test_with_description_title_change_500_single.json',
-    // 'test_with_description_title_change_1000_single.json',
-    // 'test_with_description_title_change_1500_single.json',
-    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
-    // 'test_with_description_title_change_500_single.json',
-    // 'test_with_description_title_change_1000_single.json',
-    // 'test_with_description_title_change_1500_single.json',
-    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    'test_with_description_title_change_1000_single.json',
+    'test_with_description_title_change_1500_single.json',
+    'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    'test_with_description_title_change_500_single.json',
+    'test_with_description_title_change_1000_single.json',
+    'test_with_description_title_change_1500_single.json',
+    'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
     // 'test_with_description_title_change_10000_single.json', // TODO: throws some timeout errors
   ]
 
   // await slowDown(2000)
 
-  const numberOfLambdaInvocations = Array.from(Array(1).keys())
+  const numberOfLambdaInvocations = Array.from(Array(5).keys())
 
   const promises = numberOfLambdaInvocations.map(() => {
     const payload = {

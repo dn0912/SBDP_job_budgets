@@ -150,7 +150,7 @@ module.exports.handler = async (event, context) => {
       averageTimeToCompleteTask,
     }
 
-    // const resultFileName = await putFile(fileContent)
+    const resultFileName = await putFile(fileContent)
 
     // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
 
@@ -160,7 +160,7 @@ module.exports.handler = async (event, context) => {
         message: 'SQS event processed.',
         input: event,
         averageTimeToCompleteTask,
-        // resultFileName,
+        resultFileName,
       }),
     }
 
