@@ -1,9 +1,7 @@
-"jobStartTimeStamp","arn","traceCloseTimeStamp","currentTimeStamp","elapsedTimeFromClosingTraceToNow"
+jobStartTimeStamp,arn,traceCloseTimeStamp,currentTimeStamp,elapsedTimeFromClosingTraceToNow
 1595255512307,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595255514559,1595255517329,2770
-
 1595255693655,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595255695914,1595255698241,2327
 1595255703072,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595255705255,1595255707508,2253
-
 1595264178991,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595264181199,1595264184298,3099
 1595268026600,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595268029913,1595268033615,3702
 1595277514296,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1595277519291,1595277524420,5129
@@ -31,7 +29,6 @@
 1596200536390,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596200538560,1596200542459,3899
 1596200833064,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596200835967,1596200840406,4439
 1596200985674,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596200988649,1596200993265,4616
-
 1596201271820,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596201274729,1596201278433,3704
 1596201426694,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596201429589,1596201433196,3607
 1596201689807,arn:aws:lambda:eu-central-1:646012695651:function:lambda-gsd-index-calculator-dev-start-job,1596201692665,1596201697284,4619
