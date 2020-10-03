@@ -182,12 +182,14 @@ module.exports = class AWSTracer {
     const stopLambdaTs = Date.now()
     const processingTime = (stopLambdaTs - this.lambdaTraceInfo.lambdaStartTime) / 1000
 
-    const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}::${this.awsRequestId}`
+    // const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}`
+    // TODO: for evaluation of redis speed
+    const memoryAndProcessingTimeString = `${memoryAllocationInMB}::${processingTime}::${this.awsRequestId}::${this.lambdaTraceInfo.lambdaFunctionName}::${this.jobId}`
 
     await this.tracerStoreClient.rpush(`${CACHE_KEY_PREFIX}${this.jobId}#lambda`, memoryAndProcessingTimeString)
 
     // TODO: for evaluation of redis speed
-    await this.tracerStoreClient.set(`evaluation_${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}::${this.awsRequestId}`, stopLambdaTs)
+    // await this.tracerStoreClient.set(`evaluation_${this.lambdaTraceInfo.lambdaInvokedFunctionArn}#${this.jobId}::${this.awsRequestId}`, stopLambdaTs)
     await this.checkFlag()
   }
 
