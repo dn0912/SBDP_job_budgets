@@ -18,6 +18,10 @@
       <input type="file" id="uploadfile" placeholder="Upload Cloudformation file" name="data" class="file-input"></input>
       <button type="submit" class="submit-buttons" id="register-app-submit-button">Upload</button>
     </form>
+    <form class="subscribe-budget-alarm-form" method="POST" enctype="application/x-www-form-urlencoded" id="subscribe-budget-alarm-form">
+      <input id="subscribe-budget-alarm-input" placeholder="Enter your mail address for mail notification on budget exceeding" autocomplete="off"></input>
+      <button type="submit" class="submit-buttons">Register mail</button>
+    </form>
     <form
       name="start-job-and-trace-form"
       id="start-job-and-trace-form"
@@ -116,6 +120,28 @@
             },
           });
         });
+
+        $("#subscribe-budget-alarm-form").submit((event) => {
+        event.preventDefault(); //stop submit the form, will post manually.
+        const mailInput = $('#subscribe-budget-alarm-input').val()
+
+        console.log('+++mailInput', mailInput)
+
+        if (mailInput) {
+          $.ajax({
+          url: '/subscribe-budget-alarm',
+          data: { mail: mailInput },
+          type: 'POST',
+          success: (data) => {
+            console.log('+++data', data)
+            $('#messages').append($('<li>').text('Mail subscribed successfully: ' + data.mail + '   You need to confirm the subscription mail'));
+          },
+          });
+
+        } else {
+          $('#messages').append($('<li>').text('Error: Provide mail address'));
+        }
+      });
       });
 
     function displayJobCostsContent(jobCostsDetails) {

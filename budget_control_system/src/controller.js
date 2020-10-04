@@ -432,8 +432,13 @@ const getJobStatus = async ({
 }
 
 const subscribeToBudgetAlarm = async (req, res) => {
-  console.log('+++data', req.body)
-  const requestBody = JSON.parse(req.body)
+  console.log('+++data', req.body, typeof req.body)
+  let requestBody
+  if (typeof req.body === 'string') {
+    requestBody = JSON.parse(req.body)
+  } else {
+    requestBody = req.body
+  }
   const { mail } = requestBody
   const notifier = new Notifier()
 
@@ -442,7 +447,8 @@ const subscribeToBudgetAlarm = async (req, res) => {
   console.log('++++ YOU NEED TO CONFIRM EMAIL')
 
   res.status(HttpStatus.CREATED).json({
-    Note: 'YOU NEED TO CONFIRM EMAIL SUBSCRIPTION.'
+    Note: 'YOU NEED TO CONFIRM EMAIL SUBSCRIPTION.',
+    mail,
   })
 }
 
