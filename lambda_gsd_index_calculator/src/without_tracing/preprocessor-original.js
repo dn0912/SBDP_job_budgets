@@ -5,9 +5,6 @@ const {
 const AWS = require('aws-sdk')
 const moment = require('moment')
 const _ = require('lodash')
-const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
-
-const awsTracerWithRedis = new AWSTracerWithRedis(process)
 
 const s3 = new AWS.S3()
 
@@ -17,15 +14,9 @@ const sqs = new AWS.SQS({
 
 const { promisify } = require('util')
 
-const getS3Object = awsTracerWithRedis.traceS3GetObject(
-  promisify(s3.getObject).bind(s3),
-)
-const putS3Object = awsTracerWithRedis.traceS3PutObject(
-  promisify(s3.putObject).bind(s3),
-)
-const sendMessage = awsTracerWithRedis.traceSQSSendMessage(
-  promisify(sqs.sendMessage).bind(sqs),
-)
+const getS3Object = promisify(s3.getObject).bind(s3)
+const putS3Object = promisify(s3.putObject).bind(s3)
+const sendMessage = promisify(sqs.sendMessage).bind(sqs)
 
 // TODO: remove later
 // simulate slow function
@@ -79,8 +70,6 @@ module.exports.readAndFilterFile = async (event, context) => {
     // DO NOT USE object destructuring --
     // somehow does not work and exits lambda: const { jobId } = event
     const { jobId } = event
-    // Tracing with Redis
-    await awsTracerWithRedis.startLambdaTracer(event, context)
 
     // Read batched filenames
     const inputFileNameBatches = (event && event.fileNames)
@@ -142,9 +131,6 @@ module.exports.readAndFilterFile = async (event, context) => {
     }
 
     // await _slowDown(2000)
-
-    // TRACING with redis
-    await awsTracerWithRedis.stopLambdaTracer()
 
     return response
   } catch (err) {

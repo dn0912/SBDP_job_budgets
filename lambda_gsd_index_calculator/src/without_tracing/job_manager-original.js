@@ -1,8 +1,5 @@
 const AWS = require('aws-sdk')
-const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 const { promisify } = require('util')
-
-const awsTracerWithRedis = new AWSTracerWithRedis(process)
 
 const lambda = new AWS.Lambda()
 
@@ -37,7 +34,6 @@ module.exports.startJob = async (event, context) => {
   const eventBody = JSON.parse(event.body)
   const { jobId } = eventBody
 
-  await awsTracerWithRedis.startLambdaTracer(event, context)
   // *******
 
   console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)
@@ -74,7 +70,7 @@ module.exports.startJob = async (event, context) => {
       jobId,
     }
     return invokeLambda({
-      FunctionName: 'gsd-index-calculator-dev-preprocess-with-redis',
+      FunctionName: 'gsd-index-calculator-dev-preprocess-without-tracing',
       InvocationType: 'Event',
       Payload: JSON.stringify(payload),
     })
@@ -85,9 +81,6 @@ module.exports.startJob = async (event, context) => {
 
   // await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
   // await slowDown(3000)
-
-  // TRACING with redis
-  await awsTracerWithRedis.stopLambdaTracer()
 
   return {
     statusCode: 200,

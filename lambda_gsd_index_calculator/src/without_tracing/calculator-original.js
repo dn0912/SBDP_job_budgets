@@ -4,9 +4,9 @@ const {
 
 const AWS = require('aws-sdk')
 
-const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
+// const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
-const awsTracerWithRedis = new AWSTracerWithRedis(process)
+// const awsTracerWithRedis = new AWSTracerWithRedis(process)
 
 const moment = require('moment')
 const { promisify } = require('util')
@@ -16,16 +16,10 @@ const sqs = new AWS.SQS({
   region: REGION,
 })
 
-const getS3Object = awsTracerWithRedis.traceS3GetObject(
-  promisify(s3.getObject).bind(s3),
-)
-const putS3Object = awsTracerWithRedis.traceS3PutObject(
-  promisify(s3.putObject).bind(s3),
-)
+const getS3Object = promisify(s3.getObject).bind(s3)
+const putS3Object = promisify(s3.putObject).bind(s3)
 
-const deleteMessage = awsTracerWithRedis.traceSQSDeleteMessage(
-  promisify(sqs.deleteMessage).bind(sqs),
-)
+const deleteMessage = promisify(sqs.deleteMessage).bind(sqs)
 
 // TODO: remove later
 // simulate slow function
@@ -127,11 +121,6 @@ module.exports.handler = async (event, context) => {
     const eventBody = JSON.parse(body)
     const { fileName } = eventBody
 
-    // *******
-    // Tracing with Redis
-    await awsTracerWithRedis.startLambdaTracer(event, context)
-    // *******
-
     await deleteSqsMessage(receiptHandle, context)
 
     const s3FileContentAsString = await readFile(fileName)
@@ -167,9 +156,6 @@ module.exports.handler = async (event, context) => {
     // await slowDown(2000)
 
     console.log('+++response', response)
-
-    // TRACING with redis
-    await awsTracerWithRedis.stopLambdaTracer()
 
     return response
   } catch (err) {

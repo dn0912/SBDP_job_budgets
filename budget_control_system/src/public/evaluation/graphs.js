@@ -48,7 +48,7 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
   }
 
   // eslint-disable-next-line no-undef
-  Plotly.newPlot('myDiv', data, layout)
+  Plotly.newPlot('violin-graph', data, layout)
 })
 
 // eslint-disable-next-line no-undef
@@ -96,7 +96,7 @@ Plotly.d3.csv(
     }
 
     // eslint-disable-next-line no-undef
-    Plotly.newPlot('myDiv2', data2, layout2)
+    Plotly.newPlot('violin-graph2', data2, layout2)
   }
 )
 
@@ -171,7 +171,7 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
 })
 
 /**
- * lambda processing time accuracy
+ * TODO: lambda processing time accuracy
  */
 // eslint-disable-next-line no-undef
 Plotly.d3.csv(
@@ -217,22 +217,27 @@ Plotly.d3.csv(
           }
         })
 
-        console.log('+++deltas', deltas)
+        const overshootSum = deltas.reduce((sum, val) => {
+          if (val.deltaBilledDuration) {
+            return sum += 1
+          }
+          return sum
+        }, 0)
+        console.log('+++deltas', deltas, overshootSum)
         const traceDeltaIn100MsSegments = {
           x: deltas.map((val, index) => index),
           y: deltas.map((val) => val.deltaBilledDuration),
-          mode: 'scatter',
           name: 'Billed difference',
         }
         const traceDeltaInMs = {
           x: deltas.map((val, index) => index),
           y: deltas.map((val) => val.deltaDuration),
-          mode: 'scatter',
           name: 'Measured difference',
+          type: 'bar'
         }
         // eslint-disable-next-line no-undef
         Plotly.newPlot(
-          'myDivBilledDiff',
+          'diff-measurement-billed',
           [traceDeltaIn100MsSegments],
           {
             title: 'Difference on measured lambda billed processing duration from trace backend and CloudWatch logs',
@@ -242,7 +247,7 @@ Plotly.d3.csv(
         )
         // eslint-disable-next-line no-undef
         Plotly.newPlot(
-          'myDiv4',
+          'diff-measurement-detailed',
           [traceDeltaInMs],
           {
             title: 'Difference on measured lambda execution time from tracing backend compared to CloudWatch logs',
@@ -263,13 +268,11 @@ Plotly.d3.csv(
         const cWDuration = {
           x: cwRows.map((val, index) => index),
           y: cwRows.map((val) => val.DurationInMS),
-          mode: 'scatter'
         }
 
         const traceTracerDuration = {
           x: tracerRows.map((val, index) => index),
           y: tracerRows.map((val) => val.processingTime * 1000),
-          mode: 'scatter'
         }
 
         const data2 = [cWDuration, traceTracerDuration]
@@ -323,6 +326,206 @@ Plotly.d3.csv(
         // }
         // // eslint-disable-next-line no-undef
         // Plotly.newPlot('myDiv6', data4, layout)
+      }
+    )
+  }
+)
+
+const reduceHelperFunc = (acc, nonParsedVal) => {
+  const val = {
+    ...nonParsedVal,
+    DurationInMS: Number(nonParsedVal.DurationInMS),
+    BilledDurationInMS: Number(nonParsedVal.BilledDurationInMS),
+    MemorySetInMB: Number(nonParsedVal.MemorySetInMB),
+    MemoryUsedInMB: Number(nonParsedVal.MemorySetInMB),
+  }
+  // dataset contains 500,1000,1500,2000
+  if (val.setType === 'large') {
+    if (val.FunctionArn.includes('calculate')) {
+      acc.large.calculateLambda.push(val)
+    } else if (val.FunctionArn.includes('preprocess')) {
+      acc.large.preprocessLambda.push(val)
+    } else {
+      acc.large.startJobLambda.push(val)
+    }
+  } else if (val.setType === 'small') { // dataset contains 500,1000,1500
+    if (val.FunctionArn.includes('calculate')) {
+      acc.small.calculateLambda.push(val)
+    } else if (val.FunctionArn.includes('preprocess')) {
+      acc.small.preprocessLambda.push(val)
+    } else {
+      acc.small.startJobLambda.push(val)
+    }
+  }
+
+  return acc
+}
+
+// eslint-disable-next-line no-undef
+Plotly.d3.csv(
+  'http://localhost:8080/evaluation/impact-instrumentation/impact_instrumentation-not_instrumented.csv',
+  (err, originalRows) => {
+    // eslint-disable-next-line no-undef
+    Plotly.d3.csv(
+      'http://localhost:8080/evaluation/impact-instrumentation/impact_instrumentation-traced.csv',
+      (err, tracedRows) => {
+        console.log('+++originalRows', originalRows)
+        console.log('+++tracedRows', tracedRows)
+
+        const originalDataSet = originalRows.reduce((acc, nonParsedVal) => {
+          const returnedAcc = reduceHelperFunc(acc, nonParsedVal)
+          return returnedAcc
+        },
+        {
+          small: {
+            calculateLambda: [],
+            preprocessLambda: [],
+            startJobLambda: [],
+          },
+          large: {
+            calculateLambda: [],
+            preprocessLambda: [],
+            startJobLambda: [],
+          }
+        })
+
+        const tracedDataSet = tracedRows.reduce((acc, nonParsedVal) => {
+          const returnedAcc = reduceHelperFunc(acc, nonParsedVal)
+          return returnedAcc
+        },
+        {
+          small: {
+            calculateLambda: [],
+            preprocessLambda: [],
+            startJobLambda: [],
+          },
+          large: {
+            calculateLambda: [],
+            preprocessLambda: [],
+            startJobLambda: [],
+          }
+        })
+
+        console.log('+++originalDataSet', originalDataSet)
+        const originaldataResult = {
+          small: {
+            calculateMean: _.meanBy(originalDataSet.small.calculateLambda, 'DurationInMS'),
+            preprocessMean: _.meanBy(originalDataSet.small.preprocessLambda, 'DurationInMS'),
+            startJobMean: _.meanBy(originalDataSet.small.startJobLambda, 'DurationInMS'),
+          },
+          large: {
+            calculateMean: _.meanBy(originalDataSet.large.calculateLambda, 'DurationInMS'),
+            preprocessMean: _.meanBy(originalDataSet.large.preprocessLambda, 'DurationInMS'),
+            startJobMean: _.meanBy(originalDataSet.large.startJobLambda, 'DurationInMS'),
+          }
+        }
+
+        const tracedDataSetResult = {
+          small: {
+            calculateMean: _.meanBy(tracedDataSet.small.calculateLambda, 'DurationInMS'),
+            preprocessMean: _.meanBy(tracedDataSet.small.preprocessLambda, 'DurationInMS'),
+            startJobMean: _.meanBy(tracedDataSet.small.startJobLambda, 'DurationInMS'),
+          },
+          large: {
+            calculateMean: _.meanBy(tracedDataSet.large.calculateLambda, 'DurationInMS'),
+            preprocessMean: _.meanBy(tracedDataSet.large.preprocessLambda, 'DurationInMS'),
+            startJobMean: _.meanBy(tracedDataSet.large.startJobLambda, 'DurationInMS'),
+          },
+        }
+
+        console.log('+++originaldataResult', originaldataResult)
+        console.log('+++tracedDataSetResult', tracedDataSetResult)
+
+        const xValues = ['job manager λ', 'preprocessor λ', 'calculator λ']
+        const yValuesSmallDataSetOriginal = [
+          Math.round(originaldataResult.small.startJobMean),
+          Math.round(originaldataResult.small.preprocessMean),
+          Math.round(originaldataResult.small.calculateMean),
+        ]
+
+        const yValuesSmallDataSetTraced = [
+          Math.round(tracedDataSetResult.small.startJobMean),
+          Math.round(tracedDataSetResult.small.preprocessMean),
+          Math.round(tracedDataSetResult.small.calculateMean),
+        ]
+
+        console.log('+++yValuesSmallDataSetOriginal', yValuesSmallDataSetOriginal, yValuesSmallDataSetTraced)
+
+        const chartSmallDataSetOriginal = {
+          x: xValues,
+          y: yValuesSmallDataSetOriginal,
+          type: 'bar',
+          text: yValuesSmallDataSetOriginal.map(String),
+          textposition: 'auto',
+          name: 'Non-instrumented λ',
+        }
+
+        const chartSmallDataSetTraced = {
+          x: xValues,
+          y: yValuesSmallDataSetTraced,
+          type: 'bar',
+          text: yValuesSmallDataSetTraced.map(String),
+          textposition: 'auto',
+          name: 'Traced λ',
+        }
+
+        // eslint-disable-next-line no-undef
+        Plotly.newPlot(
+          'instrumentation-impact-small-dataset',
+          [
+            chartSmallDataSetOriginal,
+            chartSmallDataSetTraced,
+          ],
+          {
+            title: 'Small data set: Mean run time of instrumented and non-instrumented λ',
+            yaxis: { title: 'time in ms' },
+          }
+        )
+
+        const yValuesLargeDataSetOriginal = [
+          Math.round(originaldataResult.large.startJobMean),
+          Math.round(originaldataResult.large.preprocessMean),
+          Math.round(originaldataResult.large.calculateMean),
+        ]
+
+        const yValuesLargeDataSetTraced = [
+          Math.round(tracedDataSetResult.large.startJobMean),
+          Math.round(tracedDataSetResult.large.preprocessMean),
+          Math.round(tracedDataSetResult.large.calculateMean),
+        ]
+
+        console.log('+++yValuesLargeDataSetOriginal', yValuesLargeDataSetOriginal, yValuesLargeDataSetTraced)
+
+        const chartLargeDataSetOriginal = {
+          x: xValues,
+          y: yValuesLargeDataSetOriginal,
+          type: 'bar',
+          text: yValuesLargeDataSetOriginal.map(String),
+          textposition: 'auto',
+          name: 'Non-instrumented λ',
+        }
+
+        const chartLargeDataSetTraced = {
+          x: xValues,
+          y: yValuesLargeDataSetTraced,
+          type: 'bar',
+          text: yValuesLargeDataSetTraced.map(String),
+          textposition: 'auto',
+          name: 'Traced λ',
+        }
+
+        // eslint-disable-next-line no-undef
+        Plotly.newPlot(
+          'instrumentation-impact-large-dataset',
+          [
+            chartLargeDataSetOriginal,
+            chartLargeDataSetTraced,
+          ],
+          {
+            title: 'Large data set: Mean run time of instrumented and non-instrumented λ',
+            yaxis: { title: 'time in ms' },
+          }
+        )
       }
     )
   }
