@@ -9,19 +9,6 @@
 
 <body>
   <div class="header">
-    <form name="get-job-status-form" id="get-job-status-form" action="">
-      <input id="get-job-costs-input" autocomplete="off"
-        placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
-      <button class="submit-buttons">Get job costs</button>
-    </form>
-    <form class="register-app-form" method="POST" enctype="multipart/form-data" id="register-app-form">
-      <input type="file" id="uploadfile" placeholder="Upload Cloudformation file" name="data" class="file-input"></input>
-      <button type="submit" class="submit-buttons" id="register-app-submit-button">Upload</button>
-    </form>
-    <form class="subscribe-budget-alarm-form" method="POST" enctype="application/x-www-form-urlencoded" id="subscribe-budget-alarm-form">
-      <input id="subscribe-budget-alarm-input" placeholder="Enter your mail address for mail notification on budget exceeding" autocomplete="off"></input>
-      <button type="submit" class="submit-buttons">Register mail</button>
-    </form>
     <form
       name="start-job-and-trace-form"
       id="start-job-and-trace-form"
@@ -34,7 +21,24 @@
         placeholder="(Opt) - App ID of uploaded Cloudformation stack" />
       <input id="start-job-and-trace-tracePeriod-input" autocomplete="off"
         placeholder="(Opt) Tracing duration (in sec) - fetching trace in 500ms period" />
-      <button class="submit-buttons">Start job</button>
+      <button class="submit-buttons primary">Start job</button>
+    </form>
+    <div class="wrapper">
+      <form class="register-app-form" method="POST" enctype="multipart/form-data" id="register-app-form">
+        <input type="file" id="uploadfile" placeholder="Upload Cloudformation file" name="data" class="file-input"></input>
+        <button type="submit" class="submit-buttons" id="register-app-submit-button">Upload</button>
+      </form>
+      <form class="subscribe-budget-alarm-form" method="POST" enctype="application/x-www-form-urlencoded"
+        id="subscribe-budget-alarm-form">
+        <input id="subscribe-budget-alarm-input"
+          placeholder="Enter your mail address for mail notification on budget exceeding" autocomplete="off"></input>
+        <button type="submit" class="submit-buttons">Register mail</button>
+      </form>
+    </div>
+    <form name="get-job-status-form" id="get-job-status-form" action="">
+      <input id="get-job-costs-input" autocomplete="off"
+        placeholder="Enter job ID here e.g. '81abeb31-e4e7-4dfc-a216-f3fa95252643'" />
+      <button class="submit-buttons">Get job costs</button>
     </form>
     <button id="clear-button">Clear page</button>
   </div>

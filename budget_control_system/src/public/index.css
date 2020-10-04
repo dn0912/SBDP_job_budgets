@@ -30,7 +30,16 @@ form input {
 
 form button {
   width: 9%;
+  border: none;
   background: rgb(130, 224, 255);
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+}
+
+.primary {
+  width: 9%;
+  background: rgb(236, 114, 17);
   border: none;
   padding: 10px;
   border-radius: 5px;
@@ -84,4 +93,8 @@ table {
 }
 #messages-table tr:nth-child(odd) {
   background: #eee;
+}
+
+.wrapper {
+  display: flex;
 }
