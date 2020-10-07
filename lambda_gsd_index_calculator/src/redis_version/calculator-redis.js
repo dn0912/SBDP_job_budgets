@@ -29,10 +29,10 @@ const deleteMessage = awsTracerWithRedis.traceSQSDeleteMessage(
 
 // TODO: remove later
 // simulate slow function
-// const slowDown = async (ms) => {
-//   console.log(`+++Take it easy!?! ${ms} ms`)
-//   await new Promise((resolve) => setTimeout(resolve, ms))
-// }
+const slowDown = async (ms) => {
+  console.log(`+++Take it easy!?! ${ms} ms`)
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 const readFile = async (fileName) => {
   const params = {
@@ -152,7 +152,7 @@ module.exports.handler = async (event, context) => {
 
     const resultFileName = await putFile(fileContent)
 
-    // await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
+    await slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
     const response = {
       statusCode: 200,

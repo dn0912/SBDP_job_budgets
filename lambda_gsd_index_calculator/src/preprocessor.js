@@ -100,7 +100,7 @@ module.exports.readAndFilterFile = async (event, context) => {
   const eventArray = _.flattenDeep(parsedEventArrays)
   const cleanTaskUpdates = _filterUnnecessaryUpdates(eventArray)
 
-  await _slowDown(4000)
+  // await _slowDown(4000)
 
   const fileName = await _putFile(cleanTaskUpdates, jobId)
 
@@ -129,7 +129,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     ...necessaryFiFoParams,
   }
 
-  await _slowDown(2000)
+  // await _slowDown(2000)
 
   // Sends single message to SQS for further process
   const test = await tracedSendMessage(sqsPayload, jobId)

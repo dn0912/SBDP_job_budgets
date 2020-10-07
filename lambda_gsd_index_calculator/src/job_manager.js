@@ -54,7 +54,7 @@ module.exports.startJob = async (event, context) => {
     'test_with_description_title_change_500_single.json',
     'test_with_description_title_change_1000_single.json',
     'test_with_description_title_change_1500_single.json',
-    'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
+    // 'test_with_description_title_change_2000_single.json', // TODO: throws some timeout errors
     // 'test_with_description_title_change_10000_single.json', // TODO: throws some timeout errors
   ]
 

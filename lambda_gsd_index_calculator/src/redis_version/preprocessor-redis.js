@@ -29,10 +29,10 @@ const sendMessage = awsTracerWithRedis.traceSQSSendMessage(
 
 // TODO: remove later
 // simulate slow function
-// const _slowDown = async (ms) => {
-//   console.log(`+++Take it easy!?! ${ms} ms`)
-//   await new Promise((resolve) => setTimeout(resolve, ms))
-// }
+const _slowDown = async (ms) => {
+  console.log(`+++Take it easy!?! ${ms} ms`)
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 const _readFile = async (fileName) => {
   const params = {
@@ -127,7 +127,7 @@ module.exports.readAndFilterFile = async (event, context) => {
     // Sends single message to SQS for further process
     const test = await sendMessage(sqsPayload)
 
-    // await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
+    await _slowDown((Math.floor(Math.random() * (30 - 10 + 1) + 10)) * 100)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)

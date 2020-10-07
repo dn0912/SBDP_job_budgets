@@ -66,7 +66,7 @@ module.exports.startJob = async (event, context) => {
 
   // await slowDown(2000)
 
-  const numberOfLambdaInvocations = Array.from(Array(5).keys())
+  const numberOfLambdaInvocations = Array.from(Array(20).keys())
 
   const promises = numberOfLambdaInvocations.map(() => {
     const payload = {
@@ -88,7 +88,6 @@ module.exports.startJob = async (event, context) => {
 
   // TRACING with redis
   await awsTracerWithRedis.stopLambdaTracer()
-
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
