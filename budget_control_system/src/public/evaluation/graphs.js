@@ -5,6 +5,78 @@ const unpack = (rows, key) => {
   return rows.map((row) => parseInt(row[key].trim(), 10))
 }
 
+/**
+ * TODO: Fetching trace data delay
+ */
+// eslint-disable-next-line no-undef
+Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchingDelaysRedis_log-local.csv', (err, localRows) => {
+  // eslint-disable-next-line no-undef
+  Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchingDelaysRedis_log-deployed_trace_backend.csv', (err, deployedRows) => {
+    // eslint-disable-next-line no-undef
+    Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchingDelaysXRay.csv', (err, xrayRows) => {
+      const localRowsWithType = localRows.map((val) => ({
+        ...val,
+        traceFetchDelayInMS: val.passedTime,
+        traceType: 'Redis-based - local',
+      }))
+
+      const deployedRowsWithType = deployedRows.map((val) => ({
+        ...val,
+        traceFetchDelayInMS: val.passedTime,
+        traceType: 'Redis-based - Deployed',
+      }))
+
+      const xrayRowsWithType = xrayRows.map((val) => ({
+        ...val,
+        traceFetchDelayInMS: val.elapsedTimeFromClosingTraceToNow,
+        traceType: 'XRay-based',
+      }))
+
+      const allRows = [...xrayRowsWithType, ...localRowsWithType, ...deployedRowsWithType]
+
+      const data = [{
+        type: 'violin',
+        x: allRows.map((val) => val.traceType),
+        y: unpack(allRows, 'traceFetchDelayInMS'),
+        points: 'none',
+        box: {
+          visible: true
+        },
+        line: {
+          color: 'green',
+        },
+        meanline: {
+          visible: true
+        },
+        transforms: [{
+          type: 'groupby',
+          groups: allRows.map((val) => val.traceType),
+          styles: [
+            { target: 'Redis-based - local', value: { line: { color: 'blue' } } },
+            { target: 'Redis-based - Deployed', value: { line: { color: 'orange' } } },
+            { target: 'XRay-based', value: { line: { color: 'green' } } },
+          ]
+        }]
+      }]
+
+      const layout = {
+        title: '',
+        yaxis: {
+          zeroline: false,
+          title: 'time in ms',
+          range: [-450, 7700],
+        },
+        width: 550,
+        height: 550,
+        // showlegend: false,
+      }
+
+      // eslint-disable-next-line no-undef
+      Plotly.newPlot('violin-graph-all', data, layout)
+    })
+  })
+})
+
 // eslint-disable-next-line no-undef
 Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchingDelaysRedis_log-local.csv', (err, rows) => {
   const unpackedData = unpack(rows, 'passedTime')
@@ -25,13 +97,14 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
     meanline: {
       visible: true
     },
-    x0: 'Delay (ms)'
+    x0: 'Local trace-backend'
   }]
 
   const layout = {
     title: 'Delay of fetching data with local trace-backend',
     yaxis: {
-      zeroline: false
+      zeroline: false,
+      title: 'time difference in ms',
     },
     autosize: false,
     width: 550,
@@ -73,13 +146,14 @@ Plotly.d3.csv(
       meanline: {
         visible: true
       },
-      x0: 'Delay (ms)'
+      x0: 'Deployed trace-backend'
     }]
 
     const layout2 = {
       title: 'Delay of fetching data with deployed trace-backend',
       yaxis: {
-        zeroline: false
+        zeroline: false,
+        title: 'time difference in ms',
       },
       autosize: false,
       width: 550,
@@ -157,6 +231,7 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
       title: 'Split local and deployed trace-backend',
       yaxis: {
         zeroline: false,
+        title: 'time in ms',
       },
       violingap: 0,
       violingroupgap: 0,
@@ -235,27 +310,43 @@ Plotly.d3.csv(
           name: 'Measured difference',
           type: 'bar'
         }
-        // eslint-disable-next-line no-undef
-        Plotly.newPlot(
-          'diff-measurement-billed',
-          [traceDeltaIn100MsSegments],
-          {
-            title: 'Difference on measured lambda billed processing duration from trace backend and CloudWatch logs',
-            width: 1000,
-            height: 550,
-          },
-        )
+
+        const getStandardDeviation = (array) => {
+          const n = array.length
+          const mean = array.reduce((a, b) => a + b) / n
+          console.log('+++mean', mean)
+          return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
+        }
+
+        const traceDeltaInMsArray = deltas.map((val) => val.deltaDuration)
+        console.log('+++getStandardDeviation', traceDeltaInMsArray, getStandardDeviation(traceDeltaInMsArray))
+
         // eslint-disable-next-line no-undef
         Plotly.newPlot(
           'diff-measurement-detailed',
           [traceDeltaInMs],
           {
-            title: 'Difference on measured lambda execution time from tracing backend compared to CloudWatch logs',
+            title: 'Time difference of lambda execution duration <br>between CloudWatch logs and trace-backend',
             width: 1000,
             height: 550,
             xaxis: { title: 'execution index' },
-            yaxis: { title: 'time in ms' },
+            yaxis: { title: 'time difference in CloudWatch log in ms' },
           },
+          { editable: true },
+        )
+
+        // eslint-disable-next-line no-undef
+        Plotly.newPlot(
+          'diff-measurement-billed',
+          [traceDeltaIn100MsSegments],
+          {
+            title: 'Billed time difference of lambda execution duration <br>between CloudWatch logs and trace-backend',
+            width: 1000,
+            height: 550,
+            xaxis: { title: 'execution index' },
+            yaxis: { title: 'time difference in ms' },
+          },
+          { editable: true },
         )
 
         const mergedCWAndTracerData = tracerRows.map((tracerVal) => {
@@ -279,12 +370,12 @@ Plotly.d3.csv(
         const data3 = [
           {
             x: mergedCWAndTracerData.map((val, index) => index),
-            y: mergedCWAndTracerData.map((val) => val.cwDuration),
+            y: mergedCWAndTracerData.map((val) => val.cwDuration / 1000),
             name: 'CloudWatch measured lambda duration',
           },
           {
             x: mergedCWAndTracerData.map((val, index) => index),
-            y: mergedCWAndTracerData.map((val) => val.tracerDuration),
+            y: mergedCWAndTracerData.map((val) => val.tracerDuration / 1000),
             name: 'Traced lambda duration',
           },
         ]
@@ -292,6 +383,30 @@ Plotly.d3.csv(
         Plotly.newPlot('myDiv5', data3, {
           width: 1000,
           height: 550,
+          yaxis: {
+            title: 'time in s',
+          },
+          xaxis: {
+            title: 'lambda execution index',
+          },
+        })
+
+        const dataExecutionProfile = [{
+          x: mergedCWAndTracerData.map((val, index) => index),
+          y: mergedCWAndTracerData.map((val) => val.cwDuration / 1000),
+          name: 'CloudWatch measured lambda duration',
+        }]
+        // eslint-disable-next-line no-undef
+        Plotly.newPlot('execution-profile', dataExecutionProfile, {
+          title: 'SBDP job execution profiles',
+          width: 1000,
+          height: 550,
+          yaxis: {
+            title: 'time in s',
+          },
+          xaxis: {
+            title: 'lambda execution index',
+          },
         })
 
         // const data4 = [{
@@ -361,6 +476,9 @@ const reduceHelperFunc = (acc, nonParsedVal) => {
   return acc
 }
 
+/**
+ * TODO: Instrumentation impact
+ */
 // eslint-disable-next-line no-undef
 Plotly.d3.csv(
   'http://localhost:8080/evaluation/impact-instrumentation/impact_instrumentation-not_instrumented.csv',
