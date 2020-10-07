@@ -33,7 +33,6 @@ const jobTraceStore = new JobTraceStore()
 const xrayTracer = new XRayTracer()
 const redisTracer = new RedisTracer(redisParams)
 const notifier = new Notifier()
-const flagPole = new FlagPoleService(redisParams, notifier)
 
 const registerApp = async (req, res) => {
   console.log('+++data', req.body)
@@ -70,6 +69,7 @@ const calculateJobCostsWithXRay = async ({
   priceCalculator,
   iterationNumber,
   budgetLimit,
+  flagPole,
 }) => {
   const startTime = parseInt(jobStartTime, 10) / 1000
   const allTraceSegments = await xrayTracer.getFullTrace(jobId, startTime)
@@ -111,6 +111,7 @@ const calculateJobCostsFromRedis = async ({
   eventBus,
   skipNotifying,
   metaData,
+  flagPole,
 }) => {
   console.log('+++calculateJobCostsFromRedis iterationNumber', iterationNumber)
   const lambdaTrace = await redisTracer.getLambdaTrace(jobId)
@@ -263,6 +264,8 @@ const startJobAndTrace = async (eventBus, additionalData) => {
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
 
+  const flagPole = new FlagPoleService(redisParams, notifier)
+
   // store job details
   const dateNow = Date.now()
   await jobTraceStore.put({
@@ -322,6 +325,7 @@ const startJobAndTrace = async (eventBus, additionalData) => {
           budgetLimit,
           eventBus,
           metaData: { awsService, additionalData },
+          flagPole,
         })
       }
     })
@@ -354,6 +358,7 @@ const startJobAndTrace = async (eventBus, additionalData) => {
       queueMap: registeredSqsQueuesMap,
       budgetLimit,
       eventBus,
+      flagPole,
     }, periodInSecCalculation)
   }
 
@@ -383,6 +388,7 @@ const stopJobRouteHandler = async (req, res) => {
   if (!isEmpty(req.body)) {
     const requestBody = JSON.parse(req.body)
     const { jobId } = requestBody
+    const flagPole = new FlagPoleService(redisParams, notifier)
     await flagPole.switchFlagAndStopJob(jobId)
     res.status(HttpStatus.OK).json({
       jobId,
@@ -405,6 +411,8 @@ const getJobStatus = async ({
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
   console.log('+++jobRecord', jobRecord)
 
+  const flagPole = new FlagPoleService(redisParams, notifier)
+
   const {
     lambdaPrices,
     sqsPrices,
@@ -419,6 +427,7 @@ const getJobStatus = async ({
     skipNotifying: true,
     jobStartTime,
     budgetLimit,
+    flagPole,
   })
 
   return {
@@ -440,7 +449,7 @@ const subscribeToBudgetAlarm = async (req, res) => {
     requestBody = req.body
   }
   const { mail } = requestBody
-  const notifier = new Notifier()
+  // const notifier = new Notifier()
 
   await notifier.subscribe(mail)
 
