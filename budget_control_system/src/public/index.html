@@ -93,8 +93,6 @@
             periodInSec: Number(inputTracePeriod),
           };
 
-          console.log('+++additionalData', additionalData)
-
           // clear input
           $('#start-job-and-trace-input').val('');
 
@@ -119,7 +117,6 @@
             processData: false,
             type: 'POST',
             success: (data) => {
-              console.log('+++data', data)
               $('#messages').append($('<li>').text('App registered successfully: ' + JSON.stringify(data)));
             },
           });
@@ -129,15 +126,12 @@
         event.preventDefault(); //stop submit the form, will post manually.
         const mailInput = $('#subscribe-budget-alarm-input').val()
 
-        console.log('+++mailInput', mailInput)
-
         if (mailInput) {
           $.ajax({
           url: '/subscribe-budget-alarm',
           data: { mail: mailInput },
           type: 'POST',
           success: (data) => {
-            console.log('+++data', data)
             $('#messages').append($('<li>').text('Mail subscribed successfully: ' + data.mail + '   You need to confirm the subscription mail'));
           },
           });
@@ -149,7 +143,6 @@
       });
 
     function displayJobCostsContent(jobCostsDetails) {
-      console.log('+++jobCostsDetails', jobCostsDetails)
       const {
         jobId,
         iterationNumber,
@@ -173,18 +166,6 @@
       const jobIdListItem = `<strong>Job ID:</strong> ${jobId}   `
       const timepassedListItem = `<strong>Time passed:</strong> ${formatedTimePassedSinceJobStart}   `
       const budgetLimitListItem = `<strong>Job budget:</strong> ${budgetLimit}$   `
-
-      // $('#messages').append('<li>'
-      //   + `${iterationNumber >= 0 ? iterationNumber + ' - ' : ''}`
-      //   + lambdaPricesListItem
-      //   + sqsPricesListItem
-      //   + s3PricesListItem
-      //   + totalJobPriceListItem
-      //   + totalJobPriceInUSDListItem
-      //   + budgetLimitListItem
-      //   + timepassedListItem
-      //   + jobIdListItem
-      //   + '</li>');
 
       const metaDataText = typeof iterationNumber === 'number' ? `Iteration: ${iterationNumber}` : `${awsService} - ${additionalData}`
 
@@ -218,7 +199,6 @@
     });
 
     socket.on('stream-job-costs', function(jobCostsDetails) {
-      console.log('+++stream-job-costs')
       displayJobCostsContent(jobCostsDetails)
     })
 
