@@ -1,12 +1,11 @@
-// Plotly.d3.csv("https://raw.githubusercontent.com/plotly/datasets/master/violin_data.csv", function (err, rows) {
-
 const unpack = (rows, key) => {
-  // console.log('rows', rows)
   return rows.map((row) => parseInt(row[key].trim(), 10))
 }
 
 /**
- * TODO: Fetching trace data delay
+ * ############################################
+ * Timely Evaluation: Fetching trace data delay
+ * ############################################
  */
 // eslint-disable-next-line no-undef
 Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchingDelaysRedis_log-local.csv', (err, localRows) => {
@@ -181,10 +180,7 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
     const unpackedLocalData = unpack(localDataRows, 'passedTime')
     const unpackedDeployedTraceBackendData = unpack(deployedTraceBackendRows, 'passedTime')
 
-    // const xValues = localDataRows.map(() => 'Delay (ms)')
-
     const _unpack = (rows, key) => {
-      console.log('rows', rows)
       return rows.map((row) => `${row[key].trim()} lambdas`)
     }
 
@@ -246,7 +242,9 @@ Plotly.d3.csv('http://localhost:8080/evaluation/trace-fetching-delay/traceFetchi
 })
 
 /**
- * TODO: lambda processing time accuracy
+ * ############################################
+ * Accuracy Evaluation: Lambda processing time accuracy
+ * ############################################
  */
 // eslint-disable-next-line no-undef
 Plotly.d3.csv(
@@ -256,16 +254,7 @@ Plotly.d3.csv(
     Plotly.d3.csv(
       'http://localhost:8080/evaluation/lambda-processing-time-accuracy/parrallel_lambdas-lambdaProcessingTimeAccuracy_tracer.csv',
       (err, tracerRows) => {
-        console.log('+++cwRows', cwRows)
-        console.log('+++tracerRows', tracerRows)
         const cloudWatchMap = cwRows.reduce((acc, value) => {
-          return {
-            ...acc,
-            [value.RequestID]: value,
-          }
-        }, {})
-
-        const tracerMap = tracerRows.reduce((acc, value) => {
           return {
             ...acc,
             [value.RequestID]: value,
@@ -293,7 +282,6 @@ Plotly.d3.csv(
         })
 
         const billedExecutiontimeByCW = cwRows.reduce((acc, { BilledDurationInMS }) => acc + parseInt(BilledDurationInMS, 10), 0)
-        console.log('+++billedExecutiontimeByCW', billedExecutiontimeByCW, cwRows)
 
         const overshootSum = deltas.reduce((sum, val) => {
           if (val.deltaBilledDuration) {
@@ -301,7 +289,7 @@ Plotly.d3.csv(
           }
           return sum
         }, 0)
-        console.log('+++deltas', deltas, overshootSum)
+
         const traceDeltaIn100MsSegments = {
           x: deltas.map((val, index) => index),
           y: deltas.map((val) => val.deltaBilledDuration),
@@ -317,12 +305,10 @@ Plotly.d3.csv(
         const getStandardDeviation = (array) => {
           const n = array.length
           const mean = array.reduce((a, b) => a + b) / n
-          console.log('+++mean', mean)
           return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
         }
 
         const traceDeltaInMsArray = deltas.map((val) => val.deltaDuration)
-        console.log('+++getStandardDeviation', traceDeltaInMsArray, getStandardDeviation(traceDeltaInMsArray))
 
         // eslint-disable-next-line no-undef
         Plotly.newPlot(
@@ -411,39 +397,6 @@ Plotly.d3.csv(
             title: 'lambda execution index',
           },
         })
-
-        // const data4 = [{
-        //   opacity: 0.5,
-        //   type: 'histogram',
-        //   x: mergedCWAndTracerData.map((val, index) => index),
-        //   y: mergedCWAndTracerData.map((val) => val.cwDuration),
-        //   name: 'CloudWatch measured lambda duration',
-        //   marker: {
-        //     color: 'green',
-        //   },
-        // },
-        // {
-        //   opacity: 0.5,
-        //   type: 'histogram',
-        //   x: mergedCWAndTracerData.map((val, index) => index),
-        //   y: mergedCWAndTracerData.map((val) => val.tracerDuration),
-        //   name: 'Traced lambda duration',
-        //   marker: {
-        //     color: 'red',
-        //   },
-        // }]
-        // const layout = {
-        //   bargap: 0.05,
-        //   bargroupgap: 0.2,
-        //   barmode: 'overlay',
-        //   // title: 'Sampled Results',
-        //   // xaxis: { title: 'Value' },
-        //   // yaxis: { title: 'Count' }
-        //   width: 1000,
-        //   height: 550,
-        // }
-        // // eslint-disable-next-line no-undef
-        // Plotly.newPlot('myDiv6', data4, layout)
       }
     )
   }
@@ -480,7 +433,9 @@ const reduceHelperFunc = (acc, nonParsedVal) => {
 }
 
 /**
- * TODO: Instrumentation impact
+ * ############################################
+ * Low-cost Evaluation: Instrumentation impact
+ * ############################################
  */
 // eslint-disable-next-line no-undef
 Plotly.d3.csv(
@@ -490,9 +445,6 @@ Plotly.d3.csv(
     Plotly.d3.csv(
       'http://localhost:8080/evaluation/impact-instrumentation/impact_instrumentation-traced.csv',
       (err, tracedRows) => {
-        console.log('+++originalRows', originalRows)
-        console.log('+++tracedRows', tracedRows)
-
         const originalDataSet = originalRows.reduce((acc, nonParsedVal) => {
           const returnedAcc = reduceHelperFunc(acc, nonParsedVal)
           return returnedAcc
@@ -527,7 +479,6 @@ Plotly.d3.csv(
           }
         })
 
-        console.log('+++originalDataSet', originalDataSet)
         const originaldataResult = {
           small: {
             calculateMean: _.meanBy(originalDataSet.small.calculateLambda, 'DurationInMS'),
@@ -554,9 +505,6 @@ Plotly.d3.csv(
           },
         }
 
-        console.log('+++originaldataResult', originaldataResult)
-        console.log('+++tracedDataSetResult', tracedDataSetResult)
-
         const xValues = ['job manager λ', 'preprocessor λ', 'calculator λ']
         const yValuesSmallDataSetOriginal = [
           Math.round(originaldataResult.small.startJobMean),
@@ -569,8 +517,6 @@ Plotly.d3.csv(
           Math.round(tracedDataSetResult.small.preprocessMean),
           Math.round(tracedDataSetResult.small.calculateMean),
         ]
-
-        console.log('+++yValuesSmallDataSetOriginal', yValuesSmallDataSetOriginal, yValuesSmallDataSetTraced)
 
         const chartSmallDataSetOriginal = {
           x: xValues,
@@ -614,8 +560,6 @@ Plotly.d3.csv(
           Math.round(tracedDataSetResult.large.preprocessMean),
           Math.round(tracedDataSetResult.large.calculateMean),
         ]
-
-        console.log('+++yValuesLargeDataSetOriginal', yValuesLargeDataSetOriginal, yValuesLargeDataSetTraced)
 
         const chartLargeDataSetOriginal = {
           x: xValues,
