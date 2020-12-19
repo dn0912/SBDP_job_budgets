@@ -292,6 +292,9 @@ Plotly.d3.csv(
           }
         })
 
+        const billedExecutiontimeByCW = cwRows.reduce((acc, { BilledDurationInMS }) => acc + parseInt(BilledDurationInMS, 10), 0)
+        console.log('+++billedExecutiontimeByCW', billedExecutiontimeByCW, cwRows)
+
         const overshootSum = deltas.reduce((sum, val) => {
           if (val.deltaBilledDuration) {
             return sum += 1
@@ -393,7 +396,7 @@ Plotly.d3.csv(
 
         const dataExecutionProfile = [{
           x: mergedCWAndTracerData.map((val, index) => index),
-          y: mergedCWAndTracerData.map((val) => val.cwDuration / 1000),
+          y: mergedCWAndTracerData.map((val) => val.cwDuration),
           name: 'CloudWatch measured lambda duration',
         }]
         // eslint-disable-next-line no-undef
@@ -402,7 +405,7 @@ Plotly.d3.csv(
           width: 1000,
           height: 550,
           yaxis: {
-            title: 'time in s',
+            title: 'lambda execution time in ms',
           },
           xaxis: {
             title: 'lambda execution index',
