@@ -138,7 +138,7 @@ Start redis services and app individually:
 ```bash
 redis-server /home/ubuntu/redis-stable/redis.conf &
 
-cd ~/SBDP_job_budgets/budget_control_system
+cd ~/SBDP_job_budgets/budget_control_system-trace_backend
 
 # Start job budget application with password protected redis connection
 # Forgot Redis password? use: cat ~/redis-stable/redis.conf | grep "requirepass "
@@ -168,7 +168,7 @@ get hello # should print out "world"
 ```
 cat ~/.aws/credentials
 
-cat ~/SBDP_job_budgets/budget_control_system/.env
+cat ~/SBDP_job_budgets/budget_control_system-trace_backend/.env
 
 cat ~/redis-stable/redis.conf | grep "requirepass "
 ```

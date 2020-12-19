@@ -19,5 +19,5 @@ https://<deployed-budget-control-system-url>/evaluation/index.html
 All evaluation related data can be found under:
 
 ```
-budget_control_system/src/public/evaluation
+budget_control_system-trace_backend/src/public/evaluation
 ```

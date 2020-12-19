@@ -108,7 +108,7 @@ chmod 755 start-app-script.sh
 ```bash
 cat ~/.aws/credentials
 
-cat ~/SBDP_job_budgets/budget_control_system/.env
+cat ~/SBDP_job_budgets/budget_control_system-trace_backend/.env
 
 cat ~/redis-stable/redis.conf | grep "requirepass "
 ```
