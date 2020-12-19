@@ -1,7 +1,7 @@
 {
-  "name": "service-cost-tracer",
+  "name": "budget_control_system-trace_library",
   "version": "1.0.0",
-  "description": "",
+  "description": "Trace backend from budget control system",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

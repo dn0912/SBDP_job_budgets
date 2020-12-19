@@ -1,4 +1,4 @@
-const TracedAWS = require('service-cost-tracer')
+const TracedAWS = require('budget_control_system-trace_library')
 const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
 
 const awsTracerWithRedis = new AWSTracerWithRedis()

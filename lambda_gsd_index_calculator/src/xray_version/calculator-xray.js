@@ -1,6 +1,6 @@
 const { BUCKET, SUBRESULT_FOLDER, PIPELINE_RESULT_FOLDER } = process.env
 
-const TracedAWS = require('service-cost-tracer')
+const TracedAWS = require('budget_control_system-trace_library')
 
 const moment = require('moment')
 const { promisify } = require('util')

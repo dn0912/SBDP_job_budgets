@@ -2,7 +2,7 @@ const {
   BUCKET, SUBRESULT_FOLDER, REGION, QUEUE_NAME,
 } = process.env
 
-const TracedAWS = require('service-cost-tracer')
+const TracedAWS = require('budget_control_system-trace_library')
 
 const moment = require('moment')
 

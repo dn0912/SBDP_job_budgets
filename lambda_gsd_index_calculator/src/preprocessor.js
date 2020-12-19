@@ -4,7 +4,7 @@ const {
 
 const AWSXRay = require('aws-xray-sdk-core')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
-const TracedAWS = require('service-cost-tracer')
+const TracedAWS = require('budget_control_system-trace_library')
 
 // TracedAWS.config.update({
 //   maxRetries: 0
