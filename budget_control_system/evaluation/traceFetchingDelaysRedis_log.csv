@@ -1,4 +1,0 @@
-
-evaluation_arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-start-job-with-redis#c6bfac7d-3282-4533-954f-a8b0b2918c17::e1012199-4422-49bb-818a-8e8ad07f5bce, 1601659761499, 1601659761554, 55
-evaluation_arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-preprocess-with-redis#c6bfac7d-3282-4533-954f-a8b0b2918c17::fd8fa34b-79db-48ce-898e-0d011e56d024, 1601659764604, 1601659764650, 46
-evaluation_arn:aws:lambda:eu-central-1:646012695651:function:gsd-index-calculator-dev-calculate-with-redis#c6bfac7d-3282-4533-954f-a8b0b2918c17::d9ff1d15-1645-55fb-8570-4ae473e6684d, 1601659775796, 1601659775906, 110
