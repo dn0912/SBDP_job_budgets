@@ -1,7 +1,18 @@
 
 # Basics
+
+## About
+This is a sample Serverless Big Data Processing application in a task management context for the evaluation purpose of the budget control system. The application calculates from task data a productivity index, called 'Get-Stuff-Done'-Index (GSD). The index represents the average time to complete the tasks.
+
+The following figure shows the system architecture:
+![SBDP system archictecture](./SBDP_app_architecture.png)
+
+
 ## Deploy whole serverless app
 ```bash
+sls deploy --aws-profile [PROFILE NAME]
+
+e.g 
 sls deploy --aws-profile duc
 ```
 
@@ -19,7 +30,7 @@ serverless invoke --function cleanup --log --aws-profile duc
 ## Logging functions
 ```bash
 sls logs -f calculate -t --aws-profile duc
-
+ 
 sls logs -f preprocess1k -t --aws-profile duc
 sls logs -f calculate1k -t --aws-profile duc
 sls logs -f start-job -t --aws-profile duc
