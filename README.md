@@ -160,3 +160,10 @@ cat ~/SBDP_job_budgets/budget_control_system-trace_backend/.env
 
 cat ~/redis-stable/redis.conf | grep "requirepass "
 ```
+
+### Resources created with the `./aws-resource-setup.sh`
+
+- EC2 instance
+- EC2 security group with name: `job-budget-security-group`
+- SNS Topic: `job-budget-alarm`
+- DynamoDB tables: `app-register-store` and `job-trace-record`
