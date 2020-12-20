@@ -18,13 +18,6 @@ const getS3Object = promisify(tracedS3.getObject).bind(tracedS3)
 const tracedPutObject = promisify(tracedS3.tracedPutObject).bind(tracedS3)
 const tracedSendMessage = promisify(tracedSQS.tracedSendMessage).bind(tracedSQS)
 
-// TODO: remove later
-// simulate slow function
-const _slowDown = async (ms) => {
-  console.log(`+++Take it easy!?! ${ms} ms`)
-  await new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 const _readFile = async (fileName) => {
   const params = {
     Bucket: BUCKET,
@@ -53,7 +46,6 @@ const _putFile = async (fileContent, jobId) => {
   return fileName
 }
 
-// TODO:
 const _filterUnnecessaryUpdates = (tasksUpdateArray) => {
   const filteredTaskUpdateArray = tasksUpdateArray.filter((updateEntry) =>
     updateEntry['OldImage']['statusId'] !== updateEntry['NewImage']['statusId'])
@@ -98,8 +90,6 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     // Sends single message to SQS for further process
     const test = await tracedSendMessage(sqsPayload, jobId)
-
-    await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)

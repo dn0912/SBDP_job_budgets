@@ -10,13 +10,6 @@ const s3 = new TracedAWS.S3()
 const getS3Object = promisify(s3.getObject).bind(s3)
 const tracedPutObject = promisify(s3.tracedPutObject).bind(s3)
 
-// TODO: remove later
-// simulate slow function
-const slowDown = async (ms) => {
-  console.log(`+++Take it easy!?! ${ms} ms`)
-  await new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 const readFile = async (fileName) => {
   const params = {
     Bucket: BUCKET,
@@ -111,10 +104,8 @@ module.exports.handler = async (event, context) => {
     preprocessedDataFileName: fileName,
     averageTimeToCompleteTask,
   }
-  // s3FileSizeTracer(jobId, fileContent)
-  const resultFileName = await putFile(fileContent, jobId)
 
-  await slowDown((Math.floor(Math.random() * (40 - 20 + 1) + 20)) * 100)
+  const resultFileName = await putFile(fileContent, jobId)
 
   const response = {
     statusCode: 200,

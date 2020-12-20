@@ -1,5 +1,5 @@
 const {
-  BUCKET, FILE, SUBRESULT_FOLDER, REGION, QUEUE_NAME,
+  BUCKET, SUBRESULT_FOLDER, REGION, QUEUE_NAME,
 } = process.env
 
 const AWS = require('aws-sdk')
@@ -17,13 +17,6 @@ const { promisify } = require('util')
 const getS3Object = promisify(s3.getObject).bind(s3)
 const putS3Object = promisify(s3.putObject).bind(s3)
 const sendMessage = promisify(sqs.sendMessage).bind(sqs)
-
-// TODO: remove later
-// simulate slow function
-// const _slowDown = async (ms) => {
-//   console.log(`+++Take it easy!?! ${ms} ms`)
-//   await new Promise((resolve) => setTimeout(resolve, ms))
-// }
 
 const _readFile = async (fileName) => {
   const params = {
@@ -54,7 +47,6 @@ const _putFile = async (fileContent) => {
   return fileName
 }
 
-// TODO:
 const _filterUnnecessaryUpdates = (tasksUpdateArray) => {
   const filteredTaskUpdateArray = tasksUpdateArray.filter((updateEntry) =>
     updateEntry['OldImage']['statusId'] !== updateEntry['NewImage']['statusId'])
@@ -81,8 +73,6 @@ module.exports.readAndFilterFile = async (event, context) => {
 
     const eventArray = _.flattenDeep(parsedEventArrays)
     const cleanTaskUpdates = _filterUnnecessaryUpdates(eventArray)
-
-    // await _slowDown(4000)
 
     const fileName = await _putFile(cleanTaskUpdates)
 
@@ -111,12 +101,8 @@ module.exports.readAndFilterFile = async (event, context) => {
       ...necessaryFiFoParams,
     }
 
-    // await _slowDown(2000)
-
     // Sends single message to SQS for further process
     const test = await sendMessage(sqsPayload)
-
-    // await _slowDown((Math.floor(Math.random() * (50 - 30 + 1) + 30)) * 100)
 
     console.log('+++sqsPayload', sqsPayload)
     console.log('+++test', test)

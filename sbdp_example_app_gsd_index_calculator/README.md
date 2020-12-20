@@ -1,5 +1,5 @@
 
-# Basics
+# Instrumented Serverless Big Data Processing application
 
 ## About
 This is a sample `Serverless Big Data Processing application` in a task management context for the evaluation purpose of the `budget control system`. The application calculates from task data a productivity index, called *'Get-Stuff-Done'-Index (GSD)*. The index represents the average time to complete the tasks.
