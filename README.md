@@ -6,6 +6,19 @@ Follow those steps to setup necessary AWS resources and this project with the pr
 
 To use the scripts you need the [AWS CLI](https://aws.amazon.com/cli/) installed on your machine.
 
+### How to get the aws_access_key_id and aws_secret_access_key
+
+1. Open the AWS Console
+2. On the top right click on your usename and select `My Security Credentials`
+
+3. Under `My security credentials` > tab `AWS IAM credentials` > `Access keys for CLI, SDK, & API access` > click `Create access key`
+
+### How to create key pair to access AWS EC2 instances
+Read from official [AWS documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html) how to create a key pair.
+
+Use the key name then when using the `./aws-resource-setup.sh` script.
+You can also find the key name again in your aws account: Go to `EC2 service` > `Key pairs` section
+
 ### 1. Setup AWS resources (Security group, EC2, S3 bucket with generated test data, SNS topic, DynamoDb tables)
 ```bash
 # chmod script to be executable
@@ -19,7 +32,13 @@ chmod 755 ./aws-resource-setup.sh
 
 #### 2.1 SSH into your created EC2
 ```bash
-ssh -i "<your key name>.pem" ubuntu@xxxxxxxxxx.[AWS_REGION].compute.amazonaws.com
+ssh -i <link to your access key>.pem ubuntu@xxxxxxxxxx.[your AWS_REGION].compute.amazonaws.com
+```
+
+Hint: if you created a new key pair to access the EC2 instance before, you need to change permission on the `.pem` key file before using it to ssh into the instance
+
+```bash
+chmod 400 <link to your access key>.pem
 ```
 
 #### 2.2 Create a file on your ec2 instance
@@ -45,23 +64,38 @@ After all installation, Redis server should be running on Port `6379` and job bu
 ### 3. Test whether you get response of running server and Redis by curl endpoint
 
 ```bash
-# Test Node app
-curl <ec-2-instance>.compute.amazonaws.com:3000/ping
+# Test budget control Node app on EC2 on port 3000
+# should return pong {"pong":"Hello world!"}
+curl <ec-2-instance>.<region>.compute.amazonaws.com:3000/ping
 
-# Test Redis
-curl -X POST <ec-2-instance>.compute.amazonaws.com:3000/redis-test
+# Test Redis by creating entry through the budget control app
+# Running curl will create an entry in Redis
+# should return created entry {"hello":"world"}
+curl -X POST <ec-2-instance>.<region>.compute.amazonaws.com:3000/redis-test
 
-# On your ec2 instance you can check in Redis for existence
+# On your ec2 instance you can check in Redis for data existence
+
 redis-cli -a <your Redis password>
 keys * # should print out "hello" key
 get hello # should print out "world"
 ```
 
-### 4. Edit serverless.yml of Serverless Big Data Processing application with Redis env vars
+You can also visit the frontend of the deployed *budget control system* on the EC2 instance on port 3000 with endoint `/live-job-status`:
+
+```bash
+# Format of adress
+<Public IPv4 address>.<aws region>.compute.amazonaws.com:3000/live-job-status
+```
+
+### 4. Edit serverless.yml of the sample Serverless Big Data Processing application with Redis env vars
+
+**IMPORTANT STEPS:**
 
 In `./sbdp_example_app_gsd_index_calculator/serverless.yml`
 
-Edit `REDIS_HOST: xx.xxx.xx.xxx` and `REDIS_CONNECTION: 'redis://:redis-password@xx.xxx.xx.xxx:6379'` with your `EC2 Public IPv4 address`
+Edit `REDIS_HOST: xx.xxx.xx.xxx` and `REDIS_CONNECTION: 'redis://:<your redis password>@xx.xxx.xx.xxx:6379'` with your `EC2 Public IPv4 address`
+
+As well as `REDIS_PASSWORD` with your previous set redis password from the script. (If you forgot your previous set passwort run `cat ~/redis-stable/redis.conf | grep "requirepass "` inside the EC2 instance. This will print it out again.)
 
 ### 5. Deploy Serverless Big Data Processing application and start tracing job
 
@@ -72,7 +106,7 @@ cd ./sbdp_example_app_gsd_index_calculator/
 
 npm i
 
-sls deploy --aws-profile [PROFILE] # get `start-job` function endpoint (https://xxxxxx.amazonaws.com/dev/start-job)
+sls deploy --aws-profile [PROFILE] # get `https://xxxxxx.amazonaws.com/dev/start-job-with-redis` function endpoint of a instrumented SBDP (https://xxxxxx.amazonaws.com/dev/start-job-with-redis)
 ```
 
 
@@ -88,11 +122,25 @@ curl -X POST http://<your EC2 public endpoint>:3000/start-tracing -H "Content-Ty
 curl -X POST ec2-18-192-00-00.eu-central-1.compute.amazonaws.com:3000/start-tracing -H "Content-Type: application/json" -d '{"jobUrl": "https://17d8y00000.execute-api.eu-central-1.amazonaws.com/dev/start-job", "budgetLimit": 0.0248}'
 ```
 
+Example screenshot of frontend of budget control system in action:
+![Example view of frontend with execution of budget control system](./example_execution.png)
 
 
 
 ## Additional info:
 A [step-by-step instruction](./step-by-step-instruction.md) to setup all AWS resources and more informations can be found [here](./step-by-step-instruction.md).
+
+### Running the budget control system locally
+If you want to run the budget control system locally you still need to deploy the Redis instance on the EC2 instance to be able to store the trace data. Follow step 1. and 2.
+
+After that create an `.env` file in `./budget_control_system-trace_backend/` with the following content:
+
+```bash
+AWS_RESOURCE_REGION=<your AWS region where you deployed the app>
+REDIS_CONNECTION=redis://:<your redis password>@<your EC2 public endpoint>:6379
+SNS_TOPIC_ARN=<the SNS arn to send mails - created by the script>
+```
+**IMPORTANT:** `REDIS_CONNECTION` is necessary to be able to connect to the trace storage
 
 ### If you closed the Redis server and NodeJS app you can restart those services by running:
 

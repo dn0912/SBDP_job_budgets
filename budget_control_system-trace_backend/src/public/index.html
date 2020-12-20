@@ -191,7 +191,8 @@
 
     socket.on('connect', () => {
       $('#messages').append($('<li>').text('Ready'));
-      $('#messages').append($('<li>').text('To start instrumented sample app use entry point URL: https://9w71qsy6r4.execute-api.eu-central-1.amazonaws.com/dev/start-job-with-redis, sample app id: app-ddb0229a-f32e-499e-92a6-afe73de0fcc3'));
+      $('#messages').append($('<li>').text('To start instrumented sample app use entry point URL of your SBDP app - e.g. https://6cvanxjr49.execute-api.eu-central-1.amazonaws.com/dev/start-job-with-redis'));
+      $('#messages').append($('<li>').text('Upload a cloudformation template and use app id when triggering the SBDP app to consider app configuration in cost calculation. E.g. FiFo queues are different then Standard queues'));
     });
 
     socket.on('disconnect', () => {
