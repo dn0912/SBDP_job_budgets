@@ -1,0 +1,231 @@
+service: gsd-index-calculator
+
+custom:
+  REGION: eu-central-1
+  S3_BUCKET: test-task-update-data-v2 # put data files here
+  S3_SUBRESULT_FOLDER: test_results # subresults of the preprocessing lambdas are stored here
+  S3_PIPELINE_RESULT_FOLDER: gsd # final results of the calculation lambdas are stored here
+  SQS_NAME: PreprocessedDataQueue
+  SQS_NAME_FIFO: PreprocessedDataQueueFiFo
+  SQS_NAME_XRAY: PreprocessedDataQueueXRay
+  SQS_NAME_REDIS: PreprocessedDataQueueRedis
+  SQS_NAME_WITHOUT_TRACING: PreprocessedDataQueueWithoutTracing
+  S3_FILE: test_pretty.json
+  S3_FILE_5TASKS: test_5tasks.json
+  S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
+  REDIS_HOST: '18.156.33.173' # either pass HOST, PORT and PASSWORD or through REDIS_CONNECTION
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: 'redis-password'
+  REDIS_CONNECTION: 'redis://:redis-password@18.156.33.173:6379' # necessary for tracer to store in Redis
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${self:custom.REGION}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+        - s3:ListBucket
+        - s3:DeleteObject
+      Resource:
+        - arn:aws:s3:::${self:custom.S3_BUCKET}
+        - arn:aws:s3:::${self:custom.S3_BUCKET}/*
+    - Effect: Allow
+      Action:
+        - apigateway:POST
+      Resource:
+        - arn:aws:apigateway:::/*
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource:
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME}
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME_XRAY}
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME_REDIS}
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME_WITHOUT_TRACING}
+        - arn:aws:sqs:*:*:${self:custom.SQS_NAME_FIFO}.fifo
+        # - arn:aws:sqs:*:*:*
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource:
+        - arn:aws:lambda:${self:custom.REGION}:*:function:*
+    - Effect: Allow
+      Action:
+        # - xray:*
+        # below for tracing in sls
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+        - xray:GetSamplingRules
+        - xray:GetSamplingTargets
+        - xray:GetSamplingStatisticSummaries
+      Resource:
+        - "*"
+  timeout: 300
+  tracing:
+    # apiGateway: true
+    lambda: true
+    # s3: true
+
+
+functions:
+  # *******************
+  # usefull helper functions
+  cleanup:
+    description: cleanup S3 directories
+    handler: src/helper.cleanup
+    events:
+      - http: GET cleanup
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
+  # XRAY VERSION
+  start-job-with-xray:
+    description: >
+      Single endpoint to trigger a job
+    handler: src/xray_version/job_manager-xray.startJob
+    events:
+      - http: POST start-job-with-xray
+  preprocess-with-xray:
+    description: >
+      Preprocess lambda which sends SQS message afterwards:
+      preprocess task update data (test data consists of 1000 tasks)
+    handler: src/xray_version/preprocessor-xray.readAndFilterFile
+    events:
+      - http: 
+          path: preprocess-with-xray
+          method: post
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_XRAY}
+  calculate-with-xray:
+    description: >
+      Single lambda - calulator lambda after receiving sqs message,
+      fetch cleaned up test data from S3 and calculates GSD index
+    handler: src/xray_version/calculator-xray.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PreprocessedDataQueueXRay
+              - Arn
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
+  # *******************
+  # REDIS VERSION
+  start-job-with-redis:
+    description: >
+      Single endpoint to trigger a job
+    handler: src/redis_version/job_manager-redis.startJob
+    events:
+      - http: POST start-job-with-redis
+    environment:
+      REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
+  preprocess-with-redis:
+    description: >
+      Preprocess lambda which sends SQS message afterwards:
+      preprocess task update data (test data consists of 1000 tasks)
+    handler: src/redis_version/preprocessor-redis.readAndFilterFile
+    events:
+      - http: 
+          path: preprocess-with-redis
+          method: post
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_REDIS}
+      REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
+  calculate-with-redis:
+    description: >
+      Single lambda - calulator lambda after receiving sqs message,
+      fetch cleaned up test data from S3 and calculates GSD index
+    handler: src/redis_version/calculator-redis.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PreprocessedDataQueueRedis
+              - Arn
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
+      REDIS_CONNECTION: ${self:custom.REDIS_CONNECTION}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_REDIS}
+  # *******************
+  # Without tracing
+  start-job-without-tracing:
+    description: >
+      Single endpoint to trigger a job
+    handler: src/without_tracing/job_manager-original.startJob
+    events:
+      - http: POST start-job-without-tracing
+  preprocess-without-tracing:
+    description: >
+      Preprocess lambda which sends SQS message afterwards:
+      preprocess task update data (test data consists of 1000 tasks)
+    handler: src/without_tracing/preprocessor-original.readAndFilterFile
+    events:
+      - http: 
+          path: preprocess-without-tracing
+          method: post
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_WITHOUT_TRACING}
+  calculate-without-tracing:
+    description: >
+      Single lambda - calulator lambda after receiving sqs message,
+      fetch cleaned up test data from S3 and calculates GSD index
+    handler: src/without_tracing/calculator-original.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PreprocessedDataQueueWithoutTracing
+              - Arn
+    environment:
+      BUCKET: ${self:custom.S3_BUCKET}
+      SUBRESULT_FOLDER: ${self:custom.S3_SUBRESULT_FOLDER}
+      PIPELINE_RESULT_FOLDER: ${self:custom.S3_PIPELINE_RESULT_FOLDER}
+      REGION: ${self:custom.REGION}
+      QUEUE_NAME: ${self:custom.SQS_NAME_WITHOUT_TRACING}
+
+resources:
+  Resources:
+    PreprocessedDataQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME}
+        VisibilityTimeout: 300
+    PreprocessedDataQueueFiFo:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME_FIFO}.fifo # must end with fifo suffix
+        FifoQueue: true
+        VisibilityTimeout: 300
+    PreprocessedDataQueueXRay:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME_XRAY}
+        VisibilityTimeout: 300
+    PreprocessedDataQueueRedis:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME_REDIS}
+        VisibilityTimeout: 300
+    PreprocessedDataQueueWithoutTracing:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.SQS_NAME_WITHOUT_TRACING}
+        VisibilityTimeout: 300
