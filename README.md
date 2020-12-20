@@ -59,7 +59,7 @@ get hello # should print out "world"
 
 ### 4. Edit serverless.yml of Serverless Big Data Processing application with Redis env vars
 
-In `./lambda_gsd_index_calculator/serverless.yml`
+In `./sbdp_example_app_gsd_index_calculator/serverless.yml`
 
 Edit `REDIS_HOST: xx.xxx.xx.xxx` and `REDIS_CONNECTION: 'redis://:redis-password@xx.xxx.xx.xxx:6379'` with your `EC2 Public IPv4 address`
 
@@ -68,7 +68,7 @@ Edit `REDIS_HOST: xx.xxx.xx.xxx` and `REDIS_CONNECTION: 'redis://:redis-password
 To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first and then:
 
 ```bash
-cd ./lambda_gsd_index_calculator/
+cd ./sbdp_example_app_gsd_index_calculator/
 
 npm i
 
@@ -76,9 +76,9 @@ sls deploy --aws-profile [PROFILE] # get `start-job` function endpoint (https://
 ```
 
 
-Visit `http://<EC2 Public address>:<PORT>/live-job-status` (Default port *3000*) to see continuous cost tracing (or trough output console logs of EC2 instance)
+Visit `http://<EC2 Public address>:<PORT>/live-job-status` (Default port *3000*) to see continuous cost tracing in the frontend (or trough output console logs of EC2 instance)
 
-Start serverless data processing through tracing app:
+Start serverless data processing through tracing app on the frontend or by curl command:
 
 ```bash
 # Replace <> with your endoints

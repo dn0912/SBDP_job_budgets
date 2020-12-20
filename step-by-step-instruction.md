@@ -250,7 +250,7 @@ aws s3 cp test_data s3://test-task-update-data-v2/ \
 
 To deploy the serverless data processing application install the [*Serverless framework*](https://www.serverless.com/framework/docs/getting-started/) first and then:
 ```bash
-# change to `./lambda_gsd_index_calculator/`
+# change to `./sbdp_example_app_gsd_index_calculator/`
 
 npm i
 
