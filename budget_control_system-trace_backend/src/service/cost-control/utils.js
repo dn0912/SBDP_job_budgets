@@ -1,7 +1,5 @@
 import { get, set, flatten } from 'lodash'
 
-const serialize = (object) => JSON.stringify(object, null, 2)
-
 const _parceFullTraceIntoServiceTraceSegments = (subsegmentName, fullTrace) =>
   fullTrace
     .filter((seg) => seg.Document.includes(subsegmentName))
@@ -12,7 +10,6 @@ const _parceFullTraceIntoServiceTraceSegments = (subsegmentName, fullTrace) =>
 
 const _parceServiceTraceSegmentsIntoSubsegments = (subsegmentName, serviceTraceSegments) =>
   flatten(serviceTraceSegments.map((document) => {
-    // const lambdaInvocationSubsegmentWithSqsAnnotation =
     const { subsegments } = get(document, 'Document.subsegments', [])
       .find((subsegment) => subsegment.name === 'Invocation')
 
@@ -36,7 +33,6 @@ const calculateLambdaProcessingTimes = (fullTraceSegments) => {
     .reduce((acc, subSeg, index) => {
       const lambdaTraceSegmentDoc = lambdaTraceSegments[index].Document
       acc.push({
-        // processingTime: subSeg.end_time - subSeg.start_time, // using subsegment start/endtime
         processingTime: lambdaTraceSegmentDoc.end_time - lambdaTraceSegmentDoc.start_time,
         memoryAllocationInMB: subSeg.annotations.memoryAllocationInMB,
       })

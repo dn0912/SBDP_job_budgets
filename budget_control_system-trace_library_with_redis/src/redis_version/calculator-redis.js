@@ -4,7 +4,7 @@ const {
 
 const AWS = require('aws-sdk')
 
-const AWSTracerWithRedis = require('service-cost-tracer-with-redis')
+const AWSTracerWithRedis = require('budget_control_system-trace_library_with_redis')
 
 const awsTracerWithRedis = new AWSTracerWithRedis(process)
 

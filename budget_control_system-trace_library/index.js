@@ -17,7 +17,7 @@ const sqsPayloadSizeTracer = function (sqsPayload, jobId) {
 
   const segment = AWSXRay.getSegment()
   const subsegment = segment.addNewSubsegment('Cost tracer subsegment - SQS: SQS payload size')
-  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024) // TODO: maybe not really necessary => only chunksize
+  subsegment.addAnnotation('sqsMessagePayloadSizeInKiloBytes', payloadByteSize / 1024)
   subsegment.addAnnotation('sqsMessageChunkAmounts', sqs64KiloByteChunkAmounts)
   subsegment.addAnnotation('queueUrl', QueueUrl)
   subsegment.addAnnotation('jobId', jobId)
@@ -75,5 +75,4 @@ AWS.S3.prototype.tracedPutObject = function (params, jobId, callback) {
   return this.putObject(params, callback)
 }
 
-// AWS.DucSQS = DucSQS
 module.exports = AWS

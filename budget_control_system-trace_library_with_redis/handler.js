@@ -7,7 +7,6 @@ const { promisify } = require('util')
 
 const getS3Object = promisify(s3.getObject).bind(s3)
 
-
 const readFile = async (bucketName, fileName) => {
   const params = {
     Bucket: bucketName,

@@ -129,7 +129,6 @@ const getRandomAdditionMilliSecTime = (min, max) => {
 const updateTaskStatus = (task, status) => ({
   ...task,
   statusId: status,
-  // updateDate: task.updateDate + 1000 * 60 * 60 * 14,
   updateDate: task.updateDate + getRandomAdditionMilliSecTime(1000 * 60 * 60 * 4, 1000*60*60*12), // between 4 - 12 hours
 })
 
@@ -152,7 +151,7 @@ const createEvent = (newTask, oldTask = {}) => ({
   "SequenceNumber": "5698991600000000006845103024",
   "SizeBytes": 679,
   "ApproximateCreationDateTime": 1577837157,
-  "eventName": "MODIFY" //TODO check creation eventname
+  "eventName": "MODIFY"
 })
 
 const main = () => {
@@ -172,7 +171,6 @@ const main = () => {
   const args = parser.parse_args()
 
   const taskEvents = []
-  // const randomContextSet = generateRandomContextSet(1, 1, 1)
   const randomContextSet = [CONTEXT_SET]
   const taskAmount = Number(args.number)
 
@@ -189,20 +187,16 @@ const main = () => {
       // 1. create task event
       taskEvents.push(createEvent(newTask))
 
-      // 80% of updating task details
-      // if (Math.random() < 0.8) {
-        const updatedDescriptionNewTask = updateTaskDetails(newTask, { description: 'has changed' })
-        taskEvents.push(createEvent(updatedDescriptionNewTask, newTask))
-      // }
+      // updating task details
+      const updatedDescriptionNewTask = updateTaskDetails(newTask, { description: 'has changed' })
+      taskEvents.push(createEvent(updatedDescriptionNewTask, newTask))
 
       // 2. from created/planned status to in progress
       taskEvents.push(createEvent(taskInProgress, updatedDescriptionNewTask))
 
-      // 80% of updating task details again
-      // if (Math.random() < 0.8) {
-        const updatedTitleInProgressTask = updateTaskDetails(taskInProgress, { title: 'title has changed' })
-        taskEvents.push(createEvent(updatedTitleInProgressTask, taskInProgress))
-      // }
+      // updating task details again
+      const updatedTitleInProgressTask = updateTaskDetails(taskInProgress, { title: 'title has changed' })
+      taskEvents.push(createEvent(updatedTitleInProgressTask, taskInProgress))
 
       // 3. from in progress to completed
       taskEvents.push(createEvent(taskCompleted, updatedTitleInProgressTask))

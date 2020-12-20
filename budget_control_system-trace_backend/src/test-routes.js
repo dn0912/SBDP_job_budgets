@@ -20,7 +20,7 @@ const {
 const serialize = (object) => JSON.stringify(object, null, 2)
 
 /**
- * Test routes to test each system functionality seperate
+ * Test routes to test each system functionality separately
  */
 
 export default ({
@@ -159,27 +159,9 @@ export default ({
     app.get('/test-get-xraydata/:traceIds', async (req, res) => {
       const traceIds = req.params.traceIds.split(',')
       console.log('+++traceIds', traceIds)
-      // const traceIds = ['1-5efdc64d-851fcc5c2219f4c03a07f6c8']
       const traceData = await tracer.getXRayTraces(traceIds)
 
       console.log('+++traceData', serialize(traceData))
-
-      // const counter = {
-      //   value: 0
-      // }
-
-      // const intervalRefId = setInterval(() => {
-      //   console.log('+++counter.value', counter, intervalRefId)
-      //   counter.value++
-
-      //   //
-      //   if (counter.value === 10) {
-      //     clearInterval(intervalRefId)
-      //     res.status(HttpStatus.OK).json({
-      //       hello: 'world'
-      //     })
-      //   }
-      // }, 500)
 
       res.status(HttpStatus.OK).json({
         hello: 'world'
@@ -215,19 +197,6 @@ export default ({
         hello: 'world'
       })
     }),
-
-    // app.get('/test-get-xray-service-graph/:startTime', async (req, res) => {
-    //   // Dateformat in traces are like: 1593786073.729
-    //   // const startTime = 1594197396137 / 1000
-    //   const startTime = parseInt(req.params.startTime, 10) / 1000
-    //   const endTime = Date.now() / 1000
-    //   const traceData = await tracer.getXRayServiceGraph(startTime, endTime)
-    //   console.log('+++getXRayServiceGraph++++', traceData)
-    //   console.log('+++getXRayServiceGraph', serialize(traceData))
-    //   res.status(HttpStatus.OK).json({
-    //     hello: 'world'
-    //   })
-    // })
 
     /* Example curl:
     curl http://localhost:8080/test-job-tracing-summary/:startTime/:jobId

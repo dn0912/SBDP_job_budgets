@@ -8,8 +8,6 @@ AWS.config.update({
 
 const XRay = new AWS.XRay()
 
-// const serialize = (object) => JSON.stringify(object, null, 2)
-
 export default class XRayTracer {
   constructor() {
     this.xray = XRay

@@ -4,11 +4,7 @@ import { get } from 'lodash'
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
-const serialize = (object) => JSON.stringify(object, null, 2)
-
-// TODO: current price list service api endpoints only for
-// us-east-1
-// ap-south-1
+// Price list service api endpoints only available for us-east-1 and ap-south-1
 AWS.config.update({
   region: 'us-east-1',
 })
