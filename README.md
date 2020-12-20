@@ -1,4 +1,4 @@
-# SBDP_job_budgets
+# Job Budgets for Serverless Big Data Processing
 
 ## How to setup and run this project
 
