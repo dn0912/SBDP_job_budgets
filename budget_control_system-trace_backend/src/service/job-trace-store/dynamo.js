@@ -4,19 +4,14 @@ import uuid from 'node-uuid'
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
-console.log('+++process.env', process.env.AWS_RESOURCE_REGION)
-
 AWS.config.update({
   region: process.env.AWS_RESOURCE_REGION,
 })
-
-// const update = promisify(dynamoDb.update.bind(dynamoDb))
 
 const tableName = 'job-trace-record'
 
 class DynamoDB {
   constructor() {
-    // this.tableName = 'trace-record'
     this.ddb = new AWS.DynamoDB.DocumentClient()
   }
 
@@ -48,7 +43,6 @@ class DynamoDB {
         },
       }
       const dbRecord = await this.ddb.get(param).promise()
-      console.log('+++dbRecord', dbRecord)
       return dbRecord.Item || null
     } catch (err) {
       console.log('err', err)

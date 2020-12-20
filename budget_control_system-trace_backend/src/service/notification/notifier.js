@@ -4,13 +4,10 @@ import moment from 'moment'
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
-console.log('+++process.env sns-region', process.env.AWS_RESOURCE_REGION)
-
 AWS.config.update({
   region: process.env.AWS_RESOURCE_REGION,
 })
 
-// TODO:
 const TOPIC_ARN = process.env.SNS_TOPIC_ARN
 
 class Notifier {
@@ -27,8 +24,7 @@ class Notifier {
         ReturnSubscriptionArn: true,
       }
 
-      const test = await this.sns.subscribe(params).promise()
-      console.log('+++params', params, test)
+      await this.sns.subscribe(params).promise()
       return mailAddress
     } catch (err) {
       console.log('err', err)
@@ -43,8 +39,7 @@ class Notifier {
         TopicArn: TOPIC_ARN,
       }
 
-      const test = await this.sns.publish(params).promise()
-      console.log('+++params', params, test)
+      await this.sns.publish(params).promise()
     } catch (err) {
       console.log('err', err)
     }

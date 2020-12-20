@@ -31,15 +31,10 @@ export default class FlagPoleService extends Redis {
     }
 
     if (currentCost > budgetLimit) {
-      console.log('+++FlagPoleService currentCost', currentCost)
-      console.log('+++FlagPoleService isInBudgetLimit', await this.get(jobId))
-
-      console.log('+++FlagPoleService FLIP SWITCH')
       this.set(createFlagPoleCacheKey(jobId), budgetLimit)
       if (!this.isFlagSwitched) {
         this.isFlagSwitched = true
         if (!skipNotifying) {
-          console.log('+++FlagPoleService SEND SNS NOTIFICATION')
           const msgSubject = `Job ${jobId} reached budget limit`
           const msgContent = `Job with ID: ${jobId} reached budget limit of ${budgetLimit}$`
           this.notifier.publish(msgSubject, msgContent)
@@ -54,7 +49,6 @@ export default class FlagPoleService extends Redis {
   }
 
   async switchFlagAndStopJob(jobId) {
-    console.log('+++FlagPoleService switchFlagAndStopJob')
     this.set(createFlagPoleCacheKey(jobId), 1)
   }
 }

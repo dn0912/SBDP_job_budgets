@@ -19,27 +19,22 @@ class PriceCalculator {
     let lambdaProcessingTimes
     if (isTraceFromCache) {
       lambdaProcessingTimes = fullTrace
-      console.log('+++redis lambdaProcessingTimes', lambdaProcessingTimes)
     } else {
       lambdaProcessingTimes = calculateLambdaProcessingTimes(fullTrace)
-      console.log('+++xray lambdaProcessingTimes', lambdaProcessingTimes)
     }
 
-    // TODO: enhance function with lambda memory usage of each function
+    // enhance function with lambda memory usage of each function
     const lambdaPricingPer100MsWith1GBMemory = this.lambdaPricing
-    // console.log('+++lambdaPricingPer100Ms', lambdaPricingPer100MsWith1GBMemory)
     const lambdaPrices = lambdaProcessingTimes.map((tracedLambdaVal) => {
       const roundedLambdaProcTime = Math.ceil(tracedLambdaVal.processingTime * 10)
       const memoryAllocation = tracedLambdaVal.memoryAllocationInMB
 
       const lambdaPricePer100MS = (1024 / memoryAllocation) * lambdaPricingPer100MsWith1GBMemory
 
-      console.log('+++roundedLambdaProcTime billed lambda 100ms', roundedLambdaProcTime)
       return lambdaPricePer100MS * roundedLambdaProcTime // Nano USD
     })
 
     const lambdaTotalPrice = lambdaPrices.reduce((acc, val) => (acc + val), 0)
-    // console.log('++++calculateLambdaPrice', lambdaPrices, lambdaTotalPrice)
     return lambdaTotalPrice
   }
 
@@ -57,16 +52,12 @@ class PriceCalculator {
     // Each 64 KB chunk of a payload is billed as 1 request
     // (for example, an API action with a 256 KB payload is billed as 4 requests).
 
-    // TODO: enhance funtion with queue type through queueUrl: for now all queues are standard type
     let messageAmountsPerType
     if (isTraceFromCache) {
-      // const standardMessageAmount = fullTrace.reduce((acc, val) => acc + Number(val), 0)
       messageAmountsPerType = {
         standard: Number(fullTrace),
         fifo: Number(fifoQueueChunkAmount),
       }
-
-      console.log('+++redis messageAmountsPerType', messageAmountsPerType)
     } else {
       const sqsRequestsMapPerQueue = calculateSqsRequestAmountsPerQueue(fullTrace)
       const queueUrls = Object.keys(sqsRequestsMapPerQueue)
@@ -82,8 +73,6 @@ class PriceCalculator {
         standard: 0,
         fifo: 0,
       })
-
-      console.log('+++xray messageAmountsPerType', messageAmountsPerType)
     }
 
     const { fifo, standard } = this.sqsPricing
@@ -92,19 +81,15 @@ class PriceCalculator {
     const sqsFIFOPrice = Number(`${fifo}e9`) * messageAmountsPerType.fifo
 
     const sqsTotalPrice = sqsStandardPrice + sqsFIFOPrice
-    // console.log('+++sqsPrice', {
-    //   messageAmountsPerType, sqsStandardPrice, sqsFIFOPrice, sqsTotalPrice,
-    // })
     return sqsTotalPrice
   }
 
   // TODO: currently only S3 Standard
   calculateS3Price(fullTrace, isTraceFromCache = false) {
     const s3Pricings = this.s3Pricing
-    // console.log('+++s3Pricings', s3Pricings)
 
     const _calculateStorageFactor = (completeTrace) => {
-      // TODO: UserInput of how much data (in GB) is already stored in S3 for pricing calculation
+      // UserInput of how much data (in GB) is already stored in S3 for pricing calculation
       const s3CurrentUsageInGB = 0
       const pricePerGBFactor = s3Pricings.storagePrices.find((priceObj) => {
         const beginRange = Number(priceObj.beginRange)
@@ -119,12 +104,9 @@ class PriceCalculator {
       let s3ContentSizeInGB
       if (isTraceFromCache) {
         s3ContentSizeInGB = calculateS3ContentSizeInGBFromRedis(completeTrace.fileSizesInKB)
-        console.log('+++redis s3ContentSizeInGB', s3ContentSizeInGB)
       } else {
         s3ContentSizeInGB = calculateS3ContentSizeInGB(completeTrace)
-        console.log('+++xray s3ContentSizeInGB', s3ContentSizeInGB)
       }
-      // console.log('+++s3ContentSizeInGB', s3ContentSizeInGB)
 
       return Math.ceil(s3ContentSizeInGB) * pricePerGBFactor.pricePerUnitUSD
     }
@@ -133,14 +115,11 @@ class PriceCalculator {
       let s3RequestsMap
       if (isTraceFromCache) {
         s3RequestsMap = completeTrace.s3RequestsMap
-        console.log('+++redis s3RequestsMap', s3RequestsMap)
       } else {
         const fullRequestTracingMap = createServiceTracingMap(completeTrace)
         s3RequestsMap = get(fullRequestTracingMap, 'S3', {})
-        console.log('+++xray s3RequestsMap', s3RequestsMap)
       }
 
-      // TODO: add PUT, COPY, POST, LIST request as one type together
       const price = Object.keys(s3RequestsMap)
         .reduce((acc, requestType) => {
           const requestAmount = s3RequestsMap[requestType] || 0
@@ -157,22 +136,13 @@ class PriceCalculator {
       return price
     }
 
-    const _calculateDataTransferFactor = () => { }
-    const _calculateManagementAndReplicationFactor = () => { }
-
-    // TODO: get userinput of how much data he already used on S3 for pricing factor
     const storagePrice = _calculateStorageFactor(fullTrace)
 
-    // 2. Request and Data Retrieval price
+    // Request and Data Retrieval price
     // e.g. { SQS: { SendMessage: 2 }, S3: { GetObject: 4, PutObject: 4 } }
     const requestAndDataRetrievalsPrice = _calculateRequestAndRetrievalsFactor(fullTrace)
 
     const s3Totalprice = storagePrice + requestAndDataRetrievalsPrice
-
-    console.log('+++s3Totalprice', {
-      storagePrice,
-      requestAndDataRetrievalsPrice,
-    })
 
     // nano USD
     return s3Totalprice * 10 ** 9

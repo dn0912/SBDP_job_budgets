@@ -19,6 +19,10 @@ const {
 
 const serialize = (object) => JSON.stringify(object, null, 2)
 
+/**
+ * Test routes to test each system functionality seperate
+ */
+
 export default ({
   app,
   jobTraceStore,
@@ -29,8 +33,6 @@ export default ({
     app.get('/hello', (req, res) => res.status(200).json({
       pong: 'Hello kfkfkk!',
     })),
-    // **************
-    // TEST ROUTES!?!
 
     // Redis
     app.post('/redis-test', async (req, res) => {
@@ -263,9 +265,6 @@ export default ({
         totalPrice: lambdaPrices + sqsPrices
       })
     })
-
-    // TEST ROUTES!?!
-    // **************
   ]
 
   return testRoutes

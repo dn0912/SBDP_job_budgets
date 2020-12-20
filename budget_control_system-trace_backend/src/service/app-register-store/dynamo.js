@@ -5,31 +5,22 @@ import { get } from 'lodash'
 const credentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE })
 AWS.config.credentials = credentials
 
-console.log('+++process.env', process.env.AWS_RESOURCE_REGION)
-
 AWS.config.update({
   region: process.env.AWS_RESOURCE_REGION,
 })
 
 const dynamoDocClient = new AWS.DynamoDB.DocumentClient()
-// const update = promisify(dynamoDb.update.bind(dynamoDb))
 
 const tableName = 'app-register-store'
 
 class DynamoDB {
   constructor(tableName) {
-    // this.tableName = 'trace-record'
     this.tableName = tableName
     this.ddb = dynamoDocClient
   }
 
   async put(appData) {
     try {
-      // const storeItem = {
-      //   appId: uuid.v4(),
-      //   ...appData,
-      // }
-
       const appId = `app-${uuid.v4()}`
       const storeItem = {
         appId,

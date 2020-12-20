@@ -91,11 +91,6 @@ export default class RedisTracer extends Redis {
     const tracedS3PutObjectCalls = await this.lrange(tracedS3PutObjectCallsCacheKey, 0, -1) || []
     const tracedS3PutObjectFileSizeArray = tracedS3PutObjectCalls.map((str) => Number(str))
 
-    console.log('+++getS3TraceAndCalculatePrice', {
-      tracedS3GetObjectCalls,
-      tracedS3PutObjectFileSizeArray,
-    })
-
     return {
       fileSizesInKB: tracedS3PutObjectFileSizeArray,
       s3RequestsMap: {

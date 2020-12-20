@@ -35,7 +35,6 @@ const redisTracer = new RedisTracer(redisParams)
 const notifier = new Notifier()
 
 const registerApp = async (req, res) => {
-  console.log('+++data', req.body)
   const jsonString = fs.readFileSync(req.file.path, 'utf-8')
 
   const cloudFormationTemplate = JSON.parse(jsonString)
@@ -57,9 +56,8 @@ const registerApp = async (req, res) => {
   })
 
   const createdItem = await appRegisterStore.put(cloudFormationData)
-  console.log('+++cloudFormationData', cloudFormationData)
-  console.log('+++createdItem', createdItem)
-
+  console.log('>>> cloudFormationData', cloudFormationData)
+  console.log('>>> createdItem', createdItem)
   res.status(HttpStatus.CREATED).json(createdItem)
 }
 
@@ -88,7 +86,7 @@ const calculateJobCostsWithXRay = async ({
 
   const isInBudgetLimit = await flagPole.isInBudgetLimit(jobId, budgetLimit, totalJobPriceInUSD)
 
-  console.log('+++totalJobPrice in Nano USD', {
+  console.log('>>> totalJobPrice in Nano USD', {
     iteration: iterationNumber,
     isInBudgetLimit,
     'Budget limit': budgetLimit,
@@ -113,7 +111,6 @@ const calculateJobCostsFromRedis = async ({
   metaData,
   flagPole,
 }) => {
-  console.log('+++calculateJobCostsFromRedis iterationNumber', iterationNumber)
   const lambdaTrace = await redisTracer.getLambdaTrace(jobId)
   const lambdaPrices = priceCalculator.calculateLambdaPrice(lambdaTrace, true)
 
@@ -123,12 +120,6 @@ const calculateJobCostsFromRedis = async ({
 
   const s3Trace = await redisTracer.getS3Trace(jobId)
   const s3Prices = priceCalculator.calculateS3Price(s3Trace, true)
-
-  console.log('+++pricingFromRedis', {
-    sqsPrices,
-    lambdaPrices,
-    s3Prices,
-  })
 
   const totalJobPrice = lambdaPrices + sqsPrices + s3Prices
   const totalJobPriceInUSD = Number(`${totalJobPrice}e-9`)
@@ -155,7 +146,7 @@ const calculateJobCostsFromRedis = async ({
     metaData,
   }
 
-  console.log('+++totalJobPriceFromRedis in Nano USD', {
+  console.log('>>> totalJobPriceFromRedis in Nano USD', {
     jobId,
     iteration: iterationNumber,
     isInBudgetLimit,
@@ -167,14 +158,6 @@ const calculateJobCostsFromRedis = async ({
     'Job price in USD': totalJobPriceInUSD,
   })
 
-  // TODO: for testing purpose only
-  const testFlag = await redisTracer.get(`TEST_FLAG#####${jobId}`)
-  console.log('+++testFlag', testFlag)
-
-  // if (testFlag > 2) {
-  //   await redisTracer.set(`flag_${jobId}`, budgetLimit)
-  // }
-
   eventBus.emit('job-costs-calculated', jobId, result)
 
   return result
@@ -185,13 +168,8 @@ async function calculateJobCostsPeriodically(passedArgs, periodInSecCalculation)
   const pollPeriodinMs = 500
   const counter = { value: 0 }
 
-  // delay it for 1 sec
-  // await new Promise((resolve) => setTimeout(() => {
-  //   console.log('#### wait for 1 sec')
-  //   resolve()
-  // }, 1000))
-
   while (counter.value < counterThreshold) {
+    // delay next poll
     // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve) => setTimeout(resolve, pollPeriodinMs))
 
@@ -220,7 +198,7 @@ const initPriceCalculator = async () => {
 
 const getRegisteredSqsQueuesMap = async (appId) => (appId ? get(await appRegisterStore.get(appId), 'sqs', {}) : {})
 
-// TODO: *** Redis Keyspace notification
+// *** Redis Keyspace notification
 const redisClient = REDIS_CONNECTION
   ? new Redis(REDIS_CONNECTION)
   : new Redis({
@@ -244,6 +222,7 @@ redisKeyspaceNotificationSubscriberClient.config('set', 'notify-keyspace-events'
 
 redisKeyspaceNotificationSubscriberClient.psubscribe('__keyevent@0__:*')
 
+// Job initiator service
 const startJobAndTrace = async (eventBus, additionalData) => {
   const jobId = uuid.v4()
   let jobUrl = process.env.TEMP_JOB_URL
@@ -256,14 +235,10 @@ const startJobAndTrace = async (eventBus, additionalData) => {
     budgetLimit = Number(get(additionalData, 'budgetLimit', budgetLimit))
     appId = get(additionalData, 'appId')
     periodInSecCalculation = get(additionalData, 'periodInSec')
-    console.log('+++additionalData', additionalData, { periodInSecCalculation })
   }
-
-  console.log('+++additionalData', additionalData)
 
   const priceCalculator = await initPriceCalculator()
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
-
   const flagPole = new FlagPoleService(redisParams, notifier)
 
   // store job details
@@ -279,15 +254,13 @@ const startJobAndTrace = async (eventBus, additionalData) => {
   // calculate per keyspace notification
   if (!periodInSecCalculation) {
     redisKeyspaceNotificationSubscriberClient.on('pmessage', async (pattern, channel, message) => {
-      console.log('+++channel, message', { pattern, channel, message })
       const redisCommand = channel.split(':')[1]
 
-      // TODO: only for speed evaluation
+      // only for speed evaluation
       if (redisCommand === 'set' && message.startsWith('evaluation_arn:aws:lambda')) {
         const redisTsValue = await redisClient.get(message)
         const currentSystemTs = Date.now()
         const passedTime = currentSystemTs - redisTsValue
-        // console.log('+++passedTimeSinceTraceInRedis', message, redisTsValue, passedTime)
         // fs.appendFileSync(
         //   'evaluation/traceFetchingDelaysRedis_log.json',
         //   `\n{"arn": "${message}", "redisTsValue": ${redisTsValue}, "currentSystemTs": ${currentSystemTs}, "passedTime": ${passedTime}},`,
@@ -306,8 +279,6 @@ const startJobAndTrace = async (eventBus, additionalData) => {
 
       // every operation on the trace store
       if (message.startsWith(`${REDIS_CACHE_KEY_PREFIX}${jobId}`)) {
-        console.log('+++every operation on the trace store', { pattern, channel, message })
-
         // message format e.g.
         // tracer_356fe48b-d3c1-4be1-ac10-1d764a7612e3#s3#putObject
         const [
@@ -340,15 +311,9 @@ const startJobAndTrace = async (eventBus, additionalData) => {
       jobId
     })
 
-  console.log('+++dateNow', dateNow)
-  console.log('+++jobId', jobId)
-  console.log('+++response.statusCode', response.statusCode)
-  console.log('+++response.body', response.body)
-
-  console.log('+++registeredSqsQueuesMap', registeredSqsQueuesMap)
+  console.log('>>> response.statusCode', response.statusCode)
 
   // calculate based on periodical polling for tracec data in cache
-  console.log('+++periodInSecCalculation', typeof periodInSecCalculation)
   if (typeof periodInSecCalculation === 'number' && periodInSecCalculation > 0) {
     // fetchTracePeriodically(xRayTracer, dateNow, jobId)
     calculateJobCostsPeriodically({
@@ -371,7 +336,6 @@ const startJobAndTrace = async (eventBus, additionalData) => {
 }
 
 const startTracingRouteHandler = (eventBus) => async (req, res) => {
-  console.log('+++req.body', req.body)
   let additionalData = {}
 
   if (!isEmpty(req.body)) {
@@ -384,7 +348,6 @@ const startTracingRouteHandler = (eventBus) => async (req, res) => {
 }
 
 const stopJobRouteHandler = async (req, res) => {
-  console.log('+++req.body', req.body)
   if (!isEmpty(req.body)) {
     const requestBody = JSON.parse(req.body)
     const { jobId } = requestBody
@@ -409,7 +372,6 @@ const getJobStatus = async ({
   const jobStartTime = get(jobRecord, 'jobStartTime')
   const appId = get(jobRecord, 'appId')
   const registeredSqsQueuesMap = await getRegisteredSqsQueuesMap(appId)
-  console.log('+++jobRecord', jobRecord)
 
   const flagPole = new FlagPoleService(redisParams, notifier)
 
@@ -441,7 +403,6 @@ const getJobStatus = async ({
 }
 
 const subscribeToBudgetAlarm = async (req, res) => {
-  console.log('+++data', req.body, typeof req.body)
   let requestBody
   if (typeof req.body === 'string') {
     requestBody = JSON.parse(req.body)
@@ -449,11 +410,10 @@ const subscribeToBudgetAlarm = async (req, res) => {
     requestBody = req.body
   }
   const { mail } = requestBody
-  // const notifier = new Notifier()
 
   await notifier.subscribe(mail)
 
-  console.log('++++ YOU NEED TO CONFIRM EMAIL')
+  console.log('>>> YOU NEED TO CONFIRM EMAIL')
 
   res.status(HttpStatus.CREATED).json({
     Note: 'YOU NEED TO CONFIRM EMAIL SUBSCRIPTION.',
@@ -462,10 +422,7 @@ const subscribeToBudgetAlarm = async (req, res) => {
 }
 
 const getJobStatusRouteHandler = (eventBus) => async (req, res) => {
-  const { jobId, appId = '' } = req.params
-
-  console.log('+++jobId', { jobId, appId })
-
+  const { jobId } = req.params
   const jobCostDetails = await getJobStatus({ jobId, eventBus })
 
   res.status(HttpStatus.OK).json(jobCostDetails)
@@ -473,8 +430,6 @@ const getJobStatusRouteHandler = (eventBus) => async (req, res) => {
 
 const getRegisteredApp = async (req, res) => {
   const { appId } = req.params
-  console.log('+++appId', appId)
-
   const registeredApp = await appRegisterStore.get(appId)
 
   res.status(HttpStatus.OK).json(registeredApp)
@@ -482,8 +437,6 @@ const getRegisteredApp = async (req, res) => {
 
 const getJobRecord = async (req, res) => {
   const { jobId } = req.params
-  console.log('+++jobId', jobId)
-
   const jobRecord = await jobTraceStore.get(jobId)
 
   res.status(HttpStatus.OK).json(jobRecord)

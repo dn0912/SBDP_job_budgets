@@ -12,8 +12,6 @@ import XRayTracer from './service/tracer/xray-tracer'
 import controller, { getJobStatus, startJobAndTrace } from './controller'
 import initiateTestRoutes from './test-routes'
 
-// import { _getRoomsByUser } from './utils'
-
 const port = process.env.PORT || 3000
 
 export const {
@@ -73,7 +71,6 @@ io.on('connect', (socket) => {
   socket.on('subscribe', (jobId) => {
     console.log(`+++join room of jobId: ${jobId}`)
     socket.join(jobId)
-    // console.log(`${socket.id} now in rooms `, _getRoomsByUser(io, socket.id))
   })
 
   socket.on('unsubscribe', (jobId) => {
@@ -90,7 +87,6 @@ io.on('connect', (socket) => {
 })
 
 eventEmitter.addListener('job-costs-calculated', (jobId, jobCostResult) => {
-  // console.log('+++eventEmitter.addListener', jobId, jobCost)
   io.emit('stream-job-costs', { ...jobCostResult, jobId })
 })
 
@@ -149,7 +145,7 @@ app.get('/live-job-status', (req, res) => {
   res.sendFile(`${__dirname}/public/index.html`)
 })
 
-// TODO: will be removed, just test routes
+// Just test routes for testing each system functionality seperatly
 initiateTestRoutes({
   app,
   jobTraceStore,

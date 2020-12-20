@@ -2,8 +2,8 @@ import { get } from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
 
+// X-Ray tracing approach specific code to evaluate speed - measure trace fetching delay
 async function fetchTracePeriodically(xRayTracer, dateNow, jobId) {
-  // TODO: to measure trace fetching delay
   const pollPeriodinMs = 200
   const counter = {
     value: 0,
@@ -24,10 +24,10 @@ async function fetchTracePeriodically(xRayTracer, dateNow, jobId) {
 
     const traceCloseTimeStampAnnotation = get(traceSummary, 'TraceSummaries[0].Annotations.currentTimeStamp[0].AnnotationValue.NumberValue', undefined)
 
-    console.log('+++traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
+    console.log('>>> traceCloseTimeStampAnnotation', traceCloseTimeStampAnnotation)
 
     const currentTimeStamp = moment.utc().valueOf()
-    console.log('+++currentTimeStamp', currentTimeStamp)
+    console.log('>>> currentTimeStamp', currentTimeStamp)
 
     const traceResult = {
       jobStartTimeStamp: dateNow,
@@ -37,12 +37,12 @@ async function fetchTracePeriodically(xRayTracer, dateNow, jobId) {
       elapsedTimeFromClosingTraceToNow: currentTimeStamp - traceCloseTimeStampAnnotation,
     }
 
-    console.log('+++traceSummary.TraceSummaries', traceSummary.TraceSummaries)
+    console.log('>>> traceSummary.TraceSummaries', traceSummary.TraceSummaries)
 
-    // TODO: remove break statement => only for first fetch to record trace delay
     counter.value++
     if (traceSummary.TraceSummaries.length > 0) {
-      console.log('+++traceSummaryArray', traceResult, { pollPeriodinMs })
+      // this break statement will stop fetching records after first X-Ray trace arrives
+      console.log('>>> traceSummaryArray', traceResult, { pollPeriodinMs })
       fs.appendFileSync(
         'evaluation/traceFetchingDelays.csv',
         `\n${traceResult.jobStartTimeStamp}, ${traceResult.arn}, ${traceResult.traceCloseTimeStamp}, ${traceResult.currentTimeStamp}, ${traceResult.elapsedTimeFromClosingTraceToNow}`,
@@ -52,24 +52,6 @@ async function fetchTracePeriodically(xRayTracer, dateNow, jobId) {
   }
 }
 
-function _getRoomsByUser(io, id) {
-  const usersRooms = []
-  const { rooms } = io.sockets.adapter
-
-  // eslint-disable-next-line
-  for (let room in rooms) {
-    if (rooms.hasOwnProperty(room)) {
-      const { sockets } = rooms[room]
-      if (id in sockets) {
-        usersRooms.push(room)
-      }
-    }
-  }
-
-  return usersRooms
-}
-
 export default {
-  _getRoomsByUser,
   fetchTracePeriodically,
 }
