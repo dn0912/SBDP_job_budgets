@@ -11,7 +11,7 @@ echo ""
 read -p "AWS resource region [eu-central-1]:" INPUT_AWS_RESOURCE_REGION
 INPUT_AWS_RESOURCE_REGION=${INPUT_AWS_RESOURCE_REGION:-eu-central-1}
 echo $INPUT_AWS_RESOURCE_REGION
-read -p "AWS key name for SSH:" INPUT_AWS_KEY_NAME
+read -p "EC2 key name for SSH:" INPUT_AWS_KEY_NAME
 
 
 

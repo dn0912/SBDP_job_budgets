@@ -46,7 +46,7 @@ chmod 400 <link to your access key>.pem
 vim ec2-instance-setup.sh
 ```
 
-#### 2.3 Copy content from `./ec2-instance-setup.sh` to file on your EC2 instance and save
+#### 2.3 Copy content from `./ec2-instance-setup.sh` from this repo to file on your EC2 instance and save
 
 #### 2.4 Change file modes to be able to run script
 ```bash
@@ -167,3 +167,4 @@ cat ~/redis-stable/redis.conf | grep "requirepass "
 - EC2 security group with name: `job-budget-security-group`
 - SNS Topic: `job-budget-alarm`
 - DynamoDB tables: `app-register-store` and `job-trace-record`
+- S3 bucket: `test-task-update-data-v2`
