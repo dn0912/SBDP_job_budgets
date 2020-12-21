@@ -1,10 +1,8 @@
-# Budget control system
+# Budget control system - trace backend
 
-## About this project
+This is the trace backend of the budget control system with the responsibility of starting the instrumented SBDP app, job cost calculation, notification on budget exceeding, job data storage and includes also the frontend which can be accessed under the `/live-job-status` endpoint.
 
 ### Start app
-
-
 
 You can start the app on a specific port with the env var `PORT`
 ```bash
