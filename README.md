@@ -1,5 +1,7 @@
 # Job Budgets for Serverless Big Data Processing
 
+*Note: the following application is implemented and tested with `npm 6.13.4` and `node v10.19.0`*
+
 ## How to setup and run this project
 
 Follow those steps to setup necessary AWS resources and this project with the provided scripts. You need an AWS account with your **aws_access_key_id**, **aws_secret_access_key** and a **private key** to SSH into your EC2 instance.
