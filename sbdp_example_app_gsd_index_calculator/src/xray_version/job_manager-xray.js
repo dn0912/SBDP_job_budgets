@@ -1,4 +1,4 @@
-const TracedAWS = require('budget_control_system-trace_library')
+const TracedAWS = require('budget_control_system-trace_library_with_xray')
 
 const lambda = new TracedAWS.Lambda()
 

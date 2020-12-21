@@ -1,5 +1,5 @@
 {
-  "name": "budget_control_system-trace_library",
+  "name": "budget_control_system-trace_library_with_xray",
   "version": "1.0.0",
   "description": "Trace backend from budget control system",
   "main": "index.js",

@@ -4,7 +4,6 @@ module.exports = {
     semi: ['error', 'never'],
     'comma-dangle': 0,
     'consistent-return': 0,
-    'dot-notation': 0,
     'implicit-arrow-linebreak': [
       'off',
     ],

@@ -14,9 +14,9 @@ custom:
   S3_FILE_5TASKS: test_5tasks.json
   S3_PREPROCESS_1000TASKS: test_with_description_title_change_1000_single.json
   REDIS_PORT: 6379
-  REDIS_HOST: # TODO: before deploying fill with your data: e.g. '18.194.88.69'
-  REDIS_PASSWORD: # TODO: before deploying fill with your data: e.g. 'redis-password'
-  REDIS_CONNECTION: # TODO: before deploying fill with your data: necessary for tracer to store in Redis. Its format is: `redis://:<your redis password>@<EC2 Public IPv4 address>:6379` e.g. 'redis://:redis-password@18.194.88.69:6379'
+  REDIS_HOST: '18.194.88.69' # TODO: before deploying fill with your data: e.g. '18.194.88.69'
+  REDIS_PASSWORD: 'redis-password' # TODO: before deploying fill with your data: e.g. 'redis-password'
+  REDIS_CONNECTION: 'redis://:redis-password@18.194.88.69:6379' # TODO: before deploying fill with your data: necessary for tracer to store in Redis. Its format is: `redis://:<your redis password>@<EC2 Public IPv4 address>:6379` e.g. 'redis://:redis-password@18.194.88.69:6379'
 
 provider:
   name: aws
