@@ -22,12 +22,8 @@ const serialize = (object) => JSON.stringify(object, null, 2)
   2. start job entry point
 */
 module.exports.startJob = async (event, context) => {
-  // *******
-  // TRACING with Redis
   const eventBody = JSON.parse(event.body)
   const { jobId } = eventBody
-
-  // *******
 
   console.log(`## ENVIRONMENT VARIABLES: ${serialize(process.env)}`)
   console.log(`## CONTEXT: ${serialize(context)}`)
